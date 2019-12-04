@@ -1,0 +1,15 @@
+[package]
+name = "subscriber"
+version = "0.0.1"
+authors = ["Kevin Hoffman <alothien@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wascc-actor = "0.1.0"
+
+[profile.release]
+# Optimize for small code size
+opt-level = "s"
