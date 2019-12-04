@@ -1,5 +1,5 @@
 [package]
-name = "echo-example"
+name = "echo"
 version = "0.0.1"
 authors = ["Kevin Hoffman <alothien@gmail.com>"]
 edition = "2018"
