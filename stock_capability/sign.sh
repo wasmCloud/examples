@@ -1,0 +1,1 @@
+wascap sign ./target/wasm32-wasi/debug/stock_capability.wasm ./stock_capability.wasm -c acme:stock -a ./account.nk -m ./module.nk -p
