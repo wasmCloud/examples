@@ -1225,7 +1225,7 @@ version = "0.1.0"
 dependencies = [
  "env_logger 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "wapc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "wascc-host 0.1.0",
+ "wascc-host 0.1.1",
 ]
 
 [[package]]
@@ -1433,7 +1433,7 @@ dependencies = [
 
 [[package]]
 name = "wascc-host"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "crossbeam 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "crossbeam-channel 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",

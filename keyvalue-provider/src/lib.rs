@@ -1,0 +1,237 @@
+#[macro_use]
+extern crate wascc_codec as codec;
+
+#[macro_use]
+extern crate log;
+
+mod kv;
+
+use crate::kv::KeyValueStore;
+use codec::capabilities::{CapabilityProvider, Dispatcher, NullDispatcher};
+use codec::core::{OP_CONFIGURE, OP_REMOVE_ACTOR};
+use codec::keyvalue;
+use codec::keyvalue::*;
+use prost::Message;
+use wascc_codec::core::CapabilityConfiguration;
+
+use std::error::Error;
+use std::sync::Arc;
+use std::sync::RwLock;
+
+capability_provider!(KeyvalueProvider, KeyvalueProvider::new);
+
+const CAPABILITY_ID: &str = "wascc:keyvalue";
+
+pub struct KeyvalueProvider {
+    dispatcher: Arc<RwLock<Box<dyn Dispatcher>>>,
+    store: Arc<RwLock<KeyValueStore>>,
+}
+
+impl Default for KeyvalueProvider {
+    fn default() -> Self {
+        env_logger::init();
+
+        KeyvalueProvider {
+            dispatcher: Arc::new(RwLock::new(Box::new(NullDispatcher::new()))),
+            store: Arc::new(RwLock::new(KeyValueStore::new())),
+        }
+    }
+}
+
+impl KeyvalueProvider {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    fn configure(
+        &self,
+        config: impl Into<CapabilityConfiguration>,
+    ) -> Result<Vec<u8>, Box<dyn Error>> {
+        let _config = config.into();
+
+        // Do nothing here
+
+        Ok(vec![])
+    }
+
+    fn remove_actor(&self, _config: CapabilityConfiguration) -> Result<Vec<u8>, Box<dyn Error>> {
+        // Do nothing here
+        Ok(vec![])
+    }
+
+    fn add(&self, _actor: &str, req: AddRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut store = self.store.write().unwrap();
+        let res: i32 = store.incr(&req.key, req.value)?;
+        let resp = AddResponse { value: res };
+
+        Ok(bytes(resp))
+    }
+
+    fn del(&self, _actor: &str, req: DelRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut store = self.store.write().unwrap();
+        store.del(&req.key)?;
+        let resp = DelResponse { key: req.key };
+
+        Ok(bytes(resp))
+    }
+
+    fn get(&self, _actor: &str, req: GetRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let store = self.store.read().unwrap();
+        if !store.exists(&req.key)? {
+            Ok(bytes(GetResponse {
+                value: String::from(""),
+                exists: false,
+            }))
+        } else {
+            let v = store.get(&req.key);
+            Ok(bytes(match v {
+                Ok(s) => GetResponse {
+                    value: s,
+                    exists: true,
+                },
+                Err(e) => {
+                    eprint!("GET for {} failed: {}", &req.key, e);
+                    GetResponse {
+                        value: "".to_string(),
+                        exists: false,
+                    }
+                }
+            }))
+        }
+    }
+
+    fn list_clear(&self, actor: &str, req: ListClearRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        self.del(actor, DelRequest { key: req.key })
+    }
+
+    fn list_range(&self, _actor: &str, req: ListRangeRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let store = self.store.read().unwrap();
+        let result: Vec<String> = store.lrange(&req.key, req.start as _, req.stop as _)?;
+        Ok(bytes(ListRangeResponse { values: result }))
+    }
+
+    fn list_push(&self, _actor: &str, req: ListPushRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut store = self.store.write().unwrap();
+        let result: i32 = store.lpush(&req.key, req.value)?;
+        Ok(bytes(ListResponse { new_count: result }))
+    }
+
+    fn set(&self, _actor: &str, req: SetRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut store = self.store.write().unwrap();
+        store.set(&req.key, req.value.clone())?;
+        Ok(bytes(SetResponse { value: req.value }))
+    }
+
+    fn list_del_item(
+        &self,
+        _actor: &str,
+        req: ListDelItemRequest,
+    ) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut store = self.store.write().unwrap();
+        let result: i32 = store.lrem(&req.key, req.value)?;
+        Ok(bytes(ListResponse { new_count: result }))
+    }
+
+    fn set_add(&self, _actor: &str, req: SetAddRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut store = self.store.write().unwrap();
+        let result: i32 = store.sadd(&req.key, req.value)?;
+        Ok(bytes(SetOperationResponse { new_count: result }))
+    }
+
+    fn set_remove(&self, _actor: &str, req: SetRemoveRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut store = self.store.write().unwrap();
+        let result: i32 = store.srem(&req.key, req.value)?;
+        Ok(bytes(SetOperationResponse { new_count: result }))
+    }
+
+    fn set_union(&self, _actor: &str, req: SetUnionRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let store = self.store.read().unwrap();
+        let result: Vec<String> = store.sunion(req.keys)?;
+        Ok(bytes(SetQueryResponse { values: result }))
+    }
+
+    fn set_intersect(
+        &self,
+        _actor: &str,
+        req: SetIntersectionRequest,
+    ) -> Result<Vec<u8>, Box<dyn Error>> {
+        let store = self.store.read().unwrap();
+        let result: Vec<String> = store.sinter(req.keys)?;
+        Ok(bytes(SetQueryResponse { values: result }))
+    }
+
+    fn set_query(&self, _actor: &str, req: SetQueryRequest) -> Result<Vec<u8>, Box<dyn Error>> {
+        let store = self.store.read().unwrap();
+        let result: Vec<String> = store.smembers(req.key)?;
+        Ok(bytes(SetQueryResponse { values: result }))
+    }
+
+    fn exists(&self, _actor: &str, req: KeyExistsQuery) -> Result<Vec<u8>, Box<dyn Error>> {
+        let store = self.store.read().unwrap();
+        let result: bool = store.exists(&req.key)?;
+        Ok(bytes(GetResponse {
+            value: "".to_string(),
+            exists: result,
+        }))
+    }
+}
+
+impl CapabilityProvider for KeyvalueProvider {
+    fn capability_id(&self) -> &'static str {
+        CAPABILITY_ID
+    }
+
+    // Invoked by the runtime host to give this provider plugin the ability to communicate
+    // with actors
+    fn configure_dispatch(&self, dispatcher: Box<dyn Dispatcher>) -> Result<(), Box<dyn Error>> {
+        trace!("Dispatcher received.");
+        let mut lock = self.dispatcher.write().unwrap();
+        *lock = dispatcher;
+
+        Ok(())
+    }
+
+    fn name(&self) -> &'static str {
+        "waSCC Sample Key-Value Provider (In-Memory)"
+    }
+
+    // Invoked by host runtime to allow an actor to make use of the capability
+    // All providers MUST handle the "configure" message, even if no work will be done
+    fn handle_call(&self, actor: &str, op: &str, msg: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
+        trace!("Received host call from {}, operation - {}", actor, op);
+
+        match op {
+            OP_CONFIGURE if actor == "system" => self.configure(msg.to_vec().as_ref()),
+            OP_REMOVE_ACTOR if actor == "system" => {
+                self.remove_actor(CapabilityConfiguration::decode(msg).unwrap())
+            }
+            keyvalue::OP_ADD => self.add(actor, AddRequest::decode(msg).unwrap()),
+            keyvalue::OP_DEL => self.del(actor, DelRequest::decode(msg).unwrap()),
+            keyvalue::OP_GET => self.get(actor, GetRequest::decode(msg).unwrap()),
+            keyvalue::OP_CLEAR => self.list_clear(actor, ListClearRequest::decode(msg).unwrap()),
+            keyvalue::OP_RANGE => self.list_range(actor, ListRangeRequest::decode(msg).unwrap()),
+            keyvalue::OP_PUSH => self.list_push(actor, ListPushRequest::decode(msg).unwrap()),
+            keyvalue::OP_SET => self.set(actor, SetRequest::decode(msg).unwrap()),
+            keyvalue::OP_LIST_DEL => {
+                self.list_del_item(actor, ListDelItemRequest::decode(msg).unwrap())
+            }
+            keyvalue::OP_SET_ADD => self.set_add(actor, SetAddRequest::decode(msg).unwrap()),
+            keyvalue::OP_SET_REMOVE => {
+                self.set_remove(actor, SetRemoveRequest::decode(msg).unwrap())
+            }
+            keyvalue::OP_SET_UNION => self.set_union(actor, SetUnionRequest::decode(msg).unwrap()),
+            keyvalue::OP_SET_INTERSECT => {
+                self.set_intersect(actor, SetIntersectionRequest::decode(msg).unwrap())
+            }
+            keyvalue::OP_SET_QUERY => self.set_query(actor, SetQueryRequest::decode(msg).unwrap()),
+            keyvalue::OP_KEY_EXISTS => self.exists(actor, KeyExistsQuery::decode(msg).unwrap()),
+            _ => Err("bad dispatch".into()),
+        }
+    }
+}
+
+fn bytes(msg: impl prost::Message) -> Vec<u8> {
+    let mut buf = Vec::new();
+    msg.encode(&mut buf).unwrap();
+    buf
+}

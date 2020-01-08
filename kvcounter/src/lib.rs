@@ -33,6 +33,8 @@ fn increment_counter(ctx: &CapabilitiesContext, msg: impl Into<http::Request>) -
     let key = msg.into().path.replace('/', ":");
     let value = ctx.kv().atomic_add(&key, 1)?;
 
-    let result = json!({ "counter": value });
+    let result = json!(
+        { "counter": value,
+          "tweaked": true });
     Ok(protobytes(http::Response::json(result, 200, "OK"))?)
 }
