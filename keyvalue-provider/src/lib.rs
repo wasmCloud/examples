@@ -15,7 +15,6 @@ use prost::Message;
 use wascc_codec::core::CapabilityConfiguration;
 
 use std::error::Error;
-use std::sync::Arc;
 use std::sync::RwLock;
 
 capability_provider!(KeyvalueProvider, KeyvalueProvider::new);
@@ -23,8 +22,8 @@ capability_provider!(KeyvalueProvider, KeyvalueProvider::new);
 const CAPABILITY_ID: &str = "wascc:keyvalue";
 
 pub struct KeyvalueProvider {
-    dispatcher: Arc<RwLock<Box<dyn Dispatcher>>>,
-    store: Arc<RwLock<KeyValueStore>>,
+    dispatcher: RwLock<Box<dyn Dispatcher>>,
+    store: RwLock<KeyValueStore>,
 }
 
 impl Default for KeyvalueProvider {
@@ -32,8 +31,8 @@ impl Default for KeyvalueProvider {
         env_logger::init();
 
         KeyvalueProvider {
-            dispatcher: Arc::new(RwLock::new(Box::new(NullDispatcher::new()))),
-            store: Arc::new(RwLock::new(KeyValueStore::new())),
+            dispatcher: RwLock::new(Box::new(NullDispatcher::new())),
+            store: RwLock::new(KeyValueStore::new()),
         }
     }
 }

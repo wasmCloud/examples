@@ -46,12 +46,12 @@ impl KeyValueStore {
 
     pub fn get(&self, key: &str) -> Result<String, Box<dyn Error>> {
         self.items.get(key).map_or_else(
-            || Ok("".into()),
+            || Err("No such key".into()),
             |v| {
                 if let KeyValueItem::Scalar(ref s) = v {
                     Ok(s.clone())
                 } else {
-                    Err("Attempt to fetch non-scaler".into())
+                    Err("Attempt to fetch non-scalar".into())
                 }
             },
         )
@@ -149,7 +149,7 @@ impl KeyValueStore {
         let union = self
             .items
             .iter()
-            .filter_map(|(k, v)| {
+            .filter_map(|(k, v)| {                
                 if keys.contains(k) {
                     if let KeyValueItem::Set(s) = v {
                         Some(s.clone())
