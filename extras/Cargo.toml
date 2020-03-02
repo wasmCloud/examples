@@ -8,8 +8,7 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [dependencies]
-#wascc-actor = "0.2.0"
-wascc-actor = { path = "../../wascc-actor" }
+wascc-actor = "0.3.0"
 serde_json = "1.0"
 
 [profile.release]

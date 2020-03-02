@@ -469,9 +469,9 @@ checksum = "826e7639553986605ec5979c7dd957c7895e93eabed50ab2ffa7f6128a75097c"
 
 [[package]]
 name = "wapc-guest"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e54b0829ad79eabe62b538b11ac48e1811627ab5cdf3c433c363bcdddce81745"
+checksum = "6e5f000a6a1770d032fd3378c65c283de8633b009f3018cace1a1446785cf2e1"
 dependencies = [
  "prost 0.5.0",
  "prost-types 0.5.0",
@@ -482,7 +482,9 @@ dependencies = [
 
 [[package]]
 name = "wascc-actor"
-version = "0.2.1"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d7a5003ae0196264f2253d75ec78d924233960b5a2f216bcfd2da2bccddbcfe"
 dependencies = [
  "prost 0.6.1",
  "prost-types 0.6.1",
@@ -495,7 +497,9 @@ dependencies = [
 
 [[package]]
 name = "wascc-codec"
-version = "0.4.1"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d57815b89a048dda5f64cf619b043b9656b92e88b01feafccd2317163cf95068"
 dependencies = [
  "bytes 0.5.4",
  "prost 0.6.1",
