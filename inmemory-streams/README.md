@@ -1,6 +1,6 @@
 # In-Memory Streams
 
-This is a **waSCC** capability provider for `wascc:eventstreams`, an abstraction around the concept of an append-only event stream service. 
+This is a **waSCC** capability provider for `wascc:eventstreams`, an abstraction around the concept of an append-only event stream service.
 
 This provider exposes a transient, in-memory storage for streams (basically a vector of events) that can be used for acceptance and integration testing for actors.
 

@@ -18,22 +18,10 @@ use actor::prelude::*;
 use serde::Serialize;
 use std::collections::HashMap;
 
-actor_receive!(receive);
+actor_handlers!{ http::OP_HANDLE_REQUEST => hello_world, 
+    core::OP_HEALTH_REQUEST => health }
 
-pub fn receive(ctx: &CapabilitiesContext, operation: &str, msg: &[u8]) -> CallResult {
-    ctx.log(&format!("Handling operation {}", operation));
-    match operation {
-        http::OP_HANDLE_REQUEST => hello_world(ctx, msg),
-        core::OP_HEALTH_REQUEST => Ok(vec![]),
-        _ => Err("bad dispatch".into()),
-    }
-}
-
-fn hello_world(
-    ctx: &CapabilitiesContext,
-    payload: impl Into<http::Request>) -> CallResult {
-    let r = payload.into();
-        
+pub fn hello_world(ctx: &CapabilitiesContext, r: http::Request) -> CallResult {
     ctx.log(&format!("Received HTTP request: {:?}", &r));
     let echo = EchoRequest {
         method: r.method,
@@ -44,8 +32,13 @@ fn hello_world(
     };
 
     let resp = http::Response::json(echo, 200, "OK");
-    Ok(protobytes(resp)?)        
+    Ok(serialize(resp)?)      
 }
+
+pub fn health(_ctx: &CapabilitiesContext, _h: core::HealthRequest) -> CallResult {
+    Ok(vec![])
+}
+
 
 #[derive(Serialize)]
 struct EchoRequest {

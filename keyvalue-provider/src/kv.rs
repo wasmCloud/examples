@@ -149,7 +149,7 @@ impl KeyValueStore {
         let union = self
             .items
             .iter()
-            .filter_map(|(k, v)| {                
+            .filter_map(|(k, v)| {
                 if keys.contains(k) {
                     if let KeyValueItem::Set(s) = v {
                         Some(s.clone())

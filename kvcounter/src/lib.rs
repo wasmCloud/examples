@@ -19,21 +19,17 @@ extern crate serde_json;
 
 use actor::prelude::*;
 
-actor_receive!(receive);
+actor_handlers! { http::OP_HANDLE_REQUEST => increment_counter,
+                  core::OP_HEALTH_REQUEST => health }
 
-pub fn receive(ctx: &CapabilitiesContext, operation: &str, msg: &[u8]) -> CallResult {
-    match operation {
-        http::OP_HANDLE_REQUEST => increment_counter(ctx, msg),
-        core::OP_HEALTH_REQUEST => Ok(vec![]),
-        _ => Err("Unknown operation".into()),
-    }
-}
-
-fn increment_counter(ctx: &CapabilitiesContext, msg: impl Into<http::Request>) -> CallResult {
-    let key = msg.into().path.replace('/', ":");
+fn increment_counter(ctx: &CapabilitiesContext, msg: http::Request) -> CallResult {
+    let key = msg.path.replace('/', ":");
     let value = ctx.kv().atomic_add(&key, 1)?;
 
-    let result = json!(
-        { "counter": value });
-    Ok(protobytes(http::Response::json(result, 200, "OK"))?)
+    let result = json!({ "counter": value, "tweaked": true });
+    Ok(serialize(http::Response::json(result, 200, "OK"))?)
+}
+
+fn health(_ctx: &CapabilitiesContext, _h: core::HealthRequest) -> ReceiveResult {
+    Ok(vec![])
 }

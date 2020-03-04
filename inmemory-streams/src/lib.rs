@@ -4,17 +4,17 @@ extern crate wascc_codec as codec;
 #[macro_use]
 extern crate log;
 
-use prost::Message;
-
 use codec::capabilities::{CapabilityProvider, Dispatcher, NullDispatcher};
 use codec::core::OP_CONFIGURE;
 use codec::eventstreams::{self, Event, StreamQuery, StreamResults, WriteResponse};
 use wascc_codec::core::CapabilityConfiguration;
+use wascc_codec::{deserialize, serialize};
 
 use std::error::Error;
 use std::{
     collections::HashMap,
-    sync::{Arc, RwLock}, time::{UNIX_EPOCH, SystemTime},
+    sync::{Arc, RwLock},
+    time::{SystemTime, UNIX_EPOCH},
 };
 
 fn since_the_epoch() -> std::time::Duration {
@@ -35,7 +35,7 @@ const CAPABILITY_ID: &str = "wascc:eventstreams";
 
 pub struct TestStreamsProvider {
     dispatcher: RwLock<Box<dyn Dispatcher>>,
-    streams: Arc<RwLock<HashMap<String, Vec<EventWrapper>>>>,    
+    streams: Arc<RwLock<HashMap<String, Vec<EventWrapper>>>>,
 }
 
 impl Default for TestStreamsProvider {
@@ -57,19 +57,14 @@ impl TestStreamsProvider {
         Self::default()
     }
 
-    fn configure(
-        &self,
-        config: impl Into<CapabilityConfiguration>,
-    ) -> Result<Vec<u8>, Box<dyn Error>> {
-        let config = config.into();        
-
+    fn configure(&self, config: CapabilityConfiguration) -> Result<Vec<u8>, Box<dyn Error>> {
         self.streams.write().unwrap().insert(config.module, vec![]);
         Ok(vec![])
     }
 
     fn write_event(&self, actor: &str, event: Event) -> Result<Vec<u8>, Box<dyn Error>> {
-        let event_id = self.gen_id(actor);        
-        let evt = Event{
+        let event_id = self.gen_id(actor);
+        let evt = Event {
             event_id: event_id.clone(),
             stream: event.stream,
             values: event.values,
@@ -78,10 +73,14 @@ impl TestStreamsProvider {
             event: evt,
             timestamp: since_the_epoch().as_secs(),
         };
-        self.streams.write().unwrap().entry(actor.to_string()).and_modify(|e| e.push(wrapper));
-        
-        Ok(bytes(WriteResponse { event_id }))
-    }    
+        self.streams
+            .write()
+            .unwrap()
+            .entry(actor.to_string())
+            .and_modify(|e| e.push(wrapper));
+
+        Ok(serialize(WriteResponse { event_id })?)
+    }
 
     fn gen_id(&self, actor: &str) -> String {
         format!("event-{}", self.streams.read().unwrap()[actor].len())
@@ -93,17 +92,20 @@ impl TestStreamsProvider {
         let iter = lock[actor].iter().filter(|e| e.event.stream == sid);
         let items: Vec<_> = if let Some(time_range) = query.range {
             if query.count > 0 {
-                iter.filter(|w| w.timestamp >= time_range.min_time &&
-                w.timestamp <= time_range.max_time)
-                .take(query.count as usize).collect()
-                
+                iter.filter(|w| {
+                    w.timestamp >= time_range.min_time && w.timestamp <= time_range.max_time
+                })
+                .take(query.count as usize)
+                .collect()
             } else {
-                iter.filter(|w| w.timestamp >= time_range.min_time &&
-                    w.timestamp <= time_range.max_time).collect()                
+                iter.filter(|w| {
+                    w.timestamp >= time_range.min_time && w.timestamp <= time_range.max_time
+                })
+                .collect()
             }
         } else {
             if query.count > 0 {
-                iter.take(query.count as usize).collect()                
+                iter.take(query.count as usize).collect()
             } else {
                 iter.collect()
             }
@@ -113,10 +115,9 @@ impl TestStreamsProvider {
             events.push(evt.event.clone());
         }
 
-        Ok(bytes(StreamResults { events }))
+        Ok(serialize(StreamResults { events })?)
     }
 }
-
 
 impl CapabilityProvider for TestStreamsProvider {
     fn capability_id(&self) -> &'static str {
@@ -143,62 +144,54 @@ impl CapabilityProvider for TestStreamsProvider {
         trace!("Received host call from {}, operation - {}", actor, op);
 
         match op {
-            OP_CONFIGURE if actor == "system" => self.configure(msg.to_vec().as_ref()),
-            eventstreams::OP_WRITE_EVENT => self.write_event(actor, Event::decode(msg).unwrap()),
-            eventstreams::OP_QUERY_STREAM => {
-                self.query_stream(actor, StreamQuery::decode(msg).unwrap())
-            }
+            OP_CONFIGURE if actor == "system" => self.configure(deserialize(msg)?),
+            eventstreams::OP_WRITE_EVENT => self.write_event(actor, deserialize(msg)?),
+            eventstreams::OP_QUERY_STREAM => self.query_stream(actor, deserialize(msg)?),
             _ => Err("bad dispatch".into()),
         }
     }
 }
 
-fn bytes(msg: impl prost::Message) -> Vec<u8> {
-    let mut buf = Vec::new();
-    msg.encode(&mut buf).unwrap();
-    buf
-}
-
-
-
 #[cfg(test)]
-mod test {    
+mod test {
     use super::*;
-    use std::collections::HashMap;    
+    use std::collections::HashMap;
     // **==- REQUIRES A RUNNING REDIS INSTANCE ON LOCALHOST -==**
 
     #[test]
-    fn round_trip() {                
+    fn round_trip() {
         let prov = TestStreamsProvider::new();
         let config = CapabilityConfiguration {
             module: "testing-actor".to_string(),
             values: gen_config(),
         };
-        
+
         prov.configure(config).unwrap();
 
         for _ in 0..6 {
-            let ev = Event{
+            let ev = Event {
                 event_id: "".to_string(),
                 stream: "my-stream".to_string(),
                 values: gen_values(),
             };
-            let mut buf = Vec::new();
-            ev.encode(&mut buf).unwrap();
-            let _res = prov.handle_call("testing-actor", eventstreams::OP_WRITE_EVENT, &buf).unwrap();            
+            let buf = serialize(&ev).unwrap();
+            let _res = prov
+                .handle_call("testing-actor", eventstreams::OP_WRITE_EVENT, &buf)
+                .unwrap();
         }
 
-        let mut buf = Vec::new();
-        let query = StreamQuery{
+        let query = StreamQuery {
             count: 0,
             range: None,
             stream_id: "my-stream".to_string(),
         };
-        query.encode(&mut buf).unwrap();
-        let res = prov.handle_call("testing-actor", eventstreams::OP_QUERY_STREAM, &buf).unwrap();
-        let query_res = StreamResults::decode(res.as_ref()).unwrap();
+        let buf = serialize(&query).unwrap();
+        let res = prov
+            .handle_call("testing-actor", eventstreams::OP_QUERY_STREAM, &buf)
+            .unwrap();
+        let query_res = deserialize::<StreamResults>(res.as_ref()).unwrap();
         assert_eq!(6, query_res.events.len());
-        assert_eq!(query_res.events[0].values["scruffy-looking"], "nerf-herder");    
+        assert_eq!(query_res.events[0].values["scruffy-looking"], "nerf-herder");
     }
 
     fn gen_config() -> HashMap<String, String> {

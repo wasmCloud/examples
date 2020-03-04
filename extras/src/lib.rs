@@ -19,21 +19,17 @@ extern crate serde_json;
 
 use actor::prelude::*;
 
-actor_receive!(receive);
+actor_handlers! { http::OP_HANDLE_REQUEST => display_extras, core::OP_HEALTH_REQUEST => health }
 
-pub fn receive(ctx: &CapabilitiesContext, operation: &str, msg: &[u8]) -> ReceiveResult {
-    match operation {
-        http::OP_HANDLE_REQUEST => display_extras(ctx, msg),
-        core::OP_HEALTH_REQUEST => Ok(vec![]),
-        _ => Err("Unknown operation".into()),
-    }
-}
-
-fn display_extras(ctx: &CapabilitiesContext, _payload: impl Into<http::Request>) -> ReceiveResult {
+fn display_extras(ctx: &CapabilitiesContext, _payload: http::Request) -> ReceiveResult {
     let result = json!(
     { "random": ctx.extras().get_random(0, 100)?,
       "guid" : ctx.extras().get_guid()?,
       "sequence": ctx.extras().get_sequence_number()?,
     });
-    Ok(protobytes(http::Response::json(result, 200, "OK"))?)
+    Ok(serialize(http::Response::json(result, 200, "OK"))?)
+}
+
+fn health(_ctx: &CapabilitiesContext, _payload: core::HealthRequest) -> ReceiveResult {
+    Ok(vec![])
 }

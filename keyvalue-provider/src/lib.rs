@@ -11,8 +11,8 @@ use codec::capabilities::{CapabilityProvider, Dispatcher, NullDispatcher};
 use codec::core::{OP_CONFIGURE, OP_REMOVE_ACTOR};
 use codec::keyvalue;
 use codec::keyvalue::*;
-use prost::Message;
 use wascc_codec::core::CapabilityConfiguration;
+use wascc_codec::{deserialize, serialize};
 
 use std::error::Error;
 use std::sync::RwLock;
@@ -42,14 +42,8 @@ impl KeyvalueProvider {
         Self::default()
     }
 
-    fn configure(
-        &self,
-        config: impl Into<CapabilityConfiguration>,
-    ) -> Result<Vec<u8>, Box<dyn Error>> {
-        let _config = config.into();
-
+    fn configure(&self, _config: CapabilityConfiguration) -> Result<Vec<u8>, Box<dyn Error>> {
         // Do nothing here
-
         Ok(vec![])
     }
 
@@ -63,7 +57,7 @@ impl KeyvalueProvider {
         let res: i32 = store.incr(&req.key, req.value)?;
         let resp = AddResponse { value: res };
 
-        Ok(bytes(resp))
+        Ok(serialize(resp)?)
     }
 
     fn del(&self, _actor: &str, req: DelRequest) -> Result<Vec<u8>, Box<dyn Error>> {
@@ -71,19 +65,19 @@ impl KeyvalueProvider {
         store.del(&req.key)?;
         let resp = DelResponse { key: req.key };
 
-        Ok(bytes(resp))
+        Ok(serialize(resp)?)
     }
 
     fn get(&self, _actor: &str, req: GetRequest) -> Result<Vec<u8>, Box<dyn Error>> {
         let store = self.store.read().unwrap();
         if !store.exists(&req.key)? {
-            Ok(bytes(GetResponse {
+            Ok(serialize(GetResponse {
                 value: String::from(""),
                 exists: false,
-            }))
+            })?)
         } else {
             let v = store.get(&req.key);
-            Ok(bytes(match v {
+            Ok(serialize(match v {
                 Ok(s) => GetResponse {
                     value: s,
                     exists: true,
@@ -95,7 +89,7 @@ impl KeyvalueProvider {
                         exists: false,
                     }
                 }
-            }))
+            })?)
         }
     }
 
@@ -106,19 +100,19 @@ impl KeyvalueProvider {
     fn list_range(&self, _actor: &str, req: ListRangeRequest) -> Result<Vec<u8>, Box<dyn Error>> {
         let store = self.store.read().unwrap();
         let result: Vec<String> = store.lrange(&req.key, req.start as _, req.stop as _)?;
-        Ok(bytes(ListRangeResponse { values: result }))
+        Ok(serialize(ListRangeResponse { values: result })?)
     }
 
     fn list_push(&self, _actor: &str, req: ListPushRequest) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut store = self.store.write().unwrap();
         let result: i32 = store.lpush(&req.key, req.value)?;
-        Ok(bytes(ListResponse { new_count: result }))
+        Ok(serialize(ListResponse { new_count: result })?)
     }
 
     fn set(&self, _actor: &str, req: SetRequest) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut store = self.store.write().unwrap();
         store.set(&req.key, req.value.clone())?;
-        Ok(bytes(SetResponse { value: req.value }))
+        Ok(serialize(SetResponse { value: req.value })?)
     }
 
     fn list_del_item(
@@ -128,25 +122,25 @@ impl KeyvalueProvider {
     ) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut store = self.store.write().unwrap();
         let result: i32 = store.lrem(&req.key, req.value)?;
-        Ok(bytes(ListResponse { new_count: result }))
+        Ok(serialize(ListResponse { new_count: result })?)
     }
 
     fn set_add(&self, _actor: &str, req: SetAddRequest) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut store = self.store.write().unwrap();
         let result: i32 = store.sadd(&req.key, req.value)?;
-        Ok(bytes(SetOperationResponse { new_count: result }))
+        Ok(serialize(SetOperationResponse { new_count: result })?)
     }
 
     fn set_remove(&self, _actor: &str, req: SetRemoveRequest) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut store = self.store.write().unwrap();
         let result: i32 = store.srem(&req.key, req.value)?;
-        Ok(bytes(SetOperationResponse { new_count: result }))
+        Ok(serialize(SetOperationResponse { new_count: result })?)
     }
 
     fn set_union(&self, _actor: &str, req: SetUnionRequest) -> Result<Vec<u8>, Box<dyn Error>> {
         let store = self.store.read().unwrap();
         let result: Vec<String> = store.sunion(req.keys)?;
-        Ok(bytes(SetQueryResponse { values: result }))
+        Ok(serialize(SetQueryResponse { values: result })?)
     }
 
     fn set_intersect(
@@ -156,22 +150,22 @@ impl KeyvalueProvider {
     ) -> Result<Vec<u8>, Box<dyn Error>> {
         let store = self.store.read().unwrap();
         let result: Vec<String> = store.sinter(req.keys)?;
-        Ok(bytes(SetQueryResponse { values: result }))
+        Ok(serialize(SetQueryResponse { values: result })?)
     }
 
     fn set_query(&self, _actor: &str, req: SetQueryRequest) -> Result<Vec<u8>, Box<dyn Error>> {
         let store = self.store.read().unwrap();
         let result: Vec<String> = store.smembers(req.key)?;
-        Ok(bytes(SetQueryResponse { values: result }))
+        Ok(serialize(SetQueryResponse { values: result })?)
     }
 
     fn exists(&self, _actor: &str, req: KeyExistsQuery) -> Result<Vec<u8>, Box<dyn Error>> {
         let store = self.store.read().unwrap();
         let result: bool = store.exists(&req.key)?;
-        Ok(bytes(GetResponse {
+        Ok(serialize(GetResponse {
             value: "".to_string(),
             exists: result,
-        }))
+        })?)
     }
 }
 
@@ -200,37 +194,23 @@ impl CapabilityProvider for KeyvalueProvider {
         trace!("Received host call from {}, operation - {}", actor, op);
 
         match op {
-            OP_CONFIGURE if actor == "system" => self.configure(msg.to_vec().as_ref()),
-            OP_REMOVE_ACTOR if actor == "system" => {
-                self.remove_actor(CapabilityConfiguration::decode(msg).unwrap())
-            }
-            keyvalue::OP_ADD => self.add(actor, AddRequest::decode(msg).unwrap()),
-            keyvalue::OP_DEL => self.del(actor, DelRequest::decode(msg).unwrap()),
-            keyvalue::OP_GET => self.get(actor, GetRequest::decode(msg).unwrap()),
-            keyvalue::OP_CLEAR => self.list_clear(actor, ListClearRequest::decode(msg).unwrap()),
-            keyvalue::OP_RANGE => self.list_range(actor, ListRangeRequest::decode(msg).unwrap()),
-            keyvalue::OP_PUSH => self.list_push(actor, ListPushRequest::decode(msg).unwrap()),
-            keyvalue::OP_SET => self.set(actor, SetRequest::decode(msg).unwrap()),
-            keyvalue::OP_LIST_DEL => {
-                self.list_del_item(actor, ListDelItemRequest::decode(msg).unwrap())
-            }
-            keyvalue::OP_SET_ADD => self.set_add(actor, SetAddRequest::decode(msg).unwrap()),
-            keyvalue::OP_SET_REMOVE => {
-                self.set_remove(actor, SetRemoveRequest::decode(msg).unwrap())
-            }
-            keyvalue::OP_SET_UNION => self.set_union(actor, SetUnionRequest::decode(msg).unwrap()),
-            keyvalue::OP_SET_INTERSECT => {
-                self.set_intersect(actor, SetIntersectionRequest::decode(msg).unwrap())
-            }
-            keyvalue::OP_SET_QUERY => self.set_query(actor, SetQueryRequest::decode(msg).unwrap()),
-            keyvalue::OP_KEY_EXISTS => self.exists(actor, KeyExistsQuery::decode(msg).unwrap()),
+            OP_CONFIGURE if actor == "system" => self.configure(deserialize(msg)?),
+            OP_REMOVE_ACTOR if actor == "system" => self.remove_actor(deserialize(msg)?),
+            keyvalue::OP_ADD => self.add(actor, deserialize(msg)?),
+            keyvalue::OP_DEL => self.del(actor, deserialize(msg)?),
+            keyvalue::OP_GET => self.get(actor, deserialize(msg)?),
+            keyvalue::OP_CLEAR => self.list_clear(actor, deserialize(msg)?),
+            keyvalue::OP_RANGE => self.list_range(actor, deserialize(msg)?),
+            keyvalue::OP_PUSH => self.list_push(actor, deserialize(msg)?),
+            keyvalue::OP_SET => self.set(actor, deserialize(msg)?),
+            keyvalue::OP_LIST_DEL => self.list_del_item(actor, deserialize(msg)?),
+            keyvalue::OP_SET_ADD => self.set_add(actor, deserialize(msg)?),
+            keyvalue::OP_SET_REMOVE => self.set_remove(actor, deserialize(msg)?),
+            keyvalue::OP_SET_UNION => self.set_union(actor, deserialize(msg)?),
+            keyvalue::OP_SET_INTERSECT => self.set_intersect(actor, deserialize(msg)?),
+            keyvalue::OP_SET_QUERY => self.set_query(actor, deserialize(msg)?),
+            keyvalue::OP_KEY_EXISTS => self.exists(actor, deserialize(msg)?),
             _ => Err("bad dispatch".into()),
         }
     }
-}
-
-fn bytes(msg: impl prost::Message) -> Vec<u8> {
-    let mut buf = Vec::new();
-    msg.encode(&mut buf).unwrap();
-    buf
 }

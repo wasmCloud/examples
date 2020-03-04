@@ -17,18 +17,14 @@ extern crate wascc_actor as actor;
 use actor::prelude::*;
 use messaging::DeliverMessage;
 
-actor_receive!(receive);
+actor_handlers!{ messaging::OP_DELIVER_MESSAGE => handle_message, 
+                 core::OP_HEALTH_REQUEST => health }
 
-pub fn receive(ctx: &CapabilitiesContext, operation: &str, msg: &[u8]) -> CallResult {
-    match operation {
-        messaging::OP_DELIVER_MESSAGE => handle_message(ctx, msg),
-        core::OP_HEALTH_REQUEST => Ok(vec![]),
-        _ => Err("Unknown operation".into()),
-    }
+fn handle_message(ctx: &CapabilitiesContext, msg: DeliverMessage) -> CallResult {
+    ctx.log(&format!("Received message broker message: {:?}", msg));
+    Ok(vec![])
 }
 
-fn handle_message(ctx: &CapabilitiesContext, msg: impl Into<DeliverMessage>) -> CallResult {
-    let msg = msg.into();
-    ctx.log(&format!("Received message broker message: {:?}", msg));
+fn health(_ctx: &CapabilitiesContext, _req: core::HealthRequest) -> ReceiveResult {
     Ok(vec![])
 }
