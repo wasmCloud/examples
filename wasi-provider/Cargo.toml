@@ -1,0 +1,19 @@
+[package]
+name = "wasi-provider"
+version = "0.0.1"
+authors = ["Kevin Hoffman <alothien@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wascc-actor = "0.4.0"
+serde = "1.0.104"
+serde_json = "1.0.48"
+serde_derive = "1.0.104"
+rmp-serde = "0.14.3"
+
+[profile.release]
+# Optimize for small code size
+opt-level = "s"
