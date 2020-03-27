@@ -22,7 +22,7 @@ actor_handlers!{ http::OP_HANDLE_REQUEST => hello_world,
     core::OP_HEALTH_REQUEST => health }
 
 pub fn hello_world(ctx: &CapabilitiesContext, r: http::Request) -> CallResult {
-    ctx.log(&format!("Received HTTP request: {:?}", &r));
+    ctx.println(&format!("Received HTTP request: {:?}", &r));
     let echo = EchoRequest {
         method: r.method,
         path: r.path,

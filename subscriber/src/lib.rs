@@ -21,7 +21,7 @@ actor_handlers!{ messaging::OP_DELIVER_MESSAGE => handle_message,
                  core::OP_HEALTH_REQUEST => health }
 
 fn handle_message(ctx: &CapabilitiesContext, msg: DeliverMessage) -> CallResult {
-    ctx.log(&format!("Received message broker message: {:?}", msg));
+    ctx.println(&format!("Received message broker message: {:?}", msg));
     Ok(vec![])
 }
 
