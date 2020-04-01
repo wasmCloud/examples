@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Capital One Services, LLC
+// Copyright 2015-2020 Capital One Services, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,22 +25,22 @@ extern crate serde_json;
 
 use actor::prelude::*;
 
-actor_handlers! { http::OP_HANDLE_REQUEST => hello_world,
-core::OP_HEALTH_REQUEST => health }
+actor_handlers! { codec::http::OP_HANDLE_REQUEST => hello_world,
+                  codec::core::OP_HEALTH_REQUEST => health }
 
-fn hello_world(ctx: &CapabilitiesContext, _payload: http::Request) -> ReceiveResult {
-    let res = ctx.raw().call(
+fn hello_world(_payload: codec::http::Request) -> ReceiveResult {
+    let res = untyped::default().call(
         CAPABILITY_ID,
         CUSTOM_OPERATION,
-        &serialize(CustomMessage { super_secret: 12 })?,
+        serialize(CustomMessage { super_secret: 12 })?,
     )?;
     let reply: CustomReply = deserialize(&res)?;
 
     let result = json!({ "result": reply.reply_value });
-    Ok(serialize(http::Response::json(result, 200, "OK"))?)
+    Ok(serialize(codec::http::Response::json(result, 200, "OK"))?)
 }
 
-fn health(_ctx: &CapabilitiesContext, _req: core::HealthRequest) -> ReceiveResult {
+fn health(_req: codec::core::HealthRequest) -> ReceiveResult {
     Ok(vec![])
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Capital One Services, LLC
+// Copyright 2015-2020 Capital One Services, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@ extern crate serde_derive;
 const CUSTOM_OPERATION: &str = "DoCustomThing";
 
 actor_handlers! { crate::CUSTOM_OPERATION => do_custom,
-                  core::OP_CONFIGURE => configure, 
-                  core::OP_HEALTH_REQUEST => health }
+                  codec::core::OP_CONFIGURE => configure, 
+                  codec::core::OP_HEALTH_REQUEST => health }
 
 
 // All capability providers _must_ respond to the configure operation, even if they
 // do nothing with the data
-fn configure(_ctx: &CapabilitiesContext, payload: core::CapabilityConfiguration) -> ReceiveResult {
+fn configure(payload: codec::core::CapabilityConfiguration) -> ReceiveResult {
     // We can do println because it's WASI
     println!("Received configuration: {:?}", payload);
     Ok(vec![])
 }
 
-fn do_custom(_ctx: &CapabilitiesContext, msg: CustomMessage) -> ReceiveResult {
+fn do_custom(msg: CustomMessage) -> ReceiveResult {
     Ok(serialize(
         CustomReply{
             reply_value: msg.super_secret * 10,
@@ -42,9 +42,7 @@ fn do_custom(_ctx: &CapabilitiesContext, msg: CustomMessage) -> ReceiveResult {
     )?)
 }
 
-fn health(
-    _ctx: &CapabilitiesContext,
-    _req: core::HealthRequest
+fn health(_req: codec::core::HealthRequest
 ) -> ReceiveResult {
     Ok(vec![])
 }

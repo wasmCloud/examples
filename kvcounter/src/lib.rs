@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Capital One Services, LLC
+// Copyright 2015-2020 Capital One Services, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,17 +19,18 @@ extern crate serde_json;
 
 use actor::prelude::*;
 
-actor_handlers! { http::OP_HANDLE_REQUEST => increment_counter,
-                  core::OP_HEALTH_REQUEST => health }
+actor_handlers! { codec::http::OP_HANDLE_REQUEST => increment_counter,
+                  codec::core::OP_HEALTH_REQUEST => health }
 
-fn increment_counter(ctx: &CapabilitiesContext, msg: http::Request) -> CallResult {
+fn increment_counter(msg: codec::http::Request) -> CallResult {
     let key = msg.path.replace('/', ":");
-    let value = ctx.kv().atomic_add(&key, 1)?;
+    let value = keyvalue::default().atomic_add(&key, 1)?;
 
+    //let result = json!({"counter": value});
     let result = json!({ "counter": value, "tweaked": true });
-    Ok(serialize(http::Response::json(result, 200, "OK"))?)
+    Ok(serialize(codec::http::Response::json(result, 200, "OK"))?)
 }
 
-fn health(_ctx: &CapabilitiesContext, _h: core::HealthRequest) -> ReceiveResult {
+fn health(_h: codec::core::HealthRequest) -> ReceiveResult {
     Ok(vec![])
 }
