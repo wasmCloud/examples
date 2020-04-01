@@ -1,0 +1,24 @@
+{
+    "name": "kvcounter-as",
+    "version": "0.0.1",
+    "description": "AssemblyScript version of the Rust KVCounter actor",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "asc assembly/index.ts -b build/kvcounter-as.wasm --use abort=assembly/index/abort --validate --optimize",
+        "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --validate --sourceMap --debug",
+        "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --validate --sourceMap --optimize",
+        "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+    },
+    "author": "",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "wascc-actor-as": "git+https://github.com/wascc/wascc-actor-as",
+        "wapc-guest-as": "git+https://github.com/wapc/wapc-guest-as#v0.2.0"
+    },
+    "devDependencies": {
+        "graphql-schema-linter": "^0.2.0",
+        "prettier": "^2.0.2",
+        "assemblyscript": "^0.9.4"
+    }
+}

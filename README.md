@@ -1,4 +1,5 @@
 # Examples
+
 Example actors, capability providers, and other demonstrations
 
 * [echo](https://github.com/wascc/examples/tree/master/echo) - An actor that returns a JSON payload describing the incoming request
@@ -7,6 +8,7 @@ Example actors, capability providers, and other demonstrations
 * [keyvalue-provider](https://github.com/wascc/examples/tree/master/keyvalue-provider) - A sample in-memory Key-Value Store capability provider, used by the tutorial for creating a new capability provider
 * [inmemory-streams](https://github.com/wascc/examples/tree/master/inmemory-streams) - An example illustrating an in-memory `wascc:eventstreams` provider
 * [extras](https://github.com/wascc/examples/tree/master/extras) - A sample illustrating the use of the `wascc:extras` capability for random number, Guid, and sequence number generation.
+* [multibinding](https://github.com/wascc/examples/tree/multibinding) - An example illustrating the use of named bindings to support multiple, differentiable instances of the same capability provider type.
 
 To run these, go to the root directory of the [wascc-host](https://github.com/wascc/wascc-host) project and issue the following command:
 
