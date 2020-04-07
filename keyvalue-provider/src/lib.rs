@@ -8,7 +8,7 @@ mod kv;
 
 use crate::kv::KeyValueStore;
 use codec::capabilities::{CapabilityProvider, Dispatcher, NullDispatcher};
-use codec::core::{OP_CONFIGURE, OP_REMOVE_ACTOR};
+use codec::core::{OP_BIND_ACTOR, OP_REMOVE_ACTOR};
 use codec::keyvalue;
 use codec::keyvalue::*;
 use wascc_codec::core::CapabilityConfiguration;
@@ -194,7 +194,7 @@ impl CapabilityProvider for KeyvalueProvider {
         trace!("Received host call from {}, operation - {}", actor, op);
 
         match op {
-            OP_CONFIGURE if actor == "system" => self.configure(deserialize(msg)?),
+            OP_BIND_ACTOR if actor == "system" => self.configure(deserialize(msg)?),
             OP_REMOVE_ACTOR if actor == "system" => self.remove_actor(deserialize(msg)?),
             keyvalue::OP_ADD => self.add(actor, deserialize(msg)?),
             keyvalue::OP_DEL => self.del(actor, deserialize(msg)?),
