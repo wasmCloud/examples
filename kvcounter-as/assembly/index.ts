@@ -11,7 +11,7 @@ function handleRequest(request: Request): Response {
   const key = request.path.replaceAll("/", ":");      
   const result = kv.atomicAdd(key, 1);
     
-  const message = "Counter is " + result.toString();  
+  const message = "Counter is " + result.value.toString();  
   const payload = String.UTF8.encode(message);
 
   return new ResponseBuilder()
