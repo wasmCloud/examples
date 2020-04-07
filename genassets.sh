@@ -38,3 +38,9 @@ cd wasi-consumer
 make release
 cp ./target/wasm32-unknown-unknown/release/wasi_consumer_signed.wasm ../../wascc-host/examples/.assets/wasi_consumer.wasm
 cd ..
+
+# Logger
+cd logger
+make release
+cp ./target/wasm32-unknown-unknown/release/logger_signed.wasm ../../wascc-host/examples/.assets/logger.wasm
+cd ..

@@ -9,20 +9,24 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and 
 // limitations under the License.
+
+#[macro_use]
+extern crate log;
 
 extern crate wascc_actor as actor;
 
 use actor::prelude::*;
-use codec::messaging::BrokerMessage;
 
-actor_handlers!{ codec::messaging::OP_DELIVER_MESSAGE => handle_message, 
-                 codec::core::OP_HEALTH_REQUEST => health }
+actor_handlers! { codec::http::OP_HANDLE_REQUEST => hello_world, 
+                  codec::core::OP_HEALTH_REQUEST => health }
 
-fn handle_message(msg: BrokerMessage) -> CallResult {
-    println(&format!("Received message broker message: {:?}", msg));
-    Ok(vec![])
+fn hello_world(payload: codec::http::Request) -> ReceiveResult {
+    println("Received an HTTP request");    
+    info!("Received request: {:?}", payload);
+    logger::default().warn("Received an HTTP request")?;
+    Ok(serialize(codec::http::Response::ok())?)
 }
 
 fn health(_req: codec::core::HealthRequest) -> ReceiveResult {

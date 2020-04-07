@@ -7,15 +7,13 @@ export function _start(): void {
 }
 
 function handleRequest(request: Request): Response {
-  const bodyAsString = String.UTF8.decode(request.body);
-
-  // Set a key with the body of the request as a string.
-    const kv = new KV("");
-  const response = kv.set("foo", bodyAsString, 0);
-  
-  const message = "Response was " + response.value;  
+  const kv = new KV("");
+  const key = request.path.replaceAll("/", ":");      
+  const result = kv.atomicAdd(key, 1);
+    
+  const message = "Counter is " + result.toString();  
   const payload = String.UTF8.encode(message);
-  
+
   return new ResponseBuilder()
     .withStatusCode(200)
     .withStatus("OK")
