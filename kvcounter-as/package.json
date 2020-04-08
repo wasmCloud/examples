@@ -14,7 +14,8 @@
     "license": "Apache-2.0",
     "dependencies": {
         "wascc-actor-as": "git+https://github.com/wascc/wascc-actor-as",
-        "wapc-guest-as": "git+https://github.com/wapc/wapc-guest-as#v0.2.0"
+        "wapc-guest-as": "git+https://github.com/wapc/wapc-guest-as#v0.2.0",
+        "assemblyscript-json": "git+https://github.com/nearprotocol/assemblyscript-json"
     },
     "devDependencies": {
         "graphql-schema-linter": "^0.2.0",
