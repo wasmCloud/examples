@@ -1,6 +1,6 @@
 [package]
 name = "test-streams-provider"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Kevin Hoffman <alothien@gmail.com>"]
 edition = "2018"
 
@@ -8,6 +8,6 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wascc-codec = "0.5.2"
+wascc-codec = { version = "0.6.0", path = "../../wascc-codec" }
 log = "0.4.8"
 env_logger = "0.7.1"

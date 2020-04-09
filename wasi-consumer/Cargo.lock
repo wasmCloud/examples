@@ -96,6 +96,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b8b7a7c0c47db5545ed3fef7468ee7bb5b74691498139e4b3f6a20685dc6dd8e"
 
 [[package]]
+name = "lazy_static"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+
+[[package]]
 name = "libc"
 version = "0.2.67"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -230,6 +236,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e707fbbf255b8fc8c3b99abb91e7257a622caeb20a9818cbadbeeede4e0932ff"
 
 [[package]]
+name = "serde_bytes"
+version = "0.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "325a073952621257820e7a3469f55ba4726d8b28657e7e36653d1c36dc2c84ae"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "serde_derive"
 version = "1.0.105"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -242,9 +257,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.48"
+version = "1.0.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9371ade75d4c2d6cb154141b9752cf3781ec9c05e0e5cf35060e1e70ee7b9c25"
+checksum = "78a7a12c167809363ec3bd7329fc0a3369056996de43c4b37ef3cd54a6ce4867"
 dependencies = [
  "itoa",
  "ryu",
@@ -287,9 +302,9 @@ checksum = "826e7639553986605ec5979c7dd957c7895e93eabed50ab2ffa7f6128a75097c"
 
 [[package]]
 name = "wapc-guest"
-version = "0.2.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d195d5c20fdc1286e1004cfb03c8105d7a19d7a44eefef1b61f13cd30fe3a64a"
+checksum = "6c04289198b321831168863e11e6727c84c4bab76e06e19f232bd611b40d6d2b"
 dependencies = [
  "prost",
  "prost-types",
@@ -300,10 +315,9 @@ dependencies = [
 
 [[package]]
 name = "wascc-actor"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4517c4c4a5862abd3dea131b1fb831430e53959c519c4ec4148f697dea9415cb"
+version = "0.6.0"
 dependencies = [
+ "lazy_static",
  "log",
  "serde",
  "serde_derive",
@@ -314,13 +328,12 @@ dependencies = [
 
 [[package]]
 name = "wascc-codec"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5a3e2762c043198fa179eeb9e34f4ec9072f5570562c7aaca24254396cefc35"
+version = "0.6.0"
 dependencies = [
  "log",
  "rmp-serde",
  "serde",
+ "serde_bytes",
  "serde_derive",
  "serde_json",
 ]

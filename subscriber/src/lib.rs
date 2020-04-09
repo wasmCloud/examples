@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Capital One Services, LLC
+// Copyright 2015-2020 Capital One Services, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
 extern crate wascc_actor as actor;
 
 use actor::prelude::*;
-use messaging::DeliverMessage;
+use codec::messaging::BrokerMessage;
 
-actor_handlers!{ messaging::OP_DELIVER_MESSAGE => handle_message, 
-                 core::OP_HEALTH_REQUEST => health }
+actor_handlers!{ codec::messaging::OP_DELIVER_MESSAGE => handle_message, 
+                 codec::core::OP_HEALTH_REQUEST => health }
 
-fn handle_message(ctx: &CapabilitiesContext, msg: DeliverMessage) -> CallResult {
-    ctx.println(&format!("Received message broker message: {:?}", msg));
+fn handle_message(msg: BrokerMessage) -> CallResult {
+    println(&format!("Received message broker message: {:?}", msg));
     Ok(vec![])
 }
 
-fn health(_ctx: &CapabilitiesContext, _req: core::HealthRequest) -> ReceiveResult {
+fn health(_req: codec::core::HealthRequest) -> ReceiveResult {
     Ok(vec![])
 }

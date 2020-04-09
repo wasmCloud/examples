@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Capital One Services, LLC
+// Copyright 2015-2020 Capital One Services, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ use actor::prelude::*;
 use serde::Serialize;
 use std::collections::HashMap;
 
-actor_handlers!{ http::OP_HANDLE_REQUEST => hello_world, 
-    core::OP_HEALTH_REQUEST => health }
+actor_handlers!{ codec::http::OP_HANDLE_REQUEST => hello_world, 
+                 codec::core::OP_HEALTH_REQUEST => health }
 
-pub fn hello_world(ctx: &CapabilitiesContext, r: http::Request) -> CallResult {
-    ctx.println(&format!("Received HTTP request: {:?}", &r));
+pub fn hello_world(r: codec::http::Request) -> CallResult {
+    println(&format!("Received HTTP request: {:?}", &r));
     let echo = EchoRequest {
         method: r.method,
         path: r.path,
@@ -31,11 +31,11 @@ pub fn hello_world(ctx: &CapabilitiesContext, r: http::Request) -> CallResult {
         body: r.body,
     };
 
-    let resp = http::Response::json(echo, 200, "OK");
+    let resp = codec::http::Response::json(echo, 200, "OK");
     Ok(serialize(resp)?)      
 }
 
-pub fn health(_ctx: &CapabilitiesContext, _h: core::HealthRequest) -> CallResult {
+pub fn health(_h: codec::core::HealthRequest) -> CallResult {
     Ok(vec![])
 }
 
