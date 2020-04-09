@@ -9,7 +9,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and 
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 extern crate wascc_actor as actor;
@@ -22,29 +22,25 @@ extern crate serde_derive;
 const CUSTOM_OPERATION: &str = "DoCustomThing";
 
 actor_handlers! { crate::CUSTOM_OPERATION => do_custom,
-                  codec::core::OP_CONFIGURE => configure, 
+                  codec::core::OP_BIND_ACTOR => configure,
                   codec::core::OP_HEALTH_REQUEST => health }
-
 
 // All capability providers _must_ respond to the configure operation, even if they
 // do nothing with the data
-fn configure(payload: codec::core::CapabilityConfiguration) -> ReceiveResult {
+fn configure(payload: codec::core::CapabilityConfiguration) -> HandlerResult<()> {
     // We can do println because it's WASI
     println!("Received configuration: {:?}", payload);
-    Ok(vec![])
+    Ok(())
 }
 
-fn do_custom(msg: CustomMessage) -> ReceiveResult {
-    Ok(serialize(
-        CustomReply{
-            reply_value: msg.super_secret * 10,
-        }
-    )?)
+fn do_custom(msg: CustomMessage) -> HandlerResult<CustomReply> {
+    Ok(CustomReply {
+        reply_value: msg.super_secret * 10,
+    })
 }
 
-fn health(_req: codec::core::HealthRequest
-) -> ReceiveResult {
-    Ok(vec![])
+fn health(_req: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

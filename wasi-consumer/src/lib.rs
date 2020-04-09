@@ -28,7 +28,7 @@ use actor::prelude::*;
 actor_handlers! { codec::http::OP_HANDLE_REQUEST => hello_world,
                   codec::core::OP_HEALTH_REQUEST => health }
 
-fn hello_world(_payload: codec::http::Request) -> ReceiveResult {
+fn hello_world(_payload: codec::http::Request) -> HandlerResult<codec::http::Response> {
     let res = untyped::default().call(
         CAPABILITY_ID,
         CUSTOM_OPERATION,
@@ -37,11 +37,11 @@ fn hello_world(_payload: codec::http::Request) -> ReceiveResult {
     let reply: CustomReply = deserialize(&res)?;
 
     let result = json!({ "result": reply.reply_value });
-    Ok(serialize(codec::http::Response::json(result, 200, "OK"))?)
+    Ok(codec::http::Response::json(result, 200, "OK"))
 }
 
-fn health(_req: codec::core::HealthRequest) -> ReceiveResult {
-    Ok(vec![])
+fn health(_req: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

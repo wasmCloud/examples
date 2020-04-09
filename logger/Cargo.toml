@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 log = "0.4.8"
-wascc-actor = { version="0.6.0", path = "../../wascc-actor" }
+wascc-actor = { version="0.7.0", path = "../../wascc-actor" }
 
 [profile.release]
 # Optimize for small code size

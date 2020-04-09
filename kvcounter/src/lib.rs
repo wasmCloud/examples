@@ -22,15 +22,15 @@ use actor::prelude::*;
 actor_handlers! { codec::http::OP_HANDLE_REQUEST => increment_counter,
                   codec::core::OP_HEALTH_REQUEST => health }
 
-fn increment_counter(msg: codec::http::Request) -> CallResult {
+fn increment_counter(msg: codec::http::Request) -> HandlerResult<codec::http::Response> {
     let key = msg.path.replace('/', ":");
     let value = keyvalue::default().atomic_add(&key, 1)?;
 
-    //let result = json!({"counter": value});
-    let result = json!({ "counter": value, "tweaked": true });
-    Ok(serialize(codec::http::Response::json(result, 200, "OK"))?)
+    //let result = json!({ "counter": value, "tweaked": true });
+    let result = json!({"counter": value });
+    Ok(codec::http::Response::json(result, 200, "OK"))
 }
 
-fn health(_h: codec::core::HealthRequest) -> ReceiveResult {
-    Ok(vec![])
+fn health(_h: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }

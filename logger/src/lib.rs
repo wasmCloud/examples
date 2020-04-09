@@ -22,13 +22,13 @@ use actor::prelude::*;
 actor_handlers! { codec::http::OP_HANDLE_REQUEST => hello_world, 
                   codec::core::OP_HEALTH_REQUEST => health }
 
-fn hello_world(payload: codec::http::Request) -> ReceiveResult {
+fn hello_world(payload: codec::http::Request) -> HandlerResult<codec::http::Response> {
     println("Received an HTTP request");    
     info!("Received request: {:?}", payload);
     logger::default().warn("Received an HTTP request")?;
-    Ok(serialize(codec::http::Response::ok())?)
+    Ok(codec::http::Response::ok())
 }
 
-fn health(_req: codec::core::HealthRequest) -> ReceiveResult {
-    Ok(vec![])
+fn health(_req: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }

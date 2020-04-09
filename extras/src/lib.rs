@@ -23,16 +23,16 @@ actor_handlers! {
   codec::http::OP_HANDLE_REQUEST => display_extras, 
   codec::core::OP_HEALTH_REQUEST => health }
 
-fn display_extras(_payload: codec::http::Request) -> ReceiveResult {
+fn display_extras(_payload: codec::http::Request) -> HandlerResult<codec::http::Response> {
     let extras = extras::default();
     let result = json!(
     { "random": extras.get_random(0, 100)?,
       "guid" : extras.get_guid()?,
       "sequence": extras.get_sequence_number()?,
     });
-    Ok(serialize(codec::http::Response::json(result, 200, "OK"))?)
+    Ok(codec::http::Response::json(result, 200, "OK"))
 }
 
-fn health(_payload: codec::core::HealthRequest) -> ReceiveResult {
-    Ok(vec![])
+fn health(_payload: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }

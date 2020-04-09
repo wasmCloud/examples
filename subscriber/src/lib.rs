@@ -20,11 +20,11 @@ use codec::messaging::BrokerMessage;
 actor_handlers!{ codec::messaging::OP_DELIVER_MESSAGE => handle_message, 
                  codec::core::OP_HEALTH_REQUEST => health }
 
-fn handle_message(msg: BrokerMessage) -> CallResult {
+fn handle_message(msg: BrokerMessage) -> HandlerResult<()> {
     println(&format!("Received message broker message: {:?}", msg));
-    Ok(vec![])
+    Ok(())
 }
 
-fn health(_req: codec::core::HealthRequest) -> ReceiveResult {
-    Ok(vec![])
+fn health(_req: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }

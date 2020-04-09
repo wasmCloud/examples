@@ -22,7 +22,7 @@ use actor::prelude::*;
 actor_handlers! { codec::http::OP_HANDLE_REQUEST => gen_and_render_counts, 
                   codec::core::OP_HEALTH_REQUEST => health }
 
-fn gen_and_render_counts(payload: codec::http::Request) -> ReceiveResult {
+fn gen_and_render_counts(payload: codec::http::Request) -> HandlerResult<codec::http::Response> {
     let key = payload.path.replace('/', ":");
     
     let source1 = keyvalue::host("source1");    
@@ -37,9 +37,9 @@ fn gen_and_render_counts(payload: codec::http::Request) -> ReceiveResult {
         { "counter_1": val1,
           "counter_2": val2 });
 
-    Ok(serialize(codec::http::Response::json(result, 200, "OK"))?)    
+    Ok(codec::http::Response::json(result, 200, "OK"))    
 }
 
-fn health(_req: codec::core::HealthRequest) -> ReceiveResult {
-    Ok(vec![])
+fn health(_req: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }

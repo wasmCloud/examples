@@ -21,9 +21,9 @@ use std::collections::HashMap;
 actor_handlers!{ codec::http::OP_HANDLE_REQUEST => hello_world, 
                  codec::core::OP_HEALTH_REQUEST => health }
 
-pub fn hello_world(r: codec::http::Request) -> CallResult {
+pub fn hello_world(r: codec::http::Request) -> HandlerResult<codec::http::Response> {
     println(&format!("Received HTTP request: {:?}", &r));
-    let echo = EchoRequest {
+    let echo = EchoResponse {
         method: r.method,
         path: r.path,
         query_string: r.query_string,
@@ -31,17 +31,16 @@ pub fn hello_world(r: codec::http::Request) -> CallResult {
         body: r.body,
     };
 
-    let resp = codec::http::Response::json(echo, 200, "OK");
-    Ok(serialize(resp)?)      
+    Ok(codec::http::Response::json(echo, 200, "OK"))    
 }
 
-pub fn health(_h: codec::core::HealthRequest) -> CallResult {
-    Ok(vec![])
+pub fn health(_h: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }
 
 
 #[derive(Serialize)]
-struct EchoRequest {
+struct EchoResponse {
     method: String,
     path: String,
     query_string: String,
