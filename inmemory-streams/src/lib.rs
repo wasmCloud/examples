@@ -29,30 +29,31 @@ struct EventWrapper {
     timestamp: u64,
 }
 
-capability_provider!(TestStreamsProvider, TestStreamsProvider::new);
+#[cfg(not(feature = "static_plugin"))]
+capability_provider!(InmemoryStreamsProvider, InmemoryStreamsProvider::new);
 
 const CAPABILITY_ID: &str = "wascc:eventstreams";
 
-pub struct TestStreamsProvider {
+pub struct InmemoryStreamsProvider {
     dispatcher: RwLock<Box<dyn Dispatcher>>,
     streams: Arc<RwLock<HashMap<String, Vec<EventWrapper>>>>,
 }
 
-impl Default for TestStreamsProvider {
+impl Default for InmemoryStreamsProvider {
     fn default() -> Self {
         match env_logger::try_init() {
             Ok(_) => {}
             Err(_) => {}
         };
 
-        TestStreamsProvider {
+        InmemoryStreamsProvider {
             dispatcher: RwLock::new(Box::new(NullDispatcher::new())),
             streams: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 }
 
-impl TestStreamsProvider {
+impl InmemoryStreamsProvider {
     pub fn new() -> Self {
         Self::default()
     }
@@ -119,7 +120,7 @@ impl TestStreamsProvider {
     }
 }
 
-impl CapabilityProvider for TestStreamsProvider {
+impl CapabilityProvider for InmemoryStreamsProvider {
     fn capability_id(&self) -> &'static str {
         CAPABILITY_ID
     }
@@ -160,7 +161,7 @@ mod test {
 
     #[test]
     fn round_trip() {
-        let prov = TestStreamsProvider::new();
+        let prov = InmemoryStreamsProvider::new();
         let config = CapabilityConfiguration {
             module: "testing-actor".to_string(),
             values: gen_config(),

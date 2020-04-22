@@ -17,6 +17,7 @@ use wascc_codec::{deserialize, serialize};
 use std::error::Error;
 use std::sync::RwLock;
 
+#[cfg(not(feature = "static_plugin"))]
 capability_provider!(KeyvalueProvider, KeyvalueProvider::new);
 
 const CAPABILITY_ID: &str = "wascc:keyvalue";
@@ -28,8 +29,10 @@ pub struct KeyvalueProvider {
 
 impl Default for KeyvalueProvider {
     fn default() -> Self {
-        env_logger::init();
-
+        match env_logger::try_init() {
+            Ok(_) => {}
+            Err(_) => {}
+        };
         KeyvalueProvider {
             dispatcher: RwLock::new(Box::new(NullDispatcher::new())),
             store: RwLock::new(KeyValueStore::new()),
