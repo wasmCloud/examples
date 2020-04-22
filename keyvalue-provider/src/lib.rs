@@ -17,6 +17,7 @@ use wascc_codec::{deserialize, serialize};
 use std::error::Error;
 use std::sync::RwLock;
 
+#[cfg(not(feature = "static_plugin"))]
 capability_provider!(KeyvalueProvider, KeyvalueProvider::new);
 
 const CAPABILITY_ID: &str = "wascc:keyvalue";
