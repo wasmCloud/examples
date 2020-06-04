@@ -1,13 +1,17 @@
 [package]
 name = "keyvalue"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Kevin Hoffman <alothien@gmail.com>"]
 edition = "2018"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[features]
+# Enable if the provider will be statically compiled into a host
+static_plugin = []
+
 [dependencies]
-wascc-codec = { version = "0.6.0",  path = "../../wascc-codec" }
+wascc-codec = { version = "0.7.0",  path = "../../wascc-codec" }
 log = "0.4.8"
 env_logger = "0.7.1"

@@ -15,25 +15,49 @@
 extern crate wascc_actor as actor;
 
 use actor::prelude::*;
+use codec::capabilities::{CapabilityDescriptor, OperationDirection, OP_GET_CAPABILITY_DESCRIPTOR};
 
 #[macro_use]
 extern crate serde_derive;
 
 const CUSTOM_OPERATION: &str = "DoCustomThing";
+const CAPABILITY_ID: &str = "wascc:wasidemo";
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const REVISION: u32 = 0;
 
-actor_handlers! { crate::CUSTOM_OPERATION => do_custom,
-                  codec::core::OP_BIND_ACTOR => configure,
-                  codec::core::OP_HEALTH_REQUEST => health }
+actor_handlers! {
+    crate::CUSTOM_OPERATION => do_custom,
+    codec::core::OP_BIND_ACTOR => configure,
+    codec::core::OP_HEALTH_REQUEST => health,
+    OP_GET_CAPABILITY_DESCRIPTOR => get_descriptor
+}
+
+fn get_descriptor(_payload: codec::core::HealthRequest) -> HandlerResult<CapabilityDescriptor> {
+    Ok(CapabilityDescriptor::builder()
+        .id(CAPABILITY_ID)
+        .name("waSCC Portable Provider Demo")
+        .long_description("Sample illustrating that an actor can also be a capability provider")
+        .version(VERSION)
+        .revision(REVISION)
+        .with_operation(
+            CUSTOM_OPERATION,
+            OperationDirection::ToActor,
+            "Performs the custom, ultra-top secret operation",
+        )
+        .build())
+}
 
 // All capability providers _must_ respond to the configure operation, even if they
 // do nothing with the data
-fn configure(payload: codec::core::CapabilityConfiguration) -> HandlerResult<()> {
-    // We can do println because it's WASI
-    println!("Received configuration: {:?}", payload);
+fn configure(_payload: codec::core::CapabilityConfiguration) -> HandlerResult<()> {
     Ok(())
 }
 
 fn do_custom(msg: CustomMessage) -> HandlerResult<CustomReply> {
+    println!(
+        " ** WASI PROVIDER STDOUT ** Received Invocation! Super Secret Value - {}",
+        msg.super_secret
+    );
     Ok(CustomReply {
         reply_value: msg.super_secret * 10,
     })

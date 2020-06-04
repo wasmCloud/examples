@@ -9,10 +9,10 @@ crate-type = ["cdylib"]
 
 [dependencies]
 #wascc-actor = "0.5.0"
-wascc-actor = { version = "0.7.0", path = "../../wascc-actor" }
-serde = "1.0.105"
-serde_json = "1.0.48"
-serde_derive = "1.0.105"
+wascc-actor = { version = "0.7.3", path = "../../wascc-actor" }
+serde = "1.0.111"
+serde_json = "1.0.53"
+serde_derive = "1.0.111"
 rmp-serde = "0.14.3"
 
 [profile.release]

@@ -7,7 +7,10 @@ extern crate log;
 mod kv;
 
 use crate::kv::KeyValueStore;
-use codec::capabilities::{CapabilityProvider, Dispatcher, NullDispatcher};
+use codec::capabilities::{
+    CapabilityDescriptor, CapabilityProvider, Dispatcher, NullDispatcher, OperationDirection,
+    OP_GET_CAPABILITY_DESCRIPTOR,
+};
 use codec::core::{OP_BIND_ACTOR, OP_REMOVE_ACTOR};
 use codec::keyvalue;
 use codec::keyvalue::*;
@@ -17,9 +20,13 @@ use wascc_codec::{deserialize, serialize};
 use std::error::Error;
 use std::sync::RwLock;
 
+#[cfg(not(feature = "static_plugin"))]
 capability_provider!(KeyvalueProvider, KeyvalueProvider::new);
 
 const CAPABILITY_ID: &str = "wascc:keyvalue";
+const SYSTEM_ACTOR: &str = "system";
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+const REVISION: u32 = 0; // Increment for each crates publish
 
 pub struct KeyvalueProvider {
     dispatcher: RwLock<Box<dyn Dispatcher>>,
@@ -167,13 +174,54 @@ impl KeyvalueProvider {
             exists: result,
         })?)
     }
+
+    fn get_descriptor(&self) -> Result<Vec<u8>, Box<dyn Error>> {
+        use OperationDirection::ToProvider;
+        Ok(serialize(
+            CapabilityDescriptor::builder()
+                .id(CAPABILITY_ID)
+                .name("waSCC Default Key-Value Provider (In-Memory)")
+                .long_description(
+                    "A key-value store capability provider built on in-process hash maps",
+                )
+                .version(VERSION)
+                .revision(REVISION)
+                .with_operation(OP_ADD, ToProvider, "Performs an atomic addition operation")
+                .with_operation(OP_DEL, ToProvider, "Deletes a key from the store")
+                .with_operation(OP_GET, ToProvider, "Gets the raw value for a key")
+                .with_operation(OP_CLEAR, ToProvider, "Clears a list")
+                .with_operation(
+                    OP_RANGE,
+                    ToProvider,
+                    "Selects items from a list within a range",
+                )
+                .with_operation(OP_PUSH, ToProvider, "Pushes a new item onto a list")
+                .with_operation(OP_SET, ToProvider, "Sets the value of a key")
+                .with_operation(OP_LIST_DEL, ToProvider, "Deletes an item from a list")
+                .with_operation(OP_SET_ADD, ToProvider, "Adds an item to a set")
+                .with_operation(OP_SET_REMOVE, ToProvider, "Remove an item from a set")
+                .with_operation(
+                    OP_SET_UNION,
+                    ToProvider,
+                    "Returns the union of multiple sets",
+                )
+                .with_operation(
+                    OP_SET_INTERSECT,
+                    ToProvider,
+                    "Returns the intersection of multiple sets",
+                )
+                .with_operation(OP_SET_QUERY, ToProvider, "Queries a set")
+                .with_operation(
+                    OP_KEY_EXISTS,
+                    ToProvider,
+                    "Returns a boolean indicating if a key exists",
+                )
+                .build(),
+        )?)
+    }
 }
 
 impl CapabilityProvider for KeyvalueProvider {
-    fn capability_id(&self) -> &'static str {
-        CAPABILITY_ID
-    }
-
     // Invoked by the runtime host to give this provider plugin the ability to communicate
     // with actors
     fn configure_dispatch(&self, dispatcher: Box<dyn Dispatcher>) -> Result<(), Box<dyn Error>> {
@@ -184,18 +232,15 @@ impl CapabilityProvider for KeyvalueProvider {
         Ok(())
     }
 
-    fn name(&self) -> &'static str {
-        "waSCC Sample Key-Value Provider (In-Memory)"
-    }
-
     // Invoked by host runtime to allow an actor to make use of the capability
     // All providers MUST handle the "configure" message, even if no work will be done
     fn handle_call(&self, actor: &str, op: &str, msg: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
         trace!("Received host call from {}, operation - {}", actor, op);
 
         match op {
-            OP_BIND_ACTOR if actor == "system" => self.configure(deserialize(msg)?),
-            OP_REMOVE_ACTOR if actor == "system" => self.remove_actor(deserialize(msg)?),
+            OP_BIND_ACTOR if actor == SYSTEM_ACTOR => self.configure(deserialize(msg)?),
+            OP_REMOVE_ACTOR if actor == SYSTEM_ACTOR => self.remove_actor(deserialize(msg)?),
+            OP_GET_CAPABILITY_DESCRIPTOR if actor == SYSTEM_ACTOR => self.get_descriptor(),
             keyvalue::OP_ADD => self.add(actor, deserialize(msg)?),
             keyvalue::OP_DEL => self.del(actor, deserialize(msg)?),
             keyvalue::OP_GET => self.get(actor, deserialize(msg)?),

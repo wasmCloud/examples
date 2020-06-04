@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+# Note that we no longer sign the actor with any capabilities, as that information
+# (as of waSCC 0.8.x) comes from interrogating the actor for its capability descriptor
+
 COLOR ?= always # Valid COLOR options: {always, auto, never}
 CARGO = cargo --color $(COLOR)
 TARGET = target/wasm32-wasi
@@ -28,7 +32,7 @@ bench:
 
 build:
 	@$(CARGO) build
-	wascap sign $(DEBUG)/wasi_provider.wasm $(DEBUG)/wasi_provider_signed.wasm -i $(KEYDIR)/account.nk -u $(KEYDIR)/module.nk -p -c wascc:wasidemo -n "WASI Provider Demo"
+	wascap sign $(DEBUG)/wasi_provider.wasm $(DEBUG)/wasi_provider_signed.wasm -i $(KEYDIR)/account.nk -u $(KEYDIR)/module.nk -p -n "WASI Provider Demo"
 
 check:
 	@$(CARGO) check
@@ -47,7 +51,7 @@ update:
 
 release:
 	@$(CARGO) build --release
-	wascap sign $(RELEASE)/wasi_provider.wasm $(RELEASE)/wasi_provider_signed.wasm -i $(KEYDIR)/account.nk -u $(KEYDIR)/module.nk -p -c wascc:wasidemo -n "WASI Provider Demo"
+	wascap sign $(RELEASE)/wasi_provider.wasm $(RELEASE)/wasi_provider_signed.wasm -i $(KEYDIR)/account.nk -u $(KEYDIR)/module.nk -p -n "WASI Provider Demo"
 	
 keys: keys-account
 keys: keys-module
