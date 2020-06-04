@@ -35,8 +35,10 @@ pub struct KeyvalueProvider {
 
 impl Default for KeyvalueProvider {
     fn default() -> Self {
-        env_logger::init();
-
+        match env_logger::try_init() {
+            Ok(_) => {}
+            Err(_) => {}
+        };
         KeyvalueProvider {
             dispatcher: RwLock::new(Box::new(NullDispatcher::new())),
             store: RwLock::new(KeyValueStore::new()),
