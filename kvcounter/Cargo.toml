@@ -8,7 +8,6 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [dependencies]
-#wascc-actor = { version = "0.7.0", path = "../../wascc-actor" }
 wapc-guest = "0.4.0"
 actor-core = { git = "https://github.com/wascc/actor-interfaces", branch = "main" }
 actor-http-server = { git = "https://github.com/wascc/actor-interfaces", branch = "main"}
