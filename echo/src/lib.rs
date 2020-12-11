@@ -1,28 +1,17 @@
-// Copyright 2015-2020 Capital One Services, LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-extern crate wascc_actor as actor;
-
-use actor::prelude::*;
 use serde::Serialize;
 use std::collections::HashMap;
+extern crate wapc_guest as guest;
+use actor_core as actorcore;
+use actor_http_server as http;
+use guest::prelude::*;
 
-actor_handlers!{ codec::http::OP_HANDLE_REQUEST => hello_world, 
-                 codec::core::OP_HEALTH_REQUEST => health }
+#[no_mangle]
+pub fn wapc_init() {
+    actorcore::Handlers::register_health_request(health);
+    http::Handlers::register_handle_request(hello_world);
+}
 
-pub fn hello_world(r: codec::http::Request) -> HandlerResult<codec::http::Response> {
-    println(&format!("Received HTTP request: {:?}", &r));
+pub fn hello_world(r: http::Request) -> HandlerResult<http::Response> {
     let echo = EchoResponse {
         method: r.method,
         path: r.path,
@@ -31,13 +20,12 @@ pub fn hello_world(r: codec::http::Request) -> HandlerResult<codec::http::Respon
         body: r.body,
     };
 
-    Ok(codec::http::Response::json(echo, 200, "OK"))    
+    Ok(http::Response::json(echo, 200, "OK"))
 }
 
-pub fn health(_h: codec::core::HealthRequest) -> HandlerResult<()> {
-    Ok(())
+fn health(_h: actorcore::HealthCheckRequest) -> HandlerResult<actorcore::HealthCheckResponse> {
+    Ok(actorcore::HealthCheckResponse::healthy())
 }
-
 
 #[derive(Serialize)]
 struct EchoResponse {
