@@ -1,31 +1,12 @@
+extern crate wascc_actor as actor;
+
 use serde::Serialize;
 use std::collections::HashMap;
-extern crate wapc_guest as guest;
-use actor_core as actorcore;
-use actor_http_server as http;
-use guest::prelude::*;
+use actor::prelude::*;
 
-#[no_mangle]
-pub fn wapc_init() {
-    actorcore::Handlers::register_health_request(health);
-    http::Handlers::register_handle_request(hello_world);
-}
-
-pub fn hello_world(r: http::Request) -> HandlerResult<http::Response> {
-    let echo = EchoResponse {
-        method: r.method,
-        path: r.path,
-        query_string: r.query_string,
-        headers: r.header,
-        body: r.body,
-    };
-
-    Ok(http::Response::json(echo, 200, "OK"))
-}
-
-fn health(_h: actorcore::HealthCheckRequest) -> HandlerResult<actorcore::HealthCheckResponse> {
-    Ok(actorcore::HealthCheckResponse::healthy())
-}
+actor_handlers! { 
+    codec::http::OP_HANDLE_REQUEST => echo, 
+    codec::core::OP_HEALTH_REQUEST => health }
 
 #[derive(Serialize)]
 struct EchoResponse {
@@ -34,4 +15,20 @@ struct EchoResponse {
     query_string: String,
     headers: HashMap<String, String>,
     body: Vec<u8>,
+}
+
+pub fn echo(r:  codec::http::Request) ->  HandlerResult<codec::http::Response> {
+    let echo = EchoResponse {
+        method: r.method,
+        path: r.path,
+        query_string: r.query_string,
+        headers: r.header,
+        body: r.body,
+    };
+
+    Ok(codec::http::Response::json(echo, 200, "OK"))
+}
+
+fn health(_h: codec::core::HealthRequest) -> HandlerResult<()> {
+    Ok(())
 }
