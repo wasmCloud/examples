@@ -1,6 +1,6 @@
 import { Request, Response, ResponseBuilder, Handlers as HTTPHandlers } from "../../../actor-interfaces/assemblyscript/http-server/assembly/module";
 import { Host as KV } from "../../../actor-interfaces/assemblyscript/keyvalue/assembly/module";
-import { HealthCheckResponse, HealthCheckRequest, Handlers as CoreHandlers } from "../../../actor-interfaces/assemblyscript/actor-core/assembly/module";
+import { HealthCheckResponse, HealthCheckRequest, Handlers as CoreHandlers, HealthCheckResponseBuilder } from "../../../actor-interfaces/assemblyscript/actor-core/assembly/module";
 import { JSONEncoder } from "assemblyscript-json";
 
 export function wapc_init(): void {
@@ -9,11 +9,11 @@ export function wapc_init(): void {
 }
 
 function HealthCheck(request: HealthCheckRequest): HealthCheckResponse {
-  return new HealthCheckResponse();
+  return new HealthCheckResponseBuilder().withHealthy(true).withMessage("AssemblyScript KVCounter Healthy").build();
 }
 
 function HandleRequest(request: Request): Response {
-  const kv = new KV("");
+  const kv = new KV("default");
   const key = request.path.replace("/", ":");
   const result = kv.Add(key, 1);
 
