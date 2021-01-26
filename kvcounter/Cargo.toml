@@ -9,9 +9,9 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wapc-guest = "0.4.0"
-actor-core = { path = "../../actor-interfaces/rust/actor-core", features = ["guest"]}
-actor-http-server = { path = "../../actor-interfaces/rust/http-server", features = ["guest"]}
-actor-keyvalue = { path = "../../actor-interfaces/rust/keyvalue", features = ["guest"]}
+actor-keyvalue = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main", features = ["guest"] }
+actor-core = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main", features = ["guest"] }
+actor-http-server = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main", features = ["guest"]}
 serde_json = "1.0.59"
 
 [profile.release]

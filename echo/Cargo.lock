@@ -3,6 +3,7 @@
 [[package]]
 name = "actor-core"
 version = "0.2.0"
+source = "git+https://github.com/wasmcloud/actor-interfaces?branch=main#1d029dfba75488792ffe23952368250542e07b01"
 dependencies = [
  "lazy_static",
  "log",
@@ -16,6 +17,7 @@ dependencies = [
 [[package]]
 name = "actor-http-server"
 version = "0.1.0"
+source = "git+https://github.com/wasmcloud/actor-interfaces?branch=main#1d029dfba75488792ffe23952368250542e07b01"
 dependencies = [
  "lazy_static",
  "log",
