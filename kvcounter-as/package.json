@@ -15,6 +15,9 @@
     "dependencies": {
         "@wapc/as-guest": "^v0.2.1",
         "@wapc/as-msgpack": "^0.1.11",
+        "@wasmcloud/actor-http-server": "^0.1.2",
+        "@wasmcloud/actor-keyvalue": "^0.1.1",
+        "@wasmcloud/actor-core": "^0.1.1",
         "assemblyscript-json": "git+https://github.com/nearprotocol/assemblyscript-json"
     },
     "devDependencies": {

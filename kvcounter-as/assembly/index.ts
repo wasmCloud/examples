@@ -1,6 +1,6 @@
-import { Request, Response, ResponseBuilder, Handlers as HTTPHandlers } from "../../../actor-interfaces/assemblyscript/http-server/assembly/module";
-import { Host as KV } from "../../../actor-interfaces/assemblyscript/keyvalue/assembly/module";
-import { HealthCheckResponse, HealthCheckRequest, Handlers as CoreHandlers, HealthCheckResponseBuilder } from "../../../actor-interfaces/assemblyscript/actor-core/assembly/module";
+import { Request, Response, ResponseBuilder, Handlers as HTTPHandlers } from "@wasmcloud/actor-http-server";
+import { Host as KV } from "@wasmcloud/actor-keyvalue";
+import { HealthCheckResponse, HealthCheckRequest, Handlers as CoreHandlers, HealthCheckResponseBuilder } from "@wasmcloud/actor-core";
 import { JSONEncoder } from "assemblyscript-json";
 
 export function wapc_init(): void {
