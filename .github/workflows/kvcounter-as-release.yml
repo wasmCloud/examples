@@ -44,7 +44,7 @@ jobs:
       - name: npm build
         run: npm run build
       - name: Wash Sign Claim
-        run: wash claims sign build/kvcounter-as.wasm --issuer ${{ secrets.WASM_ACCOUNT_OFFICIAL }} --subject ${{ secrets.WASMCLOUD_KVCOUNTER }} -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter"
+        run: wash claims sign build/kvcounter-as.wasm --issuer ${{ secrets.WASM_ACCOUNT_OFFICIAL }} --subject ${{ secrets.WASMCLOUD_KVCOUNTER_AS }} -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter"
       - name: push-artifact
         run: |
           VERSION=$(cat package.json | jq ".version" | tr -d "\"")
