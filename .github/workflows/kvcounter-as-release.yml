@@ -1,4 +1,4 @@
-name: KVCOUNTER-RELEASE
+name: KVCOUNTER-AS-RELEASE
 
 on:
   push:
