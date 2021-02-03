@@ -1,0 +1,53 @@
+name: KVCOUNTER-RELEASE
+
+on:
+  push:
+    tags:
+    - 'kvcounter-as-v*'
+
+env:
+  CARGO_TERM_COLOR: always
+  working-directory: ./kvcounter-as
+  DESTINATION: build/kvcounter-as_s.wasm
+  WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_KVCOUNTER }}
+  WASH_REG_USER:  ${{ secrets.AZURECR_PUSH_USER }}
+  WASH_REG_PASSWORD:  ${{ secrets.AZURECR_PUSH_PASSWORD }}
+  REVISION: ${{ github.run_number }}
+
+jobs:
+  github_release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: true
+
+  artifact_release:
+    needs: github_release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          curl -s https://packagecloud.io/install/repositories/wasmCloud/core/script.deb.sh | sudo bash
+          sudo apt install wash
+      # Push artifact to https://AZURECR/httpclient:VERSION
+      - name: npm install
+        run: npm install
+      - name: npm build
+        run: npm run build
+      - name: Wash Sign Claim
+        run: wash claims sign build/kvcounter-as.wasm --issuer ${{ secrets.WASM_ACCOUNT_OFFICIAL }} --subject ${{ secrets.WASMCLOUD_KVCOUNTER }} -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter"
+      - name: push-artifact
+        run: |
+          VERSION=$(cat package.json | jq ".version" | tr -d "\"")
+          URL=${{secrets.AZURECR_PUSH_URL}}/kvcounter-as:$VERSION
+          wash reg push $URL ${{ env.DESTINATION }}
+        working-directory: ${{ env.working-directory }}
