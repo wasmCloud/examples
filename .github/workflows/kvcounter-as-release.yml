@@ -38,13 +38,15 @@ jobs:
       - run: |
           curl -s https://packagecloud.io/install/repositories/wasmCloud/core/script.deb.sh | sudo bash
           sudo apt install wash
-      # Push artifact to https://AZURECR/httpclient:VERSION
       - name: npm install
         run: npm install
       - name: npm build
         run: npm run build
       - name: Wash Sign Claim
-        run: wash claims sign build/kvcounter-as.wasm --issuer ${{ secrets.WASM_ACCOUNT_OFFICIAL }} --subject ${{ secrets.WASMCLOUD_KVCOUNTER_AS }} -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter"
+        run: |
+          VERSION=$(cat package.json | jq ".version" | tr -d "\"")
+          wash claims sign build/kvcounter-as.wasm --disable-keygen -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter" --ver $VERSION --rev ${{ env.REVISION }}
+      # Push artifact to https://AZURECR/kvcounter-as:VERSION
       - name: push-artifact
         run: |
           VERSION=$(cat package.json | jq ".version" | tr -d "\"")

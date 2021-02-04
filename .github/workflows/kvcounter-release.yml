@@ -61,11 +61,13 @@ jobs:
       - run: |
           curl -s https://packagecloud.io/install/repositories/wasmCloud/core/script.deb.sh | sudo bash
           sudo apt install wash
-      # Push artifact to https://AZURECR/httpclient:VERSION
       - name: Build
         run: cargo build --release
       - name: Wash Sign Claim
-        run: wash claims sign target/wasm32-unknown-unknown/release/kvcounter.wasm --issuer ${{ secrets.WASM_ACCOUNT_OFFICIAL }} --subject ${{ secrets.WASMCLOUD_KVCOUNTER }} -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter"
+        run: |
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')
+          wash claims sign target/wasm32-unknown-unknown/release/kvcounter.wasm --disable-keygen -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter" --ver $VERSION --rev ${{ env.REVISION }}
+      # Push artifact to https://AZURECR/kvcounter:VERSION
       - name: push-artifact
         run: |
           VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')
