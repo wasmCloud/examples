@@ -16,10 +16,9 @@ use wascc_codec::{deserialize, serialize};
 #[cfg(not(feature = "static_plugin"))]
 capability_provider!(KeyvalueProvider, KeyvalueProvider::new);
 
+#[allow(unused)]
 const CAPABILITY_ID: &str = "wasmcloud:keyvalue";
 const SYSTEM_ACTOR: &str = "system";
-const VERSION: &str = env!("CARGO_PKG_VERSION");
-const REVISION: u32 = 1; // Increment for each crates publish
 
 #[derive(Clone)]
 pub struct KeyvalueProvider {
@@ -29,10 +28,7 @@ pub struct KeyvalueProvider {
 
 impl Default for KeyvalueProvider {
     fn default() -> Self {
-        match env_logger::try_init() {
-            Ok(_) => {}
-            Err(_) => {}
-        };
+        if env_logger::try_init().is_ok() {};
         KeyvalueProvider {
             dispatcher: Arc::new(RwLock::new(Box::new(NullDispatcher::new()))),
             store: Arc::new(RwLock::new(KeyValueStore::new())),
@@ -256,7 +252,5 @@ impl CapabilityProvider for KeyvalueProvider {
     }
 
     /// No cleanup needed
-    fn stop(&self) {
-        ()
-    }
+    fn stop(&self) {}
 }
