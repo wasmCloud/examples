@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Add wasm32-unknown-unknown
+      run: rustup target add wasm32-unknown-unknown
     - name: Build
       run: cargo build --verbose
       working-directory: ${{ env.working-directory }}
@@ -35,6 +37,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: rustup component add clippy
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
       - name: Run cargo clippy
         run: cargo clippy --all-features
         working-directory: ${{ env.working-directory }}
@@ -61,6 +65,8 @@ jobs:
       - run: |
           curl -s https://packagecloud.io/install/repositories/wasmCloud/core/script.deb.sh | sudo bash
           sudo apt install wash
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
       - name: Build
         run: cargo build --release
         working-directory: ${{ env.working-directory }}
