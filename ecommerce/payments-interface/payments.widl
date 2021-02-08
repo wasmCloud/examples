@@ -9,18 +9,18 @@ interface {
 type AuthorizePaymentRequest {
     amount: u32
     tax: u32
-    payment_method: string
-    payment_entity: string
+    paymentMethod: string
+    paymentEntity: string
 }
 
 type AuthorizePaymentResponse {
     success: bool
-    auth_code: string?
-    fail_reason: string?
+    authCode: string?
+    failReason: string?
 }
 
 type CompletePaymentRequest {
-    auth_code: string
+    authCode: string
     request: AuthorizePaymentRequest
 }
 
