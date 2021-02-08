@@ -63,10 +63,12 @@ jobs:
           sudo apt install wash
       - name: Build
         run: cargo build --release
+        working-directory: ${{ env.working-directory }}
       - name: Wash Sign Claim
         run: |
           VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')
           wash claims sign target/wasm32-unknown-unknown/release/kvcounter.wasm --disable-keygen -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter" --ver $VERSION --rev ${{ env.REVISION }}
+        working-directory: ${{ env.working-directory }}
       # Push artifact to https://AZURECR/kvcounter:VERSION
       - name: push-artifact
         run: |

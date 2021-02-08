@@ -40,12 +40,15 @@ jobs:
           sudo apt install wash
       - name: npm install
         run: npm install
+        working-directory: ${{ env.working-directory }}
       - name: npm build
         run: npm run build
+        working-directory: ${{ env.working-directory }}
       - name: Wash Sign Claim
         run: |
           VERSION=$(cat package.json | jq ".version" | tr -d "\"")
           wash claims sign build/kvcounter-as.wasm --disable-keygen -c wasmcloud:keyvalue -c wasmcloud:httpserver --name "Key Value Counter" --ver $VERSION --rev ${{ env.REVISION }}
+        working-directory: ${{ env.working-directory }}
       # Push artifact to https://AZURECR/kvcounter-as:VERSION
       - name: push-artifact
         run: |
