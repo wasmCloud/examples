@@ -1,0 +1,35 @@
+namespace "examples:payments"
+
+interface {
+  AuthorizePayment{request: AuthorizePaymentRequest}: AuthorizePaymentResponse
+  CompletePayment{request: CompletePaymentRequest}: CompletePaymentResponse
+  GetPaymentMethods(): PaymentMethodList  
+}
+
+type AuthorizePaymentRequest {
+    amount: u32
+    tax: u32
+    payment_method: string
+    payment_entity: string
+}
+
+type AuthorizePaymentResponse {
+    success: bool
+    auth_code: string?
+    fail_reason: string?
+}
+
+type CompletePaymentRequest {
+    auth_code: string
+    request: AuthorizePaymentRequest
+}
+
+type CompletePaymentResponse {
+    success: bool
+    txid: string
+    timestamp: u64
+}
+
+type PaymentMethodList {
+    methods: {string:string}
+}
