@@ -1,7 +1,7 @@
 [package]
-name = "keyvalue"
-version = "0.3.0"
-authors = ["Kevin Hoffman <alothien@gmail.com>"]
+name = "inmemory-keyvalue"
+version = "0.4.0"
+authors = ["wasmCloud Team"]
 edition = "2018"
 
 [lib]
@@ -12,6 +12,8 @@ crate-type = ["cdylib", "rlib"]
 static_plugin = []
 
 [dependencies]
-wascc-codec = { version = "0.7.0",  path = "../../wascc-codec" }
+wascc-codec = "0.9.0"
 log = "0.4.8"
 env_logger = "0.7.1"
+actor-keyvalue = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main"}
+actor-core = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main"}

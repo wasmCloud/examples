@@ -21,7 +21,7 @@ impl KeyValueStore {
         }
     }
 
-    pub fn incr(&mut self, key: &str, value: i32) -> Result<i32, Box<dyn Error>> {
+    pub fn incr(&mut self, key: &str, value: i32) -> Result<i32, Box<dyn Error + Send + Sync>> {
         let mut orig = 0;
         self.items
             .entry(key.to_string())
@@ -35,16 +35,16 @@ impl KeyValueStore {
         Ok(orig + value)
     }
 
-    pub fn del(&mut self, key: &str) -> Result<(), Box<dyn Error>> {
+    pub fn del(&mut self, key: &str) -> Result<(), Box<dyn Error + Send + Sync>> {
         self.items.remove(key);
         Ok(())
     }
 
-    pub fn exists(&self, key: &str) -> Result<bool, Box<dyn Error>> {
+    pub fn exists(&self, key: &str) -> Result<bool, Box<dyn Error + Send + Sync>> {
         Ok(self.items.contains_key(key))
     }
 
-    pub fn get(&self, key: &str) -> Result<String, Box<dyn Error>> {
+    pub fn get(&self, key: &str) -> Result<String, Box<dyn Error + Send + Sync>> {
         self.items.get(key).map_or_else(
             || Err("No such key".into()),
             |v| {
@@ -57,7 +57,12 @@ impl KeyValueStore {
         )
     }
 
-    pub fn lrange(&self, key: &str, start: i32, stop: i32) -> Result<Vec<String>, Box<dyn Error>> {
+    pub fn lrange(
+        &self,
+        key: &str,
+        start: i32,
+        stop: i32,
+    ) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
         let start = start.max(0);
         self.items.get(key).map_or_else(
             || Ok(vec![]),
@@ -72,7 +77,7 @@ impl KeyValueStore {
         )
     }
 
-    pub fn lpush(&mut self, key: &str, value: String) -> Result<i32, Box<dyn Error>> {
+    pub fn lpush(&mut self, key: &str, value: String) -> Result<i32, Box<dyn Error + Send + Sync>> {
         let mut len = 1;
         self.items
             .entry(key.to_string())
@@ -89,7 +94,7 @@ impl KeyValueStore {
         Ok(len as _)
     }
 
-    pub fn set(&mut self, key: &str, value: String) -> Result<(), Box<dyn Error>> {
+    pub fn set(&mut self, key: &str, value: String) -> Result<(), Box<dyn Error + Send + Sync>> {
         self.items
             .entry(key.to_string())
             .and_modify(|v| {
@@ -101,7 +106,7 @@ impl KeyValueStore {
         Ok(())
     }
 
-    pub fn lrem(&mut self, key: &str, value: String) -> Result<i32, Box<dyn Error>> {
+    pub fn lrem(&mut self, key: &str, value: String) -> Result<i32, Box<dyn Error + Send + Sync>> {
         let mut len: i32 = 0;
         self.items.entry(key.to_string()).and_modify(|v| {
             if let KeyValueItem::List(ref l) = v {
@@ -117,7 +122,7 @@ impl KeyValueStore {
         Ok(len)
     }
 
-    pub fn sadd(&mut self, key: &str, value: String) -> Result<i32, Box<dyn Error>> {
+    pub fn sadd(&mut self, key: &str, value: String) -> Result<i32, Box<dyn Error + Send + Sync>> {
         let mut len: i32 = 1;
         self.items
             .entry(key.to_string())
@@ -131,7 +136,7 @@ impl KeyValueStore {
         Ok(len)
     }
 
-    pub fn srem(&mut self, key: &str, value: String) -> Result<i32, Box<dyn Error>> {
+    pub fn srem(&mut self, key: &str, value: String) -> Result<i32, Box<dyn Error + Send + Sync>> {
         let mut len: i32 = 0;
         self.items
             .entry(key.to_string())
@@ -145,7 +150,7 @@ impl KeyValueStore {
         Ok(len)
     }
 
-    pub fn sunion(&self, keys: Vec<String>) -> Result<Vec<String>, Box<dyn Error>> {
+    pub fn sunion(&self, keys: Vec<String>) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
         let union = self
             .items
             .iter()
@@ -165,7 +170,7 @@ impl KeyValueStore {
         Ok(union.iter().cloned().collect())
     }
 
-    pub fn sinter(&self, keys: Vec<String>) -> Result<Vec<String>, Box<dyn Error>> {
+    pub fn sinter(&self, keys: Vec<String>) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
         let sets: Vec<HashSet<String>> = self
             .items
             .iter()
@@ -188,7 +193,7 @@ impl KeyValueStore {
         Ok(inter.cloned().collect())
     }
 
-    pub fn smembers(&self, key: String) -> Result<Vec<String>, Box<dyn Error>> {
+    pub fn smembers(&self, key: String) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
         self.items.get(&key).map_or_else(
             || Ok(vec![]),
             |v| {
