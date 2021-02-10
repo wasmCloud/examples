@@ -1,34 +1,30 @@
-// Copyright 2015-2020 Capital One Services, LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and 
-// limitations under the License.
+extern crate wasmcloud_actor_core as core;
+extern crate wasmcloud_actor_http_server as http;
+extern crate wasmcloud_actor_logging as logging;
+use log::{debug, error, info, warn};
+use wapc_guest::HandlerResult;
 
-#[macro_use]
-extern crate log;
-
-extern crate wascc_actor as actor;
-
-use actor::prelude::*;
-
-actor_handlers! { codec::http::OP_HANDLE_REQUEST => hello_world, 
-                  codec::core::OP_HEALTH_REQUEST => health }
-
-fn hello_world(payload: codec::http::Request) -> HandlerResult<codec::http::Response> {
-    println("Received an HTTP request");    
-    info!("Received request: {:?}", payload);
-    logger::default().warn("Received an HTTP request")?;
-    Ok(codec::http::Response::ok())
+#[no_mangle]
+pub fn wapc_init() {
+    http::Handlers::register_handle_request(method_logger);
+    core::Handlers::register_health_request(health);
+    logging::enable_macros();
 }
 
-fn health(_req: codec::core::HealthRequest) -> HandlerResult<()> {
-    Ok(())
+/// Actor must be signed with `wasmcloud:logging` to log messages
+fn method_logger(msg: http::Request) -> HandlerResult<http::Response> {
+    logging::default().write_log("LOGGING_ACTORINFO", "info", "Coercing Rust String to str")?;
+    match &*msg.method {
+        "GET" => info!(target: "GETLOG", "Received a GET request"),
+        "POST" => info!("Received a POST request"),
+        "PUT" => info!("Received a PUT request"),
+        "DELETE" => warn!(target: "SYSTEM_WARNINGS", "Received a DELETE request"),
+        req => error!("Received an unsupported HTTP Request: {}", req),
+    };
+    debug!(target: "LOGGING_ACTORINFO", "Finished matching HTTP method, returning OK");
+    Ok(http::Response::ok())
+}
+
+fn health(_h: core::HealthCheckRequest) -> HandlerResult<core::HealthCheckResponse> {
+    Ok(core::HealthCheckResponse::healthy())
 }
