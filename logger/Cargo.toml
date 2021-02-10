@@ -1,15 +1,19 @@
 [package]
 name = "logger"
-version = "0.0.1"
-authors = ["Kevin Hoffman <alothien@gmail.com>"]
+version = "0.1.0"
+authors = ["wasmCloud Team"]
 edition = "2018"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-log = "0.4.8"
-wascc-actor = { version="0.7.0", path = "../../wascc-actor" }
+wapc-guest = "0.4.0"
+log = "0.4.14"
+actor-core = { git = "https://github.com/wasmCloud/actor-interfaces", branch = "main", features = ["guest"] }
+#actor-logging = { git = "https://github.com/wasmCloud/actor-interfaces", branch = "main", features = ["guest"] }
+actor-logging = { path = "../../actor-interfaces/logging/rust", features = ["guest"] }
+actor-http-server = { git = "https://github.com/wasmCloud/actor-interfaces", branch = "main", features = ["guest"] }
 
 [profile.release]
 # Optimize for small code size
