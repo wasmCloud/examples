@@ -10,10 +10,9 @@ crate-type = ["cdylib"]
 [dependencies]
 wapc-guest = "0.4.0"
 log = "0.4.14"
-actor-core = { git = "https://github.com/wasmCloud/actor-interfaces", branch = "main", features = ["guest"] }
-#actor-logging = { git = "https://github.com/wasmCloud/actor-interfaces", branch = "main", features = ["guest"] }
-actor-logging = { path = "../../actor-interfaces/logging/rust", features = ["guest"] }
-actor-http-server = { git = "https://github.com/wasmCloud/actor-interfaces", branch = "main", features = ["guest"] }
+wasmcloud-actor-core = { version = "0.2.0", features = ["guest"] }
+wasmcloud-actor-logging = { version = "0.1.0", features = ["guest"] }
+wasmcloud-actor-http-server = { version = "0.1.0", features = ["guest"] }
 
 [profile.release]
 # Optimize for small code size
