@@ -1,20 +1,18 @@
-# Replace "MODULE" with the uppercase name of the module
-# Replace "workingdir" with the folder name of the module in this repository
-name: MODULE
+name: SUBSCRIBER
 
 on:
   push:
     branches: [ main ]
     paths:
-    - "workingdir/**"
+    - "subscriber/**"
   pull_request:
     branches: [ main ]
     paths:
-    - "workingdir/**"
+    - "subscriber/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./workingdir
+  working-directory: ./subscriber
 
 jobs:
   cargo_check:

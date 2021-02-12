@@ -15,5 +15,5 @@ static_plugin = []
 wascc-codec = "0.9.0"
 log = "0.4.8"
 env_logger = "0.7.1"
-actor-keyvalue = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main"}
-actor-core = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main"}
+wasmcloud-actor-keyvalue = "0.2.0"
+wasmcloud-actor-core = "0.2.0"

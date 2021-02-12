@@ -1,20 +1,18 @@
-# Replace "MODULE" with the uppercase name of the module
-# Replace "workingdir" with the folder name of the module in this repository
-name: MODULE
+name: LOGGER
 
 on:
   push:
     branches: [ main ]
     paths:
-    - "workingdir/**"
+    - "logger/**"
   pull_request:
     branches: [ main ]
     paths:
-    - "workingdir/**"
+    - "logger/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./workingdir
+  working-directory: ./logger
 
 jobs:
   cargo_check:
