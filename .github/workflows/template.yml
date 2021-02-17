@@ -1,0 +1,45 @@
+# Replace "MODULE" with the uppercase name of the module
+# Replace "workingdir" with the folder name of the module in this repository
+name: MODULE
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+    - "workingdir/**"
+  pull_request:
+    branches: [ main ]
+    paths:
+    - "workingdir/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  working-directory: ./workingdir
+
+jobs:
+  cargo_check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Add wasm32-unknown-unknown
+      run: rustup target add wasm32-unknown-unknown
+    - name: Build
+      run: cargo build --verbose
+      working-directory: ${{ env.working-directory }}
+    - name: Run tests
+      run: cargo test --bins --verbose
+      working-directory: ${{ env.working-directory }}
+    - name: Check fmt
+      run: cargo fmt -- --check
+      working-directory: ${{ env.working-directory }}
+
+  clippy_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: rustup component add clippy
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
+      - name: Run cargo clippy
+        run: cargo clippy --all-features
+        working-directory: ${{ env.working-directory }}

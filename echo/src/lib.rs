@@ -1,9 +1,9 @@
 use serde::Serialize;
 use std::collections::HashMap;
 extern crate wapc_guest as guest;
-use actor_core as actorcore;
-use actor_http_server as http;
 use guest::prelude::*;
+use wasmcloud_actor_core as actorcore;
+use wasmcloud_actor_http_server as http;
 
 #[no_mangle]
 pub fn wapc_init() {

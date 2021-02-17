@@ -5,13 +5,13 @@ extern crate log;
 
 mod kv;
 use crate::kv::KeyValueStore;
-use actor_core::CapabilityConfiguration;
-use actor_keyvalue::*;
 use codec::capabilities::{CapabilityProvider, Dispatcher, NullDispatcher};
 use codec::core::{OP_BIND_ACTOR, OP_REMOVE_ACTOR};
 use std::error::Error;
 use std::sync::{Arc, RwLock};
 use wascc_codec::{deserialize, serialize};
+use wasmcloud_actor_core::CapabilityConfiguration;
+use wasmcloud_actor_keyvalue::*;
 
 #[cfg(not(feature = "static_plugin"))]
 capability_provider!(KeyvalueProvider, KeyvalueProvider::new);
