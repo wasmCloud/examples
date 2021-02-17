@@ -1,19 +1,17 @@
-# Examples
+# wasmCloud Examples
 
 Example actors, capability providers, and other demonstrations
 
-* [echo](https://github.com/wascc/examples/tree/master/echo) - An actor that returns a JSON payload describing the incoming request
-* [subscriber](https://github.com/wascc/examples/tree/master/subscriber) - A simple actor that logs every message it receives to `stdout`
-* [kvcounter](https://github.com/wascc/examples/tree/master/kvcounter) - An actor that uses the key-value store to increment a counter and return a value for every HTTP request it receives
-* [keyvalue-provider](https://github.com/wascc/examples/tree/master/keyvalue-provider) - A sample in-memory Key-Value Store capability provider, used by the tutorial for creating a new capability provider
-* [inmemory-streams](https://github.com/wascc/examples/tree/master/inmemory-streams) - An example illustrating an in-memory `wascc:eventstreams` provider
-* [extras](https://github.com/wascc/examples/tree/master/extras) - A sample illustrating the use of the `wascc:extras` capability for random number, Guid, and sequence number generation.
-* [multibinding](https://github.com/wascc/examples/tree/multibinding) - An example illustrating the use of named bindings to support multiple, differentiable instances of the same capability provider type.
 
-To run these, go to the root directory of the [wascc-host](https://github.com/wascc/wascc-host) project and issue the following command:
+| Example | Type | Description | Provider Archive OCI Reference |
+|---|---|---|---|
+| [echo](https://github.com/wasmcloud/examples/tree/main/echo) | Actor |An actor that returns a JSON payload describing the incoming request | wasmcloud.azurecr.io/echo:0.2.0 |
+| [extras](https://github.com/wasmcloud/examples/tree/main/extras) | Actor | A sample illustrating the use of the `wasmcloud:extras` capability for random number, Guid, and sequence number generation. | Not published |
+| [kvcounter](https://github.com/wasmcloud/examples/tree/main/kvcounter) | Actor | An actor that uses the key-value store to increment a counter and return a value for every HTTP request it receives | wasmcloud.azurecr.io/kvcounter:0.2.0 |
+| [kvcounter-as](https://github.com/wasmcloud/examples/tree/main/kvcounter-as) | Actor | The same actor as `kvcounter`, but written in AssemblyScript. This actor is meant to demonstrate the subtle differences between languages.  | wasmcloud.azurecr.io/kvcounter-as:0.1.0 |
+| [logger](https://github.com/wasmcloud/examples/tree/main/logger) | Actor | A simple actor that logs every HTTP Request Method it receives to `stdout` | wasmcloud.azurecr.io/logger:0.1.0 |
+| [subscriber](https://github.com/wasmcloud/examples/tree/main/subscriber) | Actor | A simple actor that logs every message it receives to `stdout` | wasmcloud.azurecr.io/subscriber:0.2.0 |
+| [inmemory-keyvalue](https://github.com/wasmcloud/examples/tree/main/inmemory-keyvalue) | Provider | A sample in-memory Key-Value Store capability provider, used by the tutorial for creating a new capability provider | wasmcloud.azurecr.io/inmemory-keyvalue:0.4.0 |
+| [inmemory-streams](https://github.com/wasmcloud/examples/tree/main/inmemory-streams) | Provider | An example illustrating an in-memory `wasmcloud:eventstreams` provider | Not published |
 
-```shell
-$ cargo run --example (example name)
-```
-
-You'll see the examples in the [examples](https://github.com/wascc/wascc-host/tree/master/examples) directory.
+Please refer to the GitHub Release versions for the most up-to-date versions of the example actors.
