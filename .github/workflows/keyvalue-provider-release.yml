@@ -10,7 +10,7 @@ env:
   working-directory: ./inmemory-keyvalue
   DESTINATION: inmemory-keyvalue.par.gz #aka the filename of the parJEEzy
   WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_INMEMORY-KEYVALUE }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_INMEMORY_KEYVALUE }}
   WASH_REG_USER:  ${{ secrets.AZURECR_PUSH_USER }}
   WASH_REG_PASSWORD:  ${{ secrets.AZURECR_PUSH_PASSWORD }}
   REVISION: ${{ github.run_number }}
