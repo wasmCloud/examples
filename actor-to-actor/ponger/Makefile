@@ -12,7 +12,7 @@ all: build
 
 build:
 	@$(CARGO) build	
-	wash claims sign $(DEBUG)/ponger.wasm --name "ponger" --ver $(VERSION) --rev 0
+	wash claims sign $(DEBUG)/ponger.wasm --name "ponger" -a "wasmcloud/examples/ponger" --ver $(VERSION) --rev 0
 
 check:
 	@$(CARGO) check
@@ -31,4 +31,4 @@ update:
 
 release:
 	@$(CARGO) build --release	
-	wash claims sign $(RELEASE)/ponger.wasm --name "ponger" --ver $(VERSION) --rev 0
+	wash claims sign $(RELEASE)/ponger.wasm --name "ponger" -a "wasmcloud/examples/ponger" --ver $(VERSION) --rev 0
