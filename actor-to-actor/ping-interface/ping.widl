@@ -1,0 +1,13 @@
+namespace "examples:ping"
+
+interface {
+  Ping{request: Ping}: Pong
+}
+
+type Ping {
+    value: i32
+}
+
+type Pong {
+    value: i32
+}
