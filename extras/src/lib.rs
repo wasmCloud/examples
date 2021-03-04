@@ -1,38 +1,23 @@
-// Copyright 2015-2020 Capital One Services, LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-extern crate wascc_actor as actor;
-
 #[macro_use]
 extern crate serde_json;
+extern crate wapc_guest as guest;
+use guest::prelude::*;
+use wasmcloud_actor_core as actor;
+use wasmcloud_actor_extras as extras;
+use wasmcloud_actor_http_server as http;
 
-use actor::prelude::*;
-
-actor_handlers! { 
-  codec::http::OP_HANDLE_REQUEST => display_extras, 
-  codec::core::OP_HEALTH_REQUEST => health }
-
-fn display_extras(_payload: codec::http::Request) -> HandlerResult<codec::http::Response> {
-    let extras = extras::default();
-    let result = json!(
-    { "random": extras.get_random(0, 100)?,
-      "guid" : extras.get_guid()?,
-      "sequence": extras.get_sequence_number()?,
-    });
-    Ok(codec::http::Response::json(result, 200, "OK"))
+#[actor::init]
+fn init() {
+  http::Handlers::register_handle_request(display_extras);
 }
 
-fn health(_payload: codec::core::HealthRequest) -> HandlerResult<()> {
-    Ok(())
+fn display_extras(_payload: http::Request) -> HandlerResult<http::Response> {
+  let extras = extras::default();
+
+  let result = json!(
+  { "random": extras.request_random(0, 100)?,
+    "guid" : extras.request_guid()?,
+    "sequence": extras.request_sequence()?,
+  });
+  Ok(http::Response::json(result, 200, "OK"))
 }
