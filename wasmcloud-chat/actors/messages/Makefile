@@ -12,7 +12,7 @@ all: build
 
 build:
 	@$(CARGO) build	
-	wash claims sign $(DEBUG)/messages.wasm -c wasmcloud:httpserver --name "messages" --ver $(VERSION) --rev 0
+	wash claims sign $(DEBUG)/messages.wasm -a "wasmcloud/chat/messages" -g -c "wasmcloud:eventstreams" --name "Message Processor" --ver $(VERSION) --rev 0
 
 check:
 	@$(CARGO) check
@@ -31,4 +31,4 @@ update:
 
 release:
 	@$(CARGO) build --release	
-	wash claims sign $(RELEASE)/messages.wasm -c wasmcloud:httpserver --name "messages" --ver $(VERSION) --rev 0
+	wash claims sign $(RELEASE)/messages.wasm -a "wasmcloud/chat/messages" -g -c "wasmcloud:eventstreams" --name "Message Processor" --ver $(VERSION) --rev 0

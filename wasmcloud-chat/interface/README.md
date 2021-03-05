@@ -20,7 +20,8 @@ The following is a list of relevant NATS subjects used by the chat system
 | Subject | Subscribers | Description |
 | :-- | :--: | :-- |
 | `wcc.events` | All Channel Actors | Global events that occur within the wasmcloud chat (WCC) environment |
-| `wcc.events.rooms.*` | Channel Actors | Subscribed to when a user logs into a channel that is a member of a given room |
+| `wcc.events.room.*` | Channel Actors | Subscribed to when a user logs into a channel that is a member of a given room. Room-scoped messages are published here. |
+| `wcc.events.user.*` | Channel Actors | Subscribed to when a user logs in. Private/direct messages are published here |
 
 ## Events
 
@@ -34,3 +35,18 @@ The following is a list of the events that can be published, either globally or 
 | `MessageDelivered` | Room | Published by channel actors to indicate that a published message has been delivered to a room |
 | `UserJoined` | Room | Indicates a user joined the room |
 | `UserLeft` | Room | Indicates a user left the room. This corresponds to permanently surrendering interest in the room, _not_ logging off |
+
+## Message Targeting
+
+Message targeting in wasmCloud Chat is done via URLs. All target URLs in this ecosystem use the scheme `wcchat` (wasmcloud chat).
+
+The next path segment is the qualifier for the type of target, of which there are two:
+* users
+* rooms
+
+We're using plural here to make the URL read semi-friendly to those used to RESTful APIs. The next segment is the unique identifier of either the room or the user.
+
+Examples:
+* `wcchat://users/abc12345689djcn1223mnca`
+* `wcchat://rooms/general` 
+* `wcchat://rooms/gchat-abc1234jcskjl42`

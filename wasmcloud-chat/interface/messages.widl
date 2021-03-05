@@ -1,0 +1,24 @@
+namespace "wcc:messages"
+
+interface {    
+    ProcessMessage{message: ChannelMessage}: ProcessAck
+}
+
+type ChannelMessage {    
+    message_id: string    
+    origin_channel: string        
+    origin_user_id: string    
+    origin_room: string?    
+    message_text: string    
+    created_on: u64        
+    target_url: string    
+    message_type: string    
+    data: string?
+}
+
+
+type ProcessAck {    
+    message_id: string    
+    processed: bool    
+    error: string?
+}
