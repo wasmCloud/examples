@@ -1,15 +1,6 @@
 # Message Broker Channel
 
-```
-  FE                        .-----------------.                            .--------------.
-BROKER ---[Chat Request]--->|                  |-----[Channel Message]---->|               |
-                <---[ACK]---|                  |             <----[ACK]----|   Messages    |-------.
-                            |  Broker Channel  |                           |               |       |
-                            |                  |                            `--------------'       |
-  FE   <----[Message] ------|                  |                           .-----------------.     |
-BROKER                      |                  |<------[Chat Event]--------|  Backend Broker |<----'
-                            `------------------'                           `-----------------'
-```
+[![](https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRkIgYXMgRnJvbnRlbmQgQnJva2VyXG4gICAgcGFydGljaXBhbnQgQkMgYXMgQnJva2VyIENoYW5uZWxcbiAgICBwYXJ0aWNpcGFudCBNIGFzIE1lc3NhZ2VzXG4gICAgcGFydGljaXBhbnQgQkIgYXMgQmFja2VuZCBCcm9rZXJcblxuICAgIEZCLT4-K0JDOiBDaGF0IFJlcXVlc3RcbiAgICBCQy0-PitNOiBDaGFubmVsIE1lc3NhZ2VcbiAgICBNLS0-PkJCOiBQdWJsaXNoIEV2ZW50XG4gICAgTS0-Pi1CQzogQUNLXG4gICAgQkMtPj4tRkI6IEFDS1xuICAgIFxuICAgIEJCLS0-PitCQzogQ2hhdCBFdmVudFxuICAgIEJDLS0-Pi1GQjogTWVzc2FnZVxuICAgICAgICAgICAgIiwibWVybWFpZCI6e30sInVwZGF0ZUVkaXRvciI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRkIgYXMgRnJvbnRlbmQgQnJva2VyXG4gICAgcGFydGljaXBhbnQgQkMgYXMgQnJva2VyIENoYW5uZWxcbiAgICBwYXJ0aWNpcGFudCBNIGFzIE1lc3NhZ2VzXG4gICAgcGFydGljaXBhbnQgQkIgYXMgQmFja2VuZCBCcm9rZXJcblxuICAgIEZCLT4-K0JDOiBDaGF0IFJlcXVlc3RcbiAgICBCQy0-PitNOiBDaGFubmVsIE1lc3NhZ2VcbiAgICBNLS0-PkJCOiBQdWJsaXNoIEV2ZW50XG4gICAgTS0-Pi1CQzogQUNLXG4gICAgQkMtPj4tRkI6IEFDS1xuICAgIFxuICAgIEJCLS0-PitCQzogQ2hhdCBFdmVudFxuICAgIEJDLS0-Pi1GQjogTWVzc2FnZVxuICAgICAgICAgICAgIiwibWVybWFpZCI6e30sInVwZGF0ZUVkaXRvciI6ZmFsc2V9)
 
 The message broker channel actor is one of the channel actors that provide a _proxy_ or _gateway_ to the back-end. In the case of
 the broker channel, the front-end is a `wasmcloud:messaging` capability provider and the back-end is the `messages` actor.
