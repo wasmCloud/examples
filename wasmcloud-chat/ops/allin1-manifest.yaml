@@ -12,7 +12,7 @@ capabilities:
     - image_ref: wasmcloud.azurecr.io/logging:0.9.1
     - image_ref: wasmcloud.azurecr.io/redisstreams:0.4.0
 links:
-  # configure the broker channel actor - messaging, logging
+  # configure the broker channel actor - messaging, logging, extras
   - actor: ${BROKERCHANNEL_ACTOR:MAP7EXS72YJ5Z6U5AJ6IMYIRVMRJRZJBLVTC6H4E552K7SJDRYBPA3YF}
     contract_id: "wasmcloud:messaging"
     provider_id: "VADNMSIML2XGO2X4TPIONTIC55R2UUQGPPDZPAVSC2QD7E76CR77SPW7"
@@ -22,6 +22,9 @@ links:
   - actor: ${BROKERCHANNEL_ACTOR:MAP7EXS72YJ5Z6U5AJ6IMYIRVMRJRZJBLVTC6H4E552K7SJDRYBPA3YF}
     contract_id: "wasmcloud:logging"
     provider_id: "VCCANMDC7KONJK435W6T7JFEEL7S3ZG6GUZMZ3FHTBZ32OZHJQR5MJWZ"
+  - actor: ${BROKERCHANNEL_ACTOR:MAP7EXS72YJ5Z6U5AJ6IMYIRVMRJRZJBLVTC6H4E552K7SJDRYBPA3YF}
+    contract_id: "wasmcloud:extras"
+    provider_id: "VDHPKGFKDI34Y4RN4PWWZHRYZ6373HYRSNNEM4UTDLLOGO5B37TSVREP"
   
   # the messages actor needs: eventstreams, messaging, logging
   - actor: ${MESSAGES_ACTOR:MD6EZIZRZ5VCN6FSJZXHE2NBGGWSIIKP2GDDTODFHOTGNIVIDF2MPHIK}

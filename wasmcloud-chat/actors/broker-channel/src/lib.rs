@@ -68,13 +68,21 @@ fn handle_inbound_message(msg: messaging::BrokerMessage) -> HandlerResult<()> {
         message_type: MSGTYPE_MESSAGE.to_string(),
         message_text: req.message_text,
     };
+    info!("Submitting message to message actor for processing");
     let ack: msgactor::ProcessAck =
-        actor::call_actor(MSG_ACTOR_CALL_ALIAS, OP_PROCESS_MESSAGE, &channelmsg)?;
+        match actor::call_actor(MSG_ACTOR_CALL_ALIAS, OP_PROCESS_MESSAGE, &channelmsg) {
+            Ok(ack) => ack,
+            Err(e) => {
+                error!("Failed to process message: {}", e);
+                return Err("Failed to process message".into());
+            }
+        };
     let response = InboundResponse {
         acknowledged: ack.processed,
         error: ack.error,
         message_id: ack.message_id,
-    };
+    }; 
+    
     if !msg.reply_to.is_empty() {
         let _ = messaging::host(LINK_NAME_FRONTEND).publish(
             msg.reply_to,
