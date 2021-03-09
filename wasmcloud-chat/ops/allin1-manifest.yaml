@@ -1,0 +1,11 @@
+---
+labels:
+    sample: "wasmCloud Chat"
+actors:
+    - ../actors/messages/target/wasm32-unknown-unknown/debug/messages_s.wasm
+capabilities:
+    - image_ref: wasmcloud.azurecr.io/nats:0.10.1
+      link_name: frontend
+    - image_ref: wasmcloud.azurecr.io/nats:0.10.1
+      link_name: backend
+links: []
