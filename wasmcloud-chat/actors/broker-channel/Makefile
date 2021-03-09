@@ -12,7 +12,7 @@ all: build
 
 build:
 	@$(CARGO) build	
-	wash claims sign $(DEBUG)/broker_channel.wasm -g -z --name "Message Broker Channel" --ver $(VERSION) --rev 0
+	wash claims sign $(DEBUG)/broker_channel.wasm -l -g -z --name "Message Broker Channel" --ver $(VERSION) --rev 0
 
 check:
 	@$(CARGO) check
@@ -31,4 +31,4 @@ update:
 
 release:
 	@$(CARGO) build --release	
-	wash claims sign $(RELEASE)/broker_channel.wasm -g -z --name "Message Broker Channel" --ver $(VERSION) --rev 0
+	wash claims sign $(RELEASE)/broker_channel.wasm -l -g -z --name "Message Broker Channel" --ver $(VERSION) --rev 0

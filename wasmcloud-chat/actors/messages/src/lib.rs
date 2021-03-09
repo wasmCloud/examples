@@ -20,6 +20,8 @@ const WCCHAT_SCHEME: &str = "wcchat";
 const EVENT_TYPE_MESSAGE_PUBLISHED: &str = "com.wasmcloud.chat.events.messagepublished";
 const EVENT_SOURCE: &str = "/actors/messaging";
 
+const BACKEND_SUBJECT_PREFIX: &str = "wcc.backend.events.";
+
 const HMK_ORIGIN_CHANNEL: &str = "origin_channel";
 const HMK_ORIGIN_USER: &str = "origin_user";
 const HMK_TIMESTAMP: &str = "timestamp";
@@ -28,6 +30,8 @@ const HMK_ID: &str = "message_id";
 
 const MSGTYPE_MESSAGE: &str = "MSG";
 const VALID_MESSAGE_TYPES: [&str; 1] = [MSGTYPE_MESSAGE];
+
+const LINK_BACKEND:&str = "backend"; // The link name of the backend capability provider
 
 #[actor::init]
 fn init() {
@@ -83,8 +87,8 @@ fn publish_broker_message(
     message: &messages::ChannelMessage,
 ) -> HandlerResult<()> {
     let topic = match target {
-        MessageTarget::User(s) => format!("wcc.events.user.{}", s),
-        MessageTarget::Room(s) => format!("wcc.events.room.{}", s),
+        MessageTarget::User(s) => format!("{}.user.{}", BACKEND_SUBJECT_PREFIX, s),
+        MessageTarget::Room(s) => format!("{}.room.{}", BACKEND_SUBJECT_PREFIX, s),
         _ => "".to_string(),
     };
     let ce = CloudEvent::new_json(
@@ -95,7 +99,7 @@ fn publish_broker_message(
         &message,
     );
 
-    broker::default().publish(topic, "".to_string(), serde_json::to_vec(&ce)?)?;
+    broker::host(LINK_BACKEND).publish(topic, "".to_string(), serde_json::to_vec(&ce)?)?;
     Ok(())
 }
 

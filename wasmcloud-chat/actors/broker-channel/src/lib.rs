@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 extern crate serde_json;
 
 use serde::{Deserialize, Serialize};
@@ -5,12 +8,13 @@ use wapc_guest as guest;
 use wasmcloud_actor_core as actor;
 use wasmcloud_actor_extras as extras;
 use wasmcloud_actor_messaging as messaging;
+use wasmcloud_actor_logging as logging;
 use wasmcloudchat_messages_interface as msgactor;
 
 use guest::prelude::*;
 
 const INBOUND_SUBJECT: &str = "wcc.frontend.requests";
-const BACKEND_SUBJECT_PREFIX: &str = "wcc.events.";
+const BACKEND_SUBJECT_PREFIX: &str = "wcc.backend.events.";
 const FRONTEND_SUBJECT_PREFIX: &str = "wcc.frontend.events.";
 const MSG_ACTOR_CALL_ALIAS: &str = "wasmcloud/chat/messages";
 const OP_PROCESS_MESSAGE: &str = "ProcessMessage";
@@ -24,6 +28,8 @@ const _LINK_NAME_BACKEND: &str = "backend";
 #[actor::init]
 fn init() {
     messaging::Handlers::register_handle_message(handle_message);
+
+    logging::enable_macros();
 }
 
 fn handle_message(msg: messaging::BrokerMessage) -> HandlerResult<()> {
@@ -45,6 +51,7 @@ fn handle_message(msg: messaging::BrokerMessage) -> HandlerResult<()> {
 /// the `messages` actor's `ProcessMessage` operation. Responds to the front-end
 /// with a copy of the acknowledgement received from the internal actor.
 fn handle_inbound_message(msg: messaging::BrokerMessage) -> HandlerResult<()> {
+    info!("Handling inbound message request");
     // TODO: validate access token
     let req: InboundRequest = serde_json::from_slice(&msg.body)?;
     let new_guid = extras::default()
