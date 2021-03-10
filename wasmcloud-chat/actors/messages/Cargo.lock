@@ -91,12 +91,14 @@ name = "messages"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "log",
  "serde",
  "serde_json",
  "url",
  "wapc-guest",
  "wasmcloud-actor-core",
  "wasmcloud-actor-eventstreams",
+ "wasmcloud-actor-logging",
  "wasmcloud-actor-messaging",
  "wasmcloudchat-messages-interface",
 ]
@@ -338,6 +340,20 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_json",
+ "wapc-guest",
+]
+
+[[package]]
+name = "wasmcloud-actor-logging"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e25b41da6aa9d05952ec35998163fb6e65232c99c5ed4827c778fdbf801993c5"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
  "wapc-guest",
 ]
 
