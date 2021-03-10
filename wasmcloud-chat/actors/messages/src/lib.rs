@@ -61,7 +61,7 @@ fn process_message(message: ChannelMessage) -> HandlerResult<ProcessAck> {
         return Err(msg.into());
     }
 
-    Ok(validate_message(&message)
+    let ack = validate_message(&message)
         .and_then(|_| publish_broker_message(&target, &message))
         .and_then(|_| emit_stream_event(&target, &message))
         .map_or_else(
@@ -72,7 +72,9 @@ fn process_message(message: ChannelMessage) -> HandlerResult<ProcessAck> {
                 )
             },
             |_v| ProcessAck::success(&message.message_id),
-        ))
+        );
+    info!("Acking: {:?}", ack);
+    Ok(ack)
 }
 
 fn validate_message(message: &messages::ChannelMessage) -> HandlerResult<()> {
@@ -131,21 +133,28 @@ fn emit_stream_event(
 
     let mut hm = HashMap::new();
     hm.insert(HMK_ORIGIN_CHANNEL.to_string(), message.origin_channel);
-    info!("A");
     hm.insert(HMK_ORIGIN_USER.to_string(), message.origin_user_id);
-    info!("B");
     hm.insert(
         HMK_TIMESTAMP.to_string(),
         Utc.timestamp(message.created_on as i64, 0).to_rfc2822(),
     );
-    info!("C");
     hm.insert(HMK_MESSAGE_TEXT.to_string(), message.message_text);
-    info!("D");
     hm.insert(HMK_ID.to_string(), message.message_id);
-    info!("E");
 
+    info!("Writing event");
     match streams::default().write_event(stream_name, hm) {
-        Ok(eid) => info!("Event created: {}", eid),
+        Ok(ack) => match ack.event_id {
+            Some(eid) => info!("Event created: {}", eid),
+            None => {
+                info!("WTH");
+                let msg = format!(
+                    "Failed to emit stream event: {}",
+                    ack.error.unwrap_or("???".into())
+                );
+                error!("{}", msg);
+                return Err(msg.into());
+            }
+        },
         Err(e) => {
             error!("Failed to emit stream event: {}", e);
             return Err(e);

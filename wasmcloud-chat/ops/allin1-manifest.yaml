@@ -10,7 +10,7 @@ capabilities:
     - image_ref: wasmcloud.azurecr.io/nats:0.10.2
       link_name: backend
     - image_ref: wasmcloud.azurecr.io/logging:0.9.1
-    - image_ref: wasmcloud.azurecr.io/redisstreams:0.4.0
+    - image_ref: wasmcloud.azurecr.io/redisstreams:0.5.1
 links:
   # configure the broker channel actor - messaging, logging, extras
   - actor: ${BROKERCHANNEL_ACTOR:MAP7EXS72YJ5Z6U5AJ6IMYIRVMRJRZJBLVTC6H4E552K7SJDRYBPA3YF}

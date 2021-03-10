@@ -330,11 +330,10 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-actor-eventstreams"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6297c1ef821450a341870dc2e93af05289eab007ed1e94b01048410dcf209c7"
+checksum = "20fc425c84f8a7f3ffb60312489ecb2d2fd6646e35075b5178f1a1150cc68c1a"
 dependencies = [
- "lazy_static",
  "log",
  "rmp-serde",
  "serde",

@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 wapc-guest = "0.4.0"
 wasmcloud-actor-core = { version = "0.2.2", features = ["guest"] }
 wasmcloud-actor-messaging = { version = "0.1.1", features = ["guest"] }
-wasmcloud-actor-eventstreams = {version = "0.1.0", features = ["guest"]}
+wasmcloud-actor-eventstreams = {version = "0.2.0", features = ["guest"]}
 wasmcloud-actor-logging = { version = "0.1.0", features = ["guest"]}
 wasmcloudchat-messages-interface = { path = "../../interface/messages-interface"}
 url = "2.2.1"
