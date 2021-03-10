@@ -12,7 +12,7 @@ This actor subscribes to message requests from the broker "front-end" and delive
 The following is a description of the relevant subjects used by this actor
 
 * `wcc.frontend.requests` - Subscribed to by the actor via the `frontend` named capability provider. Messages received here are then used to invoke the `messages` capability provider, with an appropriate acknowledgement returned.
-* `wcc.events.[user|room].*` - Subscribed to by the actor via the `backend` named capability provider. Messages received here are then forwarded to the front-end by publication to the frontend events subject.
+* `wcc.backend.events.[user|room].*` - Subscribed to by the actor via the `backend` named capability provider. Messages received here are then forwarded to the front-end by publication to the frontend events subject.
 * `wcc.frontend.events.[user|room].*` - Subscribed to by all manner of front-end consumers. These subjects are where actual chat messages are published and then delivered to various user interfaces, e.g. via websockets or other proxies like Phoenix Liveview websites.
 
 ## Provider Linking
