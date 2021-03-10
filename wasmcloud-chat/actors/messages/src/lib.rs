@@ -1,8 +1,12 @@
+#[macro_use]
+extern crate log;
+
 extern crate serde;
 
 extern crate wapc_guest as guest;
 extern crate wasmcloud_actor_core as actor;
 extern crate wasmcloud_actor_eventstreams as streams;
+extern crate wasmcloud_actor_logging as logging;
 extern crate wasmcloud_actor_messaging as broker;
 extern crate wasmcloudchat_messages_interface as messages;
 
@@ -20,6 +24,8 @@ const WCCHAT_SCHEME: &str = "wcchat";
 const EVENT_TYPE_MESSAGE_PUBLISHED: &str = "com.wasmcloud.chat.events.messagepublished";
 const EVENT_SOURCE: &str = "/actors/messaging";
 
+const BACKEND_SUBJECT_PREFIX: &str = "wcc.backend.events.";
+
 const HMK_ORIGIN_CHANNEL: &str = "origin_channel";
 const HMK_ORIGIN_USER: &str = "origin_user";
 const HMK_TIMESTAMP: &str = "timestamp";
@@ -29,9 +35,13 @@ const HMK_ID: &str = "message_id";
 const MSGTYPE_MESSAGE: &str = "MSG";
 const VALID_MESSAGE_TYPES: [&str; 1] = [MSGTYPE_MESSAGE];
 
+const LINK_BACKEND: &str = "backend"; // The link name of the backend capability provider
+
 #[actor::init]
 fn init() {
     messages::Handlers::register_process_message(process_message);
+
+    logging::enable_macros();
 }
 
 // Processing a message:
@@ -40,23 +50,31 @@ fn init() {
 // 3 - emit event to event stream
 // 4 - ACK
 fn process_message(message: ChannelMessage) -> HandlerResult<ProcessAck> {
+    info!(
+        "Processing inbound channel message from '{}'",
+        message.origin_channel
+    );
     let target = MessageTarget::from(&message);
     if let MessageTarget::Unknown(message) = target {
-        return Err(format!("Unable to select target for message: {}", message).into());
+        let msg = format!("Unable to select target for message: {}", message);
+        error!("{}", msg);
+        return Err(msg.into());
     }
 
-    Ok(validate_message(&message)
+    let ack = validate_message(&message)
         .and_then(|_| publish_broker_message(&target, &message))
         .and_then(|_| emit_stream_event(&target, &message))
         .map_or_else(
-            |_| ProcessAck::success(&message.message_id),
-            |_| {
+            |e| {
                 ProcessAck::fail(
                     &message.message_id,
-                    "Did not publish and emit to event stream",
+                    &format!("Failed to publish and emit to event stream: {}", e),
                 )
             },
-        ))
+            |_v| ProcessAck::success(&message.message_id),
+        );
+    info!("Acking: {:?}", ack);
+    Ok(ack)
 }
 
 fn validate_message(message: &messages::ChannelMessage) -> HandlerResult<()> {
@@ -82,9 +100,10 @@ fn publish_broker_message(
     target: &MessageTarget,
     message: &messages::ChannelMessage,
 ) -> HandlerResult<()> {
+    info!("Publishing message to back-end");
     let topic = match target {
-        MessageTarget::User(s) => format!("wcc.events.user.{}", s),
-        MessageTarget::Room(s) => format!("wcc.events.room.{}", s),
+        MessageTarget::User(s) => format!("{}.user.{}", BACKEND_SUBJECT_PREFIX, s),
+        MessageTarget::Room(s) => format!("{}.room.{}", BACKEND_SUBJECT_PREFIX, s),
         _ => "".to_string(),
     };
     let ce = CloudEvent::new_json(
@@ -95,7 +114,7 @@ fn publish_broker_message(
         &message,
     );
 
-    broker::default().publish(topic, "".to_string(), serde_json::to_vec(&ce)?)?;
+    broker::host(LINK_BACKEND).publish(topic, "".to_string(), serde_json::to_vec(&ce)?)?;
     Ok(())
 }
 
@@ -103,6 +122,7 @@ fn emit_stream_event(
     target: &MessageTarget,
     message: &messages::ChannelMessage,
 ) -> HandlerResult<()> {
+    info!("Emitting post-publish event to stream");
     let message = message.clone();
 
     let stream_name = match target {
@@ -121,7 +141,25 @@ fn emit_stream_event(
     hm.insert(HMK_MESSAGE_TEXT.to_string(), message.message_text);
     hm.insert(HMK_ID.to_string(), message.message_id);
 
-    streams::default().write_event(stream_name, hm)?;
+    info!("Writing event");
+    match streams::default().write_event(stream_name, hm) {
+        Ok(ack) => match ack.event_id {
+            Some(eid) => info!("Event created: {}", eid),
+            None => {
+                info!("WTH");
+                let msg = format!(
+                    "Failed to emit stream event: {}",
+                    ack.error.unwrap_or("???".into())
+                );
+                error!("{}", msg);
+                return Err(msg.into());
+            }
+        },
+        Err(e) => {
+            error!("Failed to emit stream event: {}", e);
+            return Err(e);
+        }
+    }
 
     Ok(())
 }
@@ -153,20 +191,23 @@ fn extract_target(url: &Url) -> MessageTarget {
     if url.path_segments().is_none() {
         return MessageTarget::Unknown("No path segments in URL".to_string());
     }
-    let mut path_segments = url.path_segments().unwrap();
+    if !url.has_host() {
+        return MessageTarget::Unknown("No target qualifier specified in URL".to_string());
+    }
 
-    match path_segments.next() {
-        Some(qualifier) if qualifier == "rooms" => match path_segments.next() {
-            Some(s) => MessageTarget::Room(s.to_string()),
-            None => MessageTarget::Unknown("No room specified in room target URL".to_string()),
-        },
-        Some(qualifier) if qualifier == "users" => match path_segments.next() {
-            Some(s) => MessageTarget::User(s.to_string()),
-            None => MessageTarget::Unknown("No user specified in user target URL".to_string()),
-        },
-        Some(qualifier) => {
-            MessageTarget::Unknown(format!("Unknown target qualifier: {}", qualifier).into())
-        }
-        None => MessageTarget::Unknown("No qualifier specified in target URL".to_string()),
+    let path_segments = url.path_segments().map(|c| c.collect::<Vec<_>>()).unwrap();
+    let target_type = url.host_str().unwrap();
+    if path_segments.len() < 1 {
+        return MessageTarget::Unknown(
+            "Not enough path segments in URL for qualifier and identity".to_string(),
+        );
+    }
+
+    if target_type == "rooms" {
+        MessageTarget::Room(path_segments[0].to_string())
+    } else if target_type == "users" {
+        MessageTarget::User(path_segments[0].to_string())
+    } else {
+        MessageTarget::Unknown(format!("Unknown target qualifier: {}", target_type))
     }
 }

@@ -1,3 +1,0 @@
-# NATS Channel
-
-TBD
