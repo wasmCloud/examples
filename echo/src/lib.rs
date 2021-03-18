@@ -1,17 +1,20 @@
 use serde::Serialize;
 use std::collections::HashMap;
-extern crate wapc_guest as guest;
-use guest::prelude::*;
-use wasmcloud_actor_core as actorcore;
+use wasmcloud_actor_core as actor;
 use wasmcloud_actor_http_server as http;
 
-#[no_mangle]
-pub fn wapc_init() {
-    actorcore::Handlers::register_health_request(health);
-    http::Handlers::register_handle_request(hello_world);
+use wapc_guest::prelude::*;
+
+#[derive(Serialize)]
+struct EchoResponse {
+    method: String,
+    path: String,
+    query_string: String,
+    headers: HashMap<String, String>,
+    body: Vec<u8>,
 }
 
-pub fn hello_world(r: http::Request) -> HandlerResult<http::Response> {
+pub fn handle_request(r: http::Request) -> HandlerResult<http::Response> {
     let echo = EchoResponse {
         method: r.method,
         path: r.path,
@@ -23,15 +26,12 @@ pub fn hello_world(r: http::Request) -> HandlerResult<http::Response> {
     Ok(http::Response::json(echo, 200, "OK"))
 }
 
-fn health(_h: actorcore::HealthCheckRequest) -> HandlerResult<actorcore::HealthCheckResponse> {
-    Ok(actorcore::HealthCheckResponse::healthy())
+fn health(_h: actor::HealthCheckRequest) -> HandlerResult<actor::HealthCheckResponse> {
+    Ok(actor::HealthCheckResponse::healthy())
 }
 
-#[derive(Serialize)]
-struct EchoResponse {
-    method: String,
-    path: String,
-    query_string: String,
-    headers: HashMap<String, String>,
-    body: Vec<u8>,
+#[no_mangle]
+pub fn wapc_init() {
+    actor::Handlers::register_health_request(health);
+    http::Handlers::register_handle_request(handle_request);
 }
