@@ -1,10 +1,10 @@
 ## How to use  built-in `wasmcloud:extras` capability provider
 
-`wasmcloud` host runtime comes with some built-in capability providers and `wasmcloud:extras` is one of them. In this tutorial we will generate a random number and retrieve some information like request ID and number of requests using `wasmcloud:extras`. 
+The `wasmcloud` host runtime comes with a built-in capability provider (wasmcloud:extras) that includes some useful and fairly common tools. In this tutorial we will generate a random number and retrieve some information like request ID and number of requests using `wasmcloud:extras`. 
 
 1. Please install `wasmcloud` and `wash` binaries if you do not have them installed already:
 
-    https://wasmcloud.dev/overview/installation/
+    [https://wasmcloud.dev/overview/installation/](https://wasmcloud.dev/overview/installation/)
 
     ```bash
     $ wasmcloud --version

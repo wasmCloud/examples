@@ -4,19 +4,19 @@ An actor is the smallest unit of deployable, portable compute within the wasmclo
 
 Actors are small WebAssembly modules that can handle messages delivered to them by the host runtime and can invoke functions on capability providers, provided they have been granted the appropriate privileges.
 
-Check out https://wasmcloud.dev/reference/host-runtime/actors/ for more.
+Check out [https://wasmcloud.dev/reference/host-runtime/actors/](https://wasmcloud.dev/reference/host-runtime/actors/) for more.
 
 In this example our actor responds to all incoming HTTP requests by returning the HTTP request as a JSON object.
 
-We will have a two part tutorial, starting with running a precompiled actor stored in a remote repo, then we will write our own actor and swap it with the remote one. We will use a manifest file to run our actor declaratively via `wasmcloud`.
+We will have a two part tutorial, starting with running a precompiled actor stored in a remote  OCI registry, then we will write our own actor and swap it with the remote one. We will use a manifest file to run our actor declaratively via `wasmcloud`.
 
-In the second part, we will spin up a custom NATS server and a local docker registry to store our WebAssembly module. We'll use the wasmcloud shell, `wash`, a feature-rich cli tool that provides an interactive REPL environment to run our actor and interact with it.
+In the second part, we will spin up a NATS server and a local docker registry to store our WebAssembly module. We'll use the wasmcloud shell, `wash`, a feature-rich cli tool that provides an interactive REPL environment to run our actor and interact with it.
 
 ## Running an echo server
 
 1. Please install `wasmcloud` and `wash` binaries if you do not have them installed already. `wasmcloud` will provide the runtime environment for our actor while `wash` will be used for development later in the tutorial:
 
-    https://wasmcloud.dev/overview/installation/
+    [https://wasmcloud.dev/overview/installation/](https://wasmcloud.dev/overview/installation/)
 
     ```bash
     $ wasmcloud --version
@@ -29,7 +29,7 @@ In the second part, we will spin up a custom NATS server and a local docker regi
     $ wasmcloud -m manifest.yaml
     ```
 
-    Here is the content of the file:
+    Here are the contents of the file:
 
     ```bash
     labels:
@@ -188,7 +188,7 @@ We will also use a local docker registry to store our echo actor to illustrate i
     ctl start actor localhost:5000/echo:0.2.2
     ```
 
-    Steps from now on is independent of our current example but we kept it for completeness:
+    The steps from now on are independent of our current example, but we've kept it for completeness:
 
 5. Start your capability provider that runs an HTML server:
 
