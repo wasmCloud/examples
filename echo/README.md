@@ -6,15 +6,15 @@ Actors are small WebAssembly modules that can handle messages delivered to them 
 
 Check out https://wasmcloud.dev/reference/host-runtime/actors/ for more.
 
-In this example our actor responds to all incoming HTTP requests by returning it as JSON object.
+In this example our actor responds to all incoming HTTP requests by returning the HTTP request as a JSON object.
 
-We will have two part tutorial starting with running a precompiled actor stored in a remote repo, then we will write our own actor and swap it with the remote one. We will use a manifest file to run our actor decleratively via `wasmcloud`.
+We will have a two part tutorial, starting with running a precompiled actor stored in a remote repo, then we will write our own actor and swap it with the remote one. We will use a manifest file to run our actor declaratively via `wasmcloud`.
 
-In the second part we will spin custom NATS server and a local Docker registry to store our WebAssembly module. In this part we will use wasmcloud shell, `wash`, a feature-rich cli tool that provides interactive repl environment to run our actor and interact with it.
+In the second part, we will spin up a custom NATS server and a local docker registry to store our WebAssembly module. We'll use the wasmcloud shell, `wash`, a feature-rich cli tool that provides an interactive REPL environment to run our actor and interact with it.
 
 ## Running an echo server
 
-1. Please install `wasmcloud` and `wash` binaries if you are not already did. `wasmcloud` will provide the runtime environment for our actor while `wash` will be used for development later in the tutorial:
+1. Please install `wasmcloud` and `wash` binaries if you do not have them installed already. `wasmcloud` will provide the runtime environment for our actor while `wash` will be used for development later in the tutorial:
 
     https://wasmcloud.dev/overview/installation/
 
@@ -68,9 +68,9 @@ In the second part we will spin custom NATS server and a local Docker registry t
     $ wash claims sign ./target/wasm32-unknown-unknown/release/echo.wasm -c wasmcloud:httpserver --name "echo" --ver 0.2.2
     ```
 
-    To read more on the security aspects at https://wasmcloud.dev/reference/host-runtime/security/.
+    Read more on the security aspects at https://wasmcloud.dev/reference/host-runtime/security/.
 
-6. We need actor id to use in our manifest.yml:
+6. Actors are signed with unique module keys, so the echo actor ID will be different for everyone. We'll need to inspect the actor to find its public key (module) for the next step:
 
     ```bash
     $ wash claims inspect ./target/wasm32-unknown-unknown/release/echo_s.wasm
@@ -87,9 +87,9 @@ In the second part we will spin custom NATS server and a local Docker registry t
     Call Alias                                                  (Not set) 
     ```
 
-    We are after module id: `MCUDTMOOZCVAM5EBNN4U3X2OGHNIY3BKPEW66HY4RTCYYVWXOE7ESVDQ`
+    We are after the module ID: `MCUDTMOOZCVAM5EBNN4U3X2OGHNIY3BKPEW66HY4RTCYYVWXOE7ESVDQ`
 
-7. Swap remote actor with our newly created one in the manifest file and don't forget to change the actor id:
+7. Swap the remote actor with our newly created one in the manifest file and don't forget to change the actor ID:
 
     ```yaml
     actors:
@@ -105,13 +105,21 @@ In the second part we will spin custom NATS server and a local Docker registry t
     $ wasmcloud -m manifest.yaml
     ```
 
+9. As a final step we will send another request to `http://localhost:8080`:
+
+    ```bash
+    curl http://localhost:8080/
+    ```
+
 ## Using `wash` for better developer experience
 
-In this second part, we will spin a NATS server and a local Docker registry to spice things up.
+Previously we were using a declarative deployment model that did not allow us to modify resources at runtime. In this section, we will use `NATS` to allow `wasmcloud` to utilize self-managing [lattice network](https://wasmcloud.dev/reference/lattice/), and we can use `wash` to interact with the `wasmcloud` host via the lattice control interface (`ctl`).
 
-1. We will run NATS servers and Docker's local image registry as our prerequisites.
+We will also use a local docker registry to store our echo actor to illustrate interacting with a local development version of an OCI registry.
 
-    NATS is a message broker used by wasmcloud’s self-managing lattice network. The image registry is for to store our WebAssembly modules.
+1. Since we are going to use `docker-compose` to run NATS server and  image registry, you need to have `wasmcloud`, `wash`, `docker` and `docker-compose` installed on your machine.
+
+2. You can either use `docker-compose.yml` file in the project's directory or create one with the following content:
 
     ```yaml
     version: "3"
@@ -128,13 +136,13 @@ In this second part, we will spin a NATS server and a local Docker registry to s
           - "8222:8222"
     ```
 
-    You can find `docker-compose.yml` in the project’s directory. We will run our containers in detached mode to reduce clutter.
+    We will run our containers in detached mode to reduce clutter.
 
     ```bash
     $ docker-compose up -d
     ```
 
-    Start a repl session using `wash up` command:
+    Start a REPL session using `wash up` command:
 
     ```bash
     $ wash up
@@ -153,36 +161,36 @@ In this second part, we will spin a NATS server and a local Docker registry to s
     NDGPVEOZKAYT6JRL2C4BDVSW3PBBOYTWRLC2QFCSLXWDX4KCIRHM6WCZ  1357
     ```
 
-2. Build .wasm file and sign it using make file:
+3. Please open a new terminal, as the REPL is running in the current one. We will build our actor first, then will sign it:
 
     ```bash
     $ cargo build --release
     $ wash claims sign ./target/wasm32-unknown-unknown/release/echo.wasm -c wasmcloud:httpserver --name "echo" --ver 0.2.2
     ```
 
-    Or you can use project’s make file:
+    Or you can use `make` file in project's directory for convenience:
 
     ```bash
     make release VERSION=0.2.2
     ```
 
-    This will produce `echo.wasm` actor and its signed version `echo_s.wasm`.
+    Now we have our actor, `echo.wasm` and its signed version `echo_s.wasm` in `./target/wasm32-unknown-unknown/release` directory.
 
-3. Push signed actor into to local registry using `wash`:
+3. Now it's time to push signed our actor into to local registry using `wash`:
 
     ```bash
     wash reg push localhost:5000/echo:0.2.2 ./target/wasm32-unknown-unknown/release/echo_s.wasm --insecure
     ```
 
-4. Run it:
+4. Now, please go back to REPL terminal and run the actor from the local image registry:
 
     ```bash
     ctl start actor localhost:5000/echo:0.2.2
     ```
 
-    Steps from now on is independent of our current example but we keep it for completeness:
+    Steps from now on is independent of our current example but we kept it for completeness:
 
-5. Start your capability that runs an html server:
+5. Start your capability provider that runs an HTML server:
 
     ```bash
     ctl start provider wasmcloud.azurecr.io/httpserver:0.11.1
@@ -190,10 +198,10 @@ In this second part, we will spin a NATS server and a local Docker registry to s
 
     Check out https://wasmcloud.dev/app-dev/create-provider for how to write your own:
 
-6. Link actor with capability using `wash`:
+6. Link the actor with capability using `wash`:
 
     ```bash
-    // Get actor and capability provider ids using:
+    // Get actor and capability provider IDs using:
     // ctl get inventory «HOST_ID»
 
     $ ctl get inventory NDGPVEOZKAYT6JRL2C4BDVSW3PBBOYTWRLC2QFCSLXWDX4KCIRHM6WCZ
@@ -205,20 +213,21 @@ In this second part, we will spin a NATS server and a local Docker registry to s
     $ ctl link MCUDTMOOZCVAM5EBNN4U3X2OGHNIY3BKPEW66HY4RTCYYVWXOE7ESVDQ VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4A YJ5RKAX2UNSCAPHA5M wasmcloud:httpserver PORT=8080 
     ```
 
-7. Visit `http://localhost:8080` or send a request:
-
-    ```bash
-    curl http://localhost:8080/
-    ```
-
-    You can use `wash` to test your actor:
-
+7. You can use `ctl call` command in the REPL window to test out our actor:
+    
     ```bash
     ctl call «ACTOR_ID» HandleRequest {"method": "GET", "path": "/", "body": "", "queryString":"","header":{}}
     ```
-    This will output response JSON along with some raw bytes which our repl terminal does not know how to interpret:
+    This will output response JSON along with some raw bytes which our REPL terminal does not know how to interpret:
 
     ```bash
     Call response (raw): ��statusCode�Ȧstatus�OK�header��body�D{"method":"GET","path":"/","query_string":"","headers":{},"body":[]}
     ```
 
+    Or you can query `http://localhost:8080` via `curl` from a seperate terminal window:
+
+    ```bash
+    curl http://localhost:8080/
+    ```
+
+    Or just visit `http://localhost:8080/` address via browser:
