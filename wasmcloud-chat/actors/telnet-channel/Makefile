@@ -12,7 +12,7 @@ all: build
 
 build:
 	@$(CARGO) build	
-	wash claims sign $(DEBUG)/telnet_channel.wasm -c wasmcloud:httpserver --name "telnet_channel" --ver $(VERSION) --rev 0
+	wash claims sign $(DEBUG)/telnet_channel.wasm -c wasmcloud:messaging -c wasmcloud:telnet -c wasmcloud:logging --name "telnet_channel" --ver $(VERSION) --rev 0
 
 check:
 	@$(CARGO) check
@@ -31,4 +31,9 @@ update:
 
 release:
 	@$(CARGO) build --release	
-	wash claims sign $(RELEASE)/telnet_channel.wasm -c wasmcloud:httpserver --name "telnet_channel" --ver $(VERSION) --rev 0
+	wash claims sign $(RELEASE)/telnet_channel.wasm -c wasmcloud:messaging -c wasmcloud:telnet -c wasmcloud:logging --name "telnet_channel" --ver $(VERSION) --rev 0
+
+run: build
+	cd ../../../../capability-providers/telnet; rm telnet.par.gz; make mac
+	wash drain all
+	RUST_LOG=info wasmcloud -m manifest.yaml

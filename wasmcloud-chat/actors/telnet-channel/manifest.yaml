@@ -1,0 +1,46 @@
+---
+labels:
+    sample: "wasmCloud Chat Telnet Channel"
+actors:
+    - ../messages/target/wasm32-unknown-unknown/debug/messages_s.wasm
+    - ./target/wasm32-unknown-unknown/debug/telnet_channel_s.wasm
+capabilities:
+    - image_ref: wasmcloud.azurecr.io/nats:0.10.2
+      link_name: frontend
+    - image_ref: wasmcloud.azurecr.io/nats:0.10.2
+      link_name: backend
+    - image_ref: wasmcloud.azurecr.io/logging:0.9.1
+    - image_ref: /Users/btownsend/github.com/wasmcloud/capability-providers/telnet/telnet.par.gz
+    # - image_ref: wasmcloud.azurecr.io/telnet:?
+links:
+  # configure the telnet channel actor - messaging, logging, extras
+  - actor: ${TELNETCHANNEL_ACTOR:MCRPDIBJPAZUIEDT5S6AM5LN7J5FWZ74R5SB6DN7OQBRYOD6EEOAZHDX}
+    contract_id: "wasmcloud:messaging"
+    provider_id: "VADNMSIML2XGO2X4TPIONTIC55R2UUQGPPDZPAVSC2QD7E76CR77SPW7"
+    link_name: frontend
+    values:
+      SUBSCRIPTION: wcc.frontend.requests,wcc.backend.events.>
+  - actor: ${TELNETCHANNEL_ACTOR:MCRPDIBJPAZUIEDT5S6AM5LN7J5FWZ74R5SB6DN7OQBRYOD6EEOAZHDX}
+    contract_id: "wasmcloud:logging"
+    provider_id: "VCCANMDC7KONJK435W6T7JFEEL7S3ZG6GUZMZ3FHTBZ32OZHJQR5MJWZ"
+  - actor: ${TELNETCHANNEL_ACTOR:MCRPDIBJPAZUIEDT5S6AM5LN7J5FWZ74R5SB6DN7OQBRYOD6EEOAZHDX}
+    contract_id: "wasmcloud:telnet"
+    provider_id: "VB4WK4J6ATXJ7NVZZCP5WCSAB6NHQHGJKTASLF7JGC2RCHD6WBLXCVZX"
+    values:
+      PORT: 23
+      MOTD: "[MOTD] Welcome to wasmcloud chat\n"
+  
+  # the messages actor needs: eventstreams, messaging, logging
+  - actor: ${MESSAGES_ACTOR:MD6EZIZRZ5VCN6FSJZXHE2NBGGWSIIKP2GDDTODFHOTGNIVIDF2MPHIK}
+    contract_id: "wasmcloud:messaging"
+    provider_id: "VADNMSIML2XGO2X4TPIONTIC55R2UUQGPPDZPAVSC2QD7E76CR77SPW7"
+    link_name: backend
+    values: {} # no subscriptions on the backend for this actor, only publishes
+  - actor: ${MESSAGES_ACTOR:MD6EZIZRZ5VCN6FSJZXHE2NBGGWSIIKP2GDDTODFHOTGNIVIDF2MPHIK}
+    contract_id: "wasmcloud:logging"
+    provider_id: "VCCANMDC7KONJK435W6T7JFEEL7S3ZG6GUZMZ3FHTBZ32OZHJQR5MJWZ"
+  - actor: ${MESSAGES_ACTOR:MD6EZIZRZ5VCN6FSJZXHE2NBGGWSIIKP2GDDTODFHOTGNIVIDF2MPHIK}
+    contract_id: "wasmcloud:eventstreams"
+    provider_id: "VC5EWH6XQOSV7RHTD7HOHBNZURBIRW7GK5DH3PJNV2OCAUOGXDTC4UCN"    
+    values:
+      URL: redis://0.0.0.0:6379/ 
