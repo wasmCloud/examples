@@ -11,7 +11,7 @@ The following is a list of actor-to-actor interactions. The **target** of the op
 | Origin | Target | Operation | Description |
 | :--: | :--: | :--: | :-- |
 | _Channel Actor_ | `messages` | `ProcessMessage` | Sent from channel to linked actor upon receipt of inbound message. If successful, results in publication of a chat message event (`MessagePublished`). Ack does **not** indicate delivery at destination. |
-| _Channel Actor_ | `rooms` | `CreateRoom`<br/>`QueryRooms`<br/>`DeleteRoom`<br/>`QueryMembers` | Room operations performed by administrators. Note that `QueryRooms` can be used to get all rooms or a list of rooms to which a specific user belongs. |
+| _Channel Actor_ | `rooms` | `CreateRoom`<br/>`QueryRooms`<br/>`DeleteRoom`<br/>`QueryMembers`<br/>`JoinRoom`<br/>`LeaveRoom` | Room operations performed by administrators. Note that `QueryRooms` can be used to get all rooms or a list of rooms to which a specific user belongs. |
 
 ## NATS Subjects
 
