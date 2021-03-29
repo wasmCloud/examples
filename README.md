@@ -2,7 +2,6 @@
 
 Example actors, capability providers, and other demonstrations
 
-
 | Example | Type | Description | OCI Reference (refer to example for latest version) |
 |---|---|---|---|
 | [echo](https://github.com/wasmcloud/examples/tree/main/echo) | Actor |An actor that returns a JSON payload describing the incoming request | wasmcloud.azurecr.io/echo:0.2.1 |
@@ -13,7 +12,5 @@ Example actors, capability providers, and other demonstrations
 | [subscriber](https://github.com/wasmcloud/examples/tree/main/subscriber) | Actor | A simple actor that logs every message it receives to `stdout` | wasmcloud.azurecr.io/subscriber:0.2.0 |
 | [actor-to-actor](https://github.com/wasmcloud/examples/tree/main/actor-to-actor) | Actors | An example illustrating shared actor interface and actor-to-actor communication | Not Published |
 | [inmemory-keyvalue](https://github.com/wasmcloud/examples/tree/main/inmemory-keyvalue) | Provider | A sample in-memory Key-Value Store capability provider, used by the tutorial for creating a new capability provider | wasmcloud.azurecr.io/inmemory-keyvalue:0.4.0 |
-| [inmemory-streams](https://github.com/wasmcloud/examples/tree/main/inmemory-streams) | Provider | An example illustrating an in-memory `wasmcloud:eventstreams` provider | Not published |
-
 
 Please refer to the GitHub Release versions for the most up-to-date versions of the example actors.
