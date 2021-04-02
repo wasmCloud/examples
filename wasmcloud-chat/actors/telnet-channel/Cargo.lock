@@ -155,6 +155,7 @@ dependencies = [
  "wapc-guest",
  "wasmcloud-actor-core",
  "wasmcloud-actor-extras",
+ "wasmcloud-actor-keyvalue",
  "wasmcloud-actor-logging",
  "wasmcloud-actor-messaging",
  "wasmcloud-actor-telnet",
@@ -215,6 +216,21 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_derive",
+ "wapc-guest",
+]
+
+[[package]]
+name = "wasmcloud-actor-keyvalue"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd68932a1884f93acd141369c3d5fd66dd523244828d11a8e91b444d3cb2d3a0"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "serde_json",
  "wapc-guest",
 ]
 
