@@ -15,15 +15,27 @@ use wasmcloudchat_messages_interface as msgactor;
 const MSG_ACTOR_CALL_ALIAS: &str = "wasmcloud/chat/messages";
 const OP_PROCESS_MESSAGE: &str = "ProcessMessage";
 const MSGTYPE_MESSAGE: &str = "MSG";
-
 const CHANNEL_ID: &str = "telnetbroker";
 const KEYVALUE_LINK: &str = "telnetsession";
-
 const MSG_LINK: &str = "frontend";
 const SESSIONS_KEY: &str = "wcc:telnet:sessions";
-
 const INIT_SUBJECT: &str = "wcc.telnet.init";
 const USER_PREFIX: &str = "wcchat://users/";
+const ROOM_PREFIX: &str = "wcchat://rooms/";
+// Constants for telnet commands
+const HELP_CMD: &str = "/help";
+const LEAVE_CMD: &str = "/leave";
+const JOIN_CMD: &str = "/join";
+const MSG_CMD: &str = "/msg";
+const ROOMS_CMD: &str = "/rooms";
+const WHO_CMD: &str = "/who";
+const HELP_TEXT: &str = "Commands:\r
+    /help               - Show this help text\r
+    /join <room>        - Join a room\r
+    /leave <room>       - Leave a room\r
+    /msg <user> <text>  - Send a direct message to a user\r
+    /rooms              - Show the list of rooms\r
+    /who                - Show all online users\r\n";
 
 #[actor::init]
 fn init() {
@@ -34,6 +46,7 @@ fn init() {
 }
 
 fn handle_message(msg: BrokerMessage) -> HandlerResult<()> {
+    //TODO: consider replacing message with user command
     if msg.subject == INIT_SUBJECT {
         init_session(msg)
     } else {
@@ -44,9 +57,16 @@ fn handle_message(msg: BrokerMessage) -> HandlerResult<()> {
 /// Handles initialization of a user session, including setting
 /// username, session_id
 fn init_session(msg: BrokerMessage) -> HandlerResult<()> {
-    //TODO: validate username, no dupes, etc
+    //TODO: validate username, update session for user
     let session = serde_json::from_slice::<UserSession>(&msg.body)?;
     let session_host = keyvalue::host(KEYVALUE_LINK);
+    // If user already exists, remove their session and replace with updated session
+    if let Some(user_session) = user_session_for_id(session.id.clone()) {
+        session_host.set_remove(
+            SESSIONS_KEY.to_string(),
+            serde_json::to_string(&user_session)?,
+        )?;
+    }
     if let Ok(_) = session_host
         .set_add(SESSIONS_KEY.to_string(), serde_json::to_string(&session)?)
         .map(|_| ())
@@ -89,10 +109,14 @@ fn backend_message(msg: BrokerMessage) -> HandlerResult<()> {
         .collect::<Vec<_>>()
         .get(0)
     {
+        //TODO: This delivers the message immediately, might be inline with what the user is currently typing
         telnet::default()
             .send_text(
                 target.id.to_string(),
-                format!("INCOMING: {}\r\n", channel_msg.message_text),
+                format!(
+                    "{}: {}\r\n> ",
+                    channel_msg.origin_user_id, channel_msg.message_text
+                ),
             )
             .map(|_| ())
     } else {
@@ -102,6 +126,7 @@ fn backend_message(msg: BrokerMessage) -> HandlerResult<()> {
 
 /// Prompts user to create a username when session begins
 /// TODO: consider assigning usernames, or basing them off of authentication
+/// OR command to create a user
 fn session_started(session_id: String) -> HandlerResult<bool> {
     debug!("telnet session started: {}", session_id);
     telnet::default().send_text(session_id, "Create a username: ".to_string())?;
@@ -136,38 +161,60 @@ fn receive_text(session: String, message_text: String) -> HandlerResult<bool> {
         return Ok(false);
     };
 
-    // Handle telnet command instead of sending message
-    if message_text.starts_with('/') {
-        handle_telnet_command(message_text, origin_session)
-    } else {
-        send_telnet_message(message_text, origin_session)
-    }
+    handle_telnet_command(&message_text, origin_session)
 }
 
-fn send_telnet_message(message_text: String, origin_session: UserSession) -> HandlerResult<bool> {
+/// Parse and handle command sent by user
+fn handle_telnet_command(command: &str, origin_session: UserSession) -> HandlerResult<bool> {
+    debug!(
+        "command {} received from user {}",
+        command, origin_session.username
+    );
+    let telnet_host = telnet::default();
+    let res = match command {
+        HELP_CMD => telnet_host.send_text(origin_session.id.clone(), HELP_TEXT.to_string()),
+        ROOMS_CMD => Ok(true),
+        WHO_CMD => Ok(true),
+        _ if command.starts_with(MSG_CMD) => {
+            //TODO: catch unwraps here
+            let cmd = command.strip_prefix(MSG_CMD).unwrap().trim();
+            let user = &cmd[0..cmd.find(char::is_whitespace).unwrap()];
+            let msg = cmd.strip_prefix(user).unwrap().trim();
+            send_telnet_message(&user_target(user), msg, origin_session.clone())
+        }
+        _ => telnet_host.send_text(
+            origin_session.id.clone(),
+            format!(
+                "Command \"{}\" not supported\r\n",
+                command.split_ascii_whitespace().next().unwrap_or_default()
+            ),
+        ),
+    };
+
+    // Replace prompt in user side TODO: Is this possible in another way?
+    telnet::default().send_text(origin_session.id, "> ".to_string())?;
+    res
+}
+
+fn send_telnet_message(
+    target_url: &str,
+    message_text: &str,
+    origin_session: UserSession,
+) -> HandlerResult<bool> {
     debug!(
         "text ({}) received from session ({})",
         message_text, origin_session.id
     );
 
-    // TODO: validate access token
-    let new_guid = extras::default()
-        .request_guid()?
-        .unwrap_or("???".to_string());
-    let channelmsg = ChannelMessage {
-        message_id: new_guid,
-        message_type: MSGTYPE_MESSAGE.to_string(),
-        origin_channel: CHANNEL_ID.to_string(),
+    let channelmsg = new_channel_message(
         message_text,
-        data: None,
-        origin_user_id: origin_session.username,
-        created_on: 0,                                  //TODO: find appropriate value
-        origin_room: Some("telnet_room".to_string()),   //find appropriate value
-        target_url: "wcchat://users/bobby".to_string(), //find appropriate value
-    };
+        &origin_session.username,
+        Some("telnet_room".to_string()),
+        target_url,
+    )?;
+
     info!("Submitting message to message actor for processing");
     // Replace prompt in user side TODO: Is this possible in another way?
-    telnet::default().send_text(origin_session.id.clone(), "> ".to_string())?;
     match actor::call_actor::<ChannelMessage, ProcessAck>(
         MSG_ACTOR_CALL_ALIAS,
         OP_PROCESS_MESSAGE,
@@ -181,28 +228,7 @@ fn send_telnet_message(message_text: String, origin_session: UserSession) -> Han
     }
 }
 
-// Constants for telnet commands
-const HELP_CMD: &str = "/help";
-const HELP_TEXT: &str = "Commands:\r
-/help      - Show this help text\r
-/listusers - Show all connected telnet users\r\n";
-
-fn handle_telnet_command(command: String, origin_session: UserSession) -> HandlerResult<bool> {
-    debug!(
-        "command {} received from user {}",
-        command, origin_session.username
-    );
-    let telnet_host = telnet::default();
-    let res = match &*command {
-        HELP_CMD => telnet_host.send_text(origin_session.id.clone(), HELP_TEXT.to_string()),
-        _ => Ok(false),
-    };
-
-    // Replace prompt in user side TODO: Is this possible in another way?
-    telnet::default().send_text(origin_session.id, "> ".to_string())?;
-    res
-}
-
+//TODO: Alter something like 'focus', or query presence actor?
 #[derive(Serialize, Deserialize, Clone)]
 /// Associates a username and telnet session, stored in keyvalue
 /// database for persistent sessions
@@ -232,6 +258,39 @@ fn user_session_for_id(session_id: String) -> Option<UserSession> {
     } else {
         None
     }
+}
+
+/// Helper function to create ChannelMessage struct
+fn new_channel_message(
+    message_text: &str,
+    origin_user_id: &str,
+    origin_room: Option<String>,
+    target_url: &str,
+) -> Result<ChannelMessage, Box<dyn ::std::error::Error + Send + Sync>> {
+    let new_guid = extras::default()
+        .request_guid()?
+        .unwrap_or("???".to_string());
+    Ok(ChannelMessage {
+        message_id: new_guid,
+        message_type: MSGTYPE_MESSAGE.to_string(),
+        origin_channel: CHANNEL_ID.to_string(),
+        message_text: message_text.to_string(),
+        data: None,
+        origin_user_id: origin_user_id.to_string(),
+        created_on: 0, //TODO: find appropriate value
+        origin_room,
+        target_url: target_url.to_string(),
+    })
+}
+
+/// Helper function to create target_url for a user
+fn user_target(user: &str) -> String {
+    format!("{}{}", USER_PREFIX, user)
+}
+
+/// Helper function to create target_url for a room
+fn room_target(room: &str) -> String {
+    format!("{}{}", ROOM_PREFIX, room)
 }
 
 /// Repesents a cloudevent v1.0 JSON format message.
