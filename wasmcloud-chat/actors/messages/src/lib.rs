@@ -24,7 +24,7 @@ const WCCHAT_SCHEME: &str = "wcchat";
 const EVENT_TYPE_MESSAGE_PUBLISHED: &str = "com.wasmcloud.chat.events.messagepublished";
 const EVENT_SOURCE: &str = "/actors/messaging";
 
-const BACKEND_SUBJECT_PREFIX: &str = "wcc.backend.events.";
+const BACKEND_SUBJECT_PREFIX: &str = "wcc.backend.events";
 
 const HMK_ORIGIN_CHANNEL: &str = "origin_channel";
 const HMK_ORIGIN_USER: &str = "origin_user";

@@ -96,9 +96,9 @@ checksum = "71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e"
 
 [[package]]
 name = "serde"
-version = "1.0.123"
+version = "1.0.125"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92d5161132722baa40d802cc70b15262b98258453e85e5d1d365c757c73869ae"
+checksum = "558dc50e1a5a5fa7112ca2ce4effcb321b0300c0d4ccf0776a9f60cd89031171"
 dependencies = [
  "serde_derive",
 ]
@@ -114,9 +114,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.123"
+version = "1.0.125"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9391c295d64fc0abb2c556bad848f33cb8296276b1ad2677d1ae1ace4f258f31"
+checksum = "b093b7a2bb58203b5da3056c05b4ec1fed827dcfdb37347a8841695263b3d06d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -125,9 +125,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.62"
+version = "1.0.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea1c6153794552ea7cf7cf63b1231a25de00ec90db326ba6264440fa08e31486"
+checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
 dependencies = [
  "itoa",
  "ryu",
@@ -149,8 +149,17 @@ dependencies = [
 name = "telnet-channel"
 version = "0.1.0"
 dependencies = [
+ "log",
+ "serde",
+ "serde_json",
  "wapc-guest",
  "wasmcloud-actor-core",
+ "wasmcloud-actor-extras",
+ "wasmcloud-actor-keyvalue",
+ "wasmcloud-actor-logging",
+ "wasmcloud-actor-messaging",
+ "wasmcloud-actor-telnet",
+ "wasmcloudchat-messages-interface",
 ]
 
 [[package]]
@@ -193,4 +202,87 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "wasmcloud-actor-extras"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "873979fdcc2eb9497026855968c5ff568401836c19b131eb27017c7224edd155"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "serde_derive",
+ "wapc-guest",
+]
+
+[[package]]
+name = "wasmcloud-actor-keyvalue"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd68932a1884f93acd141369c3d5fd66dd523244828d11a8e91b444d3cb2d3a0"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "wapc-guest",
+]
+
+[[package]]
+name = "wasmcloud-actor-logging"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e25b41da6aa9d05952ec35998163fb6e65232c99c5ed4827c778fdbf801993c5"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "wapc-guest",
+]
+
+[[package]]
+name = "wasmcloud-actor-messaging"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "244a9f68f16cf6a1594b0853cfcb9774efbac92060b3c817bbd397c6882bc36c"
+dependencies = [
+ "lazy_static",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "wapc-guest",
+]
+
+[[package]]
+name = "wasmcloud-actor-telnet"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8878e2a8e5a6016f7cfe431b2dc4358eaf69e80db9ffbafc4a1752cddeb1056b"
+dependencies = [
+ "lazy_static",
+ "rmp-serde",
+ "serde",
+ "wapc-guest",
+]
+
+[[package]]
+name = "wasmcloudchat-messages-interface"
+version = "0.1.0"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "serde_derive",
+ "serde_json",
+ "wapc-guest",
 ]

@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 use wapc_guest as guest;
 use wasmcloud_actor_core as actor;
 use wasmcloud_actor_extras as extras;
-use wasmcloud_actor_messaging as messaging;
 use wasmcloud_actor_logging as logging;
+use wasmcloud_actor_messaging as messaging;
 use wasmcloudchat_messages_interface as msgactor;
 
 use guest::prelude::*;
@@ -81,8 +81,7 @@ fn handle_inbound_message(msg: messaging::BrokerMessage) -> HandlerResult<()> {
         acknowledged: ack.processed,
         error: ack.error,
         message_id: ack.message_id,
-    }; 
-    
+    };
     if !msg.reply_to.is_empty() {
         let _ = messaging::host(LINK_NAME_FRONTEND).publish(
             msg.reply_to,
