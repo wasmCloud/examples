@@ -6,6 +6,7 @@ use wasmcloud_actor_keyvalue as keyvalue;
 use wasmcloudchat_presence_interface::*;
 
 const USER_PRESENCE_EXPIRATION_SECONDS: i32 = 10 * 60; // 10 minutes
+const PRESENCE_USERS: &str = "presence:users";
 
 pub(crate) fn store_tracking_report(report: PresenceTrackReport) -> HandlerResult<()> {
     let detail_key = format!("presence:{}", report.user_id);
@@ -24,8 +25,7 @@ pub(crate) fn store_tracking_report(report: PresenceTrackReport) -> HandlerResul
         USER_PRESENCE_EXPIRATION_SECONDS,
     )?;
 
-    let set_key = "presence:users";
-    keyvalue::default().set_add(set_key.to_string(), report.user_id.to_string());
+    keyvalue::default().set_add(PRESENCE_USERS.to_string(), report.user_id.to_string());
 
     Ok(())
 }
@@ -34,7 +34,7 @@ pub(crate) fn get_online_users() -> HandlerResult<OnlineUserList> {
     let mut expired: Vec<String> = vec![];
     let mut presences: Vec<PresenceUser> = vec![];
     let online = keyvalue::default()
-        .set_query("presence_users".to_string())?
+        .set_query(PRESENCE_USERS.to_string())?
         .values;
 
     for user in online {
@@ -52,7 +52,7 @@ pub(crate) fn get_online_users() -> HandlerResult<OnlineUserList> {
 
     // Remove users from the online list that have expired detail keys
     for user in expired {
-        let _ = keyvalue::default().set_remove("presence:users".to_string(), user.to_string())?;
+        let _ = keyvalue::default().set_remove(PRESENCE_USERS.to_string(), user.to_string())?;
     }
 
     Ok(OnlineUserList { users: presences })
