@@ -12,7 +12,7 @@ all: build
 
 build:
 	@$(CARGO) build	
-	wash claims sign $(DEBUG)/presence.wasm -c wasmcloud:httpserver --name "presence" --ver $(VERSION) --rev 0
+	wash claims sign $(DEBUG)/presence.wasm -a "wasmcloud/chat/presence" -l -k --name "Presence Actor" --ver $(VERSION) --rev 0
 
 check:
 	@$(CARGO) check
@@ -31,4 +31,4 @@ update:
 
 release:
 	@$(CARGO) build --release	
-	wash claims sign $(RELEASE)/presence.wasm -c wasmcloud:httpserver --name "presence" --ver $(VERSION) --rev 0
+	wash claims sign $(RELEASE)/presence.wasm -a "wasmcloud/chat/presence" -l -k --name "Presence Actor" --ver $(VERSION) --rev 0
