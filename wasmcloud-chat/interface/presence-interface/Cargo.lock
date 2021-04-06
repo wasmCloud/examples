@@ -50,20 +50,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "presence"
-version = "0.1.0"
-dependencies = [
- "log",
- "serde",
- "serde_json",
- "wapc-guest",
- "wasmcloud-actor-core",
- "wasmcloud-actor-keyvalue",
- "wasmcloud-actor-logging",
- "wasmcloudchat-presence-interface",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -150,9 +136,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.60"
+version = "1.0.61"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c700597eca8a5a762beb35753ef6b94df201c81cca676604f547495a0d7f0081"
+checksum = "ed22b90a0e734a23a7610f4283ac9e5acfb96cbb30dfefa540d66f866f1c09c5"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -175,63 +161,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "wasmcloud-actor-core"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3db490c15579b0c070db4cd548e4b0ebf344d5ced172d092971f07791b67b161"
-dependencies = [
- "lazy_static",
- "log",
- "rmp-serde",
- "serde",
- "serde_bytes",
- "serde_json",
- "wapc-guest",
- "wasmcloud-actor-core-derive",
-]
-
-[[package]]
-name = "wasmcloud-actor-core-derive"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48be47dd4eb5339812ef5cf60e174ad4ae6f5b4bc188dbed09eb668d7046b08f"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "wasmcloud-actor-keyvalue"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd68932a1884f93acd141369c3d5fd66dd523244828d11a8e91b444d3cb2d3a0"
-dependencies = [
- "lazy_static",
- "log",
- "rmp-serde",
- "serde",
- "serde_bytes",
- "serde_json",
- "wapc-guest",
-]
-
-[[package]]
-name = "wasmcloud-actor-logging"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e25b41da6aa9d05952ec35998163fb6e65232c99c5ed4827c778fdbf801993c5"
-dependencies = [
- "lazy_static",
- "log",
- "rmp-serde",
- "serde",
- "serde_bytes",
- "wapc-guest",
-]
-
-[[package]]
-name = "wasmcloudchat-presence-interface"
+name = "wasmcloudchat-messages-interface"
 version = "0.1.0"
 dependencies = [
  "lazy_static",

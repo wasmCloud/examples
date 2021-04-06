@@ -1,0 +1,22 @@
+namespace "wcc:presence"
+
+interface{
+    Track{report: PresenceTrackReport}: void
+    QueryOnline(): OnlineUserList
+}
+
+type PresenceTrackReport {
+    user_id: string
+    channel_id: string
+    last_activity: u64
+}
+
+type OnlineUserList {
+    users: [PresenceUser]
+}
+
+type PresenceUser {
+    user_id: string
+    channels: [string]
+    last_seen_mins: u64
+}
