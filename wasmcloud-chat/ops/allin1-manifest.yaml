@@ -60,9 +60,9 @@ links:
     provider_id: "VDHPKGFKDI34Y4RN4PWWZHRYZ6373HYRSNNEM4UTDLLOGO5B37TSVREP"
   - actor: ${TELNETCHANNEL_ACTOR:MCRPDIBJPAZUIEDT5S6AM5LN7J5FWZ74R5SB6DN7OQBRYOD6EEOAZHDX}
     contract_id: "wasmcloud:telnet"
-    provider_id: "VB4WK4J6ATXJ7NVZZCP5WCSAB6NHQHGJKTASLF7JGC2RCHD6WBLXCVZX"
+    provider_id: "VAGYXBYPQYRPSIMFVCJ2OGGN6PBSNUT3JDJ2YABB3PGGJJGBC64TSVXA"
     values:
-      PORT: 23
+      PORT: 8500
       MOTD: "
 \ ___       __   ________  ________     \n
 |\\  \\     |\\  \\|\\   ____\\|\\   ____\\ \n

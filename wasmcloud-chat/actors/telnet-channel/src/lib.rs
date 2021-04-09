@@ -182,14 +182,21 @@ fn handle_telnet_command(command: &str, origin_session: UserSession) -> HandlerR
             let msg = cmd.strip_prefix(user).unwrap().trim();
             send_telnet_message(&user_target(user), msg, origin_session.clone())
         }
-        _ => telnet_host.send_text(
+        _ if command.starts_with("/") => telnet_host.send_text(
             origin_session.id.clone(),
             format!(
                 "Command \"{}\" not supported\r\n",
                 command.split_ascii_whitespace().next().unwrap_or_default()
             ),
         ),
-    };
+        _ => {
+            send_telnet_message(
+                "wcchat://rooms/general",
+                command,
+                origin_session.clone()
+            )            
+        }
+    };    
 
     // Replace prompt in user side TODO: Is this possible in another way?
     telnet::default().send_text(origin_session.id, "> ".to_string())?;
