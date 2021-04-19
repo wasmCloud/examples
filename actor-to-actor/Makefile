@@ -24,6 +24,8 @@ clean:
 	cd pinger && cargo clean
 	cd ponger && cargo clean
 
-run: build
-	wasmcloud -m ./manifest.yaml
+makeenv: build
+	export PINGER_ACTOR=$(shell wash claims inspect pinger/target/wasm32-unknown-unknown/debug/pinger_s.wasm -o json | jq .module | tr -d "\"")
 
+run: makeenv
+	wasmcloud -m ./manifest.yaml
