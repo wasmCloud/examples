@@ -34,7 +34,7 @@ func handleRequest(request httpserver.Request) (httpserver.Response, error) {
 		ret = "add: " + nums[0] + " + " + nums[1] + " = " + strconv.Itoa(num0+num1)
 	case "/sub":
 		ret = "add: " + nums[0] + " - " + nums[1] + " = " + strconv.Itoa(num0-num1)
-	// TODO: implement multiply
+	// TODO: add multiplication
 	case "/div":
 		if num1 == 0 {
 			ret = "You can not divide by 0!"

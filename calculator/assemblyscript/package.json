@@ -1,0 +1,27 @@
+{
+  "name": "calculator",
+  "version": "0.1.0",
+  "description": "AssemblyScript version of the calculator actor example",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests",
+    "build": "asc assembly/index.ts -b calculator.wasm --optimize",
+    "asbuild:untouched": "asc assembly/index.ts -b untouched.wasm -t untouched.wat --validate --sourceMap --debug",
+    "asbuild:optimized": "asc assembly/index.ts -b optimized.wasm -t optimized.wat --validate --sourceMap --optimize",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+  },
+  "author": "Matt Gilbride",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@assemblyscript/loader": "^0.18.30",
+    "@wapc/as-guest": "^v0.2.1",
+    "@wapc/as-msgpack": "^0.1.11",
+    "@wasmcloud/actor-core": "^0.1.2",
+    "@wasmcloud/actor-http-server": "^0.1.4",
+    "asc": "^2.0.2"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.17.14",
+    "prettier": "^2.0.2"
+  }
+}

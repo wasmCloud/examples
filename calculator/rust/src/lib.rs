@@ -11,54 +11,39 @@ fn init() {
 
 fn test_body(msg: httpserver::Request) -> HandlerResult<httpserver::Response> {
     let nums: Vec<&str> = msg.query_string.split(",").collect();
+    let mut ret: String = String::from("Welcome to wasmcloud calculator");
 
-    match msg.path.as_str() {
-        "/add" => {
-            let sum = nums[0].parse::<i32>().unwrap() + nums[1].parse::<i32>().unwrap();
-            let ret = format!("add: {} + {} = {}", nums[0], nums[1], sum);
-            return Ok(httpserver::Response {
-                status_code: 200,
-                status: "OK".to_string(),
-                header: msg.header,
-                body: ret.as_bytes().to_vec(),
-            });
-        }
-        "/sub" => {
-            let sub = nums[0].parse::<i32>().unwrap() - nums[1].parse::<i32>().unwrap();
-            let ret = format!("subtract: {} - {} = {}", nums[0], nums[1], sub);
-            return Ok(httpserver::Response {
-                status_code: 200,
-                status: "OK".to_string(),
-                header: msg.header,
-                body: ret.as_bytes().to_vec(),
-            });
-        }
-        // TODO: add multiply capabilities
-        "/div" => {
-            if nums[1] == "0" {
-                return Ok(httpserver::Response {
-                    status_code: 200,
-                    status: "OK".to_string(),
-                    header: msg.header,
-                    body: "Can not divide by zero!".as_bytes().to_vec(),
-                });
+    loop {
+        match msg.path.as_str() {
+            "/add" => {
+                let sum = nums[0].parse::<i32>().unwrap() + nums[1].parse::<i32>().unwrap();
+                ret = format!("add: {} + {} = {}", nums[0], nums[1], sum);
+                break;
             }
-            let div = nums[0].parse::<i32>().unwrap() / nums[1].parse::<i32>().unwrap();
-            let ret = format!("divide: {} / {} = {}", nums[0], nums[1], div);
-            return Ok(httpserver::Response {
-                status_code: 200,
-                status: "OK".to_string(),
-                header: msg.header,
-                body: ret.as_bytes().to_vec(),
-            });
-        }
-        _ => {
-            return Ok(httpserver::Response {
-                status_code: 200,
-                status: "OK".to_string(),
-                header: msg.header,
-                body: b"Welcome to the wasmcloud calculator".to_vec(),
-            });
+            "/sub" => {
+                let sub = nums[0].parse::<i32>().unwrap() - nums[1].parse::<i32>().unwrap();
+                ret = format!("subtract: {} - {} = {}", nums[0], nums[1], sub);
+                break;
+            }
+            // TODO: add multiplication
+            "/div" => {
+                if nums[1] == "0" {
+                    ret = String::from("Can not divide by zero!");
+                    break;
+                }
+                let div = nums[0].parse::<i32>().unwrap() / nums[1].parse::<i32>().unwrap();
+                ret = format!("divide: {} / {} = {}", nums[0], nums[1], div);
+                break;
+            }
+            _ => {
+                break;
+            }
         }
     }
+    return Ok(httpserver::Response {
+        status_code: 200,
+        status: "OK".to_string(),
+        header: msg.header,
+        body: ret.as_bytes().to_vec(),
+    });
 }
