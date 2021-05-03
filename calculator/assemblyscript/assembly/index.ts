@@ -17,20 +17,20 @@ function HandleRequest(request: Request): Response {
   const numTwo = parseInt(nums[1])
   let result: string;
   
-  if (request.path == "add") {
+  if (request.path == "/add") {
     result = "add: " + numOne.toString() + " + " + numTwo.toString() + " = " + (numOne + numTwo).toString()
   }
-  else if (request.path == "sub") {
+  else if (request.path == "/sub") {
     result = "subtract: " + numOne.toString() + " - " + numTwo.toString() + " = " + (numOne - numTwo).toString()
-//TODO: add multiplication
-  } else if (request.path == "div") {
+  //TODO: add multiplication
+  } else if (request.path == "/div") {
     if (numTwo === 0) {
       result = "Can not divide by zero!"
     } else {
       result = "divide: " + numOne.toString() + " / " + numTwo.toString() +  " = " +  (numOne / numTwo).toString()
     }
   } else {
-    result = "Unsupported operation"
+    result = "Welcome to the wasmcloud calculator app!"
   }
   
   return new ResponseBuilder()
