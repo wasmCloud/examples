@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node tests",
-    "build": "asc assembly/index.ts -b calculator.wasm --optimize",
+    "build": "asc assembly/index.ts -b calculator.wasm --use abort=assembly/index/abort --optimize",
     "asbuild:untouched": "asc assembly/index.ts -b untouched.wasm -t untouched.wat --validate --sourceMap --debug",
     "asbuild:optimized": "asc assembly/index.ts -b optimized.wasm -t optimized.wat --validate --sourceMap --optimize",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
