@@ -8,9 +8,6 @@ import (
 	httpserver "github.com/wasmcloud/actor-interfaces/http-server/go"
 )
 
-func wapc_init() {
-}
-
 func main() {
 	core.Handlers{HealthRequest: healthRequest}.Register()
 	httpserver.Handlers{HandleRequest: handleRequest}.Register()

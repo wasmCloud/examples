@@ -12,10 +12,10 @@ all: release
 
 build:
 	@$(CARGO) build	
-	wash claims sign $(DEBUG)/calculator.wasm -c wasmcloud:httpserver --name "calculator" --ver $(VERSION) --rev 0
+	wash claims sign $(DEBUG)/calculator.wasm -c wasmcloud:httpserver --name "calculator" --ver $(VERSION) --rev 0 --destination ./calculator_s.wasm
 
 start:
-	RUST_LOG=debug wasmcloud --allowed-insecure localhost:5000 -m manifest.yaml
+	RUST_LOG=debug wasmcloud -m manifest.yaml
 
 check:
 	@$(CARGO) check
@@ -34,6 +34,4 @@ update:
 
 release:
 	@$(CARGO) build --release	
-	wash claims sign $(RELEASE)/calculator.wasm -c wasmcloud:httpserver --name "calculator" --ver $(VERSION) --rev 0
-	wash drain all
-	wash reg push localhost:5000/calc:0.1.0 target/wasm32-unknown-unknown/release/calculator_s.wasm --insecure
+	wash claims sign $(RELEASE)/calculator.wasm -c wasmcloud:httpserver --name "calculator" --ver $(VERSION) --rev 0 --destination ./calculator_s.wasm
