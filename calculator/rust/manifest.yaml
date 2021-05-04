@@ -1,7 +1,7 @@
 labels:
   actor: "calculator"
 actors:
-  - "calculator_s.wasm"
+  - "localhost:5000/calc:0.1.0"
 capabilities:
   - image_ref: wasmcloud.azurecr.io/httpserver:0.12.1
     link_name: default
