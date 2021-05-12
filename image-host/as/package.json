@@ -1,0 +1,28 @@
+{
+    "name": "image-host",
+    "version": "0.1.0",
+    "description": "AssemblyScript version of the Image Host actor",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "asc assembly/index.ts -b build/imagehost-as.wasm --use abort=assembly/index/abort --validate --optimize",
+        "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --validate --sourceMap --debug",
+        "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --validate --sourceMap --optimize",
+        "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+    },
+    "author": "wasmCloud Team",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "@wapc/as-guest": "^v0.2.1",
+        "@wapc/as-msgpack": "^0.1.11",
+        "@wasmcloud/actor-http-server": "^0.1.3",
+        "@wasmcloud/actor-core": "^0.1.1",
+        "@wasmcloud/actor-blobstore": "^0.2.0",
+        "assemblyscript-json": "git+https://github.com/nearprotocol/assemblyscript-json"
+    },
+    "devDependencies": {
+        "assemblyscript": "^0.17.1",
+        "graphql-schema-linter": "^0.2.0",
+        "prettier": "^2.0.2"
+    }
+}

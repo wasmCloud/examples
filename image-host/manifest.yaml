@@ -1,0 +1,33 @@
+---
+labels:
+  sample: "wasmCloud Image Host"
+actors:
+  - ${IMAGE_HOST_WASM:./rust/target/wasm32-unknown-unknown/debug/image_host_s.wasm}
+capabilities:
+  - image_ref: "wasmcloud.azurecr.io/fs:0.3.3"
+  # - image_ref: "wasmcloud.azurecr.io/s3:0.9.3"
+  - image_ref: "wasmcloud.azurecr.io/httpserver:0.12.0"
+links:
+  # HTTP Server, listen on port 8080
+  - actor: ${IMAGE_HOST_PKEY:MDLGC3T4GIZIWAMBYP4GX32M5X7XB62B447T3DC2FVGJTO6K65J6J4GZ}
+    contract_id: "wasmcloud:httpserver"
+    provider_id: "VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M"
+    values:
+      PORT: "8080"
+  # Filesystem blobstore
+  - actor: ${IMAGE_HOST_PKEY:MDLGC3T4GIZIWAMBYP4GX32M5X7XB62B447T3DC2FVGJTO6K65J6J4GZ}
+    contract_id: "wasmcloud:blobstore"
+    provider_id: "VC76O62NX6GXR5FLTAUT7SJCOBN6WPZMEFVN5NGQEGH3JZ5HCLNT2UJJ"
+    values:
+      ROOT: ${BLOBSTORE_ROOT:/tmp/}
+  # S3 blobstore
+  # - actor: ${IMAGE_HOST_PKEY:MDLGC3T4GIZIWAMBYP4GX32M5X7XB62B447T3DC2FVGJTO6K65J6J4GZ}
+  #   contract_id: "wasmcloud:blobstore"
+  #   provider_id: "VDDTI2TQY3S2QGB74ZLI37JWGB7T2K45QEJRZNNYE7O2Z6ZD5HBN4CMT"
+  #   values:
+  #     ROOT: ${AWS_ROOT_BUCKET:wasmcloud-bucket}
+  #     REGION: ${AWS_REGION:us-east-1}
+  #     AWS_ACCESS_KEY: ${AWS_ACCESS_KEY_ID:default}
+  #     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:default}
+  #     AWS_TOKEN: ${AWS_SESSION_TOKEN:default}
+  #     TOKEN_VALID_FOR: ${TOKEN_EXPIRATION:default}
