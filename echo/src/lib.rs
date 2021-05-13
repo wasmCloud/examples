@@ -26,12 +26,7 @@ pub fn handle_request(r: http::Request) -> HandlerResult<http::Response> {
     Ok(http::Response::json(echo, 200, "OK"))
 }
 
-fn health(_h: actor::HealthCheckRequest) -> HandlerResult<actor::HealthCheckResponse> {
-    Ok(actor::HealthCheckResponse::healthy())
-}
-
-#[no_mangle]
-pub fn wapc_init() {
-    actor::Handlers::register_health_request(health);
+#[actor::init]
+pub fn init() {
     http::Handlers::register_handle_request(handle_request);
 }
