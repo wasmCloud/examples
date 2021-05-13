@@ -1,0 +1,19 @@
+---
+labels:
+    sample: "wasmCloud Fibonacci"
+actors:
+    # Note: we will be specifying this with `wash up --watch`, so it won't be loaded from this manifest
+    - ./target/wasm32-unknown-unknown/debug/http_fib_s.wasm
+capabilities:
+    - image_ref: wasmcloud.azurecr.io/httpserver:0.12.1
+    - image_ref: wasmcloud.azurecr.io/inmemory-keyvalue:0.4.0
+links:
+  # configure the fib actor - httpserver and keyvalue
+  - actor: ${FIB_ACTOR:MDVUB2IKGSH634XUWJSKJPSCLLLUCPOZL3HTYYCE6IC34A42UOHWTQ4P}
+    contract_id: "wasmcloud:httpserver"
+    provider_id: "VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M"
+    values:
+      PORT: 8080
+  - actor: ${FIB_ACTOR:MDVUB2IKGSH634XUWJSKJPSCLLLUCPOZL3HTYYCE6IC34A42UOHWTQ4P}
+    contract_id: "wasmcloud:keyvalue"
+    provider_id: ""
