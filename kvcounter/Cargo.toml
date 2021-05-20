@@ -9,9 +9,9 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wapc-guest = "0.4.0"
-actor-keyvalue = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main", features = ["guest"] }
-actor-core = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main", features = ["guest"] }
-actor-http-server = { git = "https://github.com/wasmcloud/actor-interfaces", branch = "main", features = ["guest"]}
+wasmcloud-actor-keyvalue = { version = "0.2.0", branch = "main", features = ["guest"] }
+wasmcloud-actor-core = { version = "0.2.0", branch = "main", features = ["guest"] }
+wasmcloud-actor-http-server = { version = "0.1.2", branch = "main", features = ["guest"]}
 serde_json = "1.0.59"
 
 [profile.release]

@@ -3,9 +3,16 @@ name = "inmemory-keyvalue"
 version = "0.4.0"
 authors = ["wasmCloud Team"]
 edition = "2018"
+license-file = "LICENSE"
+description = "In-memory keyvalue store implementing the wasmcloud:keyvalue contract"
+repository = "https://github.com/wasmcloud/wasmcloud"
+documentation = "https://wasmcloud.dev"
+readme = "README.md"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+
+#warning: manifest has no description, license, license-file, documentation, homepage or repository.
 
 [features]
 # Enable if the provider will be statically compiled into a host
