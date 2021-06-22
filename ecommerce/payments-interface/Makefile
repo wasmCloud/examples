@@ -4,6 +4,8 @@ all: deps codegen build
 
 deps:
 
+build:
+
 codegen:
 	wapc generate codegen.yaml
 
