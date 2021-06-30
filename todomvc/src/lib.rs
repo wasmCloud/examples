@@ -67,11 +67,29 @@ fn get_all_todos() -> Result<Vec<Todo>> {
         .collect()
 }
 
+fn delete_all_todos() -> Result<()> {
+    let ids = kv::default()
+        .set_query("all_ids".to_string())
+        .map_err(|e| anyhow::anyhow!(e))?
+        .values;
+
+    for id in ids {
+        kv::default()
+            .set_remove("all_ids".to_string(), id.clone())
+            .map_err(|e| anyhow::anyhow!(e))?;
+
+        kv::default().del(id).map_err(|e| anyhow::anyhow!(e))?;
+    }
+
+    Ok(())
+}
+
 fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
     match (msg.path.as_ref(), msg.method.as_ref()) {
         ("/", "POST") => create_todo(serde_json::from_slice(&msg.body)?)
             .map(|todo| http::Response::json(todo, 200, "OK")),
         ("/", "GET") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
+        ("/", "DELETE") => delete_all_todos().map(|_| http::Response::ok()),
         (_, _) => Ok(http::Response::not_found()),
     }
     .or_else(|e| {
