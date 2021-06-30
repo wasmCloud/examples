@@ -16,13 +16,23 @@ Then `export TODO_ACTOR=<Actor id (called Module in the above output)>`.
 
 Then `wasmcloud -m manifest.yaml`.
 
-To test:
+## To test:
 
 Add a todo with: `curl localhost:8082 -d '{"title": "xx"}'`
 
 List todos with `curl localhost:8082`
 
-Hacky "hot" reloader until I can think of a better one:
+For a real test, use the TodoBackend test suite:
+
+```
+git clone https://github.com/TodoBackend/todo-backend-js-spec
+cd todo-backend-js-spec
+pnpx live-server --proxy=/api:http://localhost:8082
+```
+
+and then type `/api` in the box.
+
+## Hacky "hot" reloader until I can think of a better one:
 
 ```
 watchexec --no-ignore --verbose --restart --watch=target/wasm32-unknown-unknown/debug/todomvc_s.wasm -- wasmcloud -m manifest.yaml
