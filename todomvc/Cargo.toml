@@ -13,6 +13,7 @@ wasmcloud-actor-keyvalue = { version = "0.2.0", branch = "main", features = ["gu
 wasmcloud-actor-core = { version = "0.2.0", branch = "main", features = ["guest"] }
 wasmcloud-actor-http-server = { version = "0.1.2", branch = "main", features = ["guest"]}
 serde_json = "1.0.59"
+serde = "1.0.126"
 
 [profile.release]
 # Optimize for small code size
