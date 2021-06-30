@@ -22,6 +22,18 @@ Add a todo with: `curl localhost:8082 -d '{"title": "xx"}'`
 
 List todos with `curl localhost:8082`
 
+Hacky "hot" reloader until I can think of a better one:
+
+```
+watchexec --no-ignore --verbose --restart --watch=target/wasm32-unknown-unknown/debug/todomvc_s.wasm -- wasmcloud -m manifest.yaml
+```
+
+and
+
+```
+cargo watch -c --shell 'make'
+```
+
 ## Development TODOs
 
 - [ ] Implement spec
