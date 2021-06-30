@@ -6,8 +6,6 @@ This actor makes use of the HTTP server (`wasmcloud:httpserver`) capability and 
 
 ## Development TODOs
 
-- [ ] get it compiling under the new name
-  - [ ] manifest.yaml needs label name, exe path and actor id changing
 - [ ] Implement spec
 - [ ] ...
 - [ ] Profit
