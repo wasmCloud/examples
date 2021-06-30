@@ -45,7 +45,7 @@ fn create_todo(input: InputTodo) -> Result<Todo> {
         .map_err(|e| anyhow::anyhow!(e))?;
 
     kv::default()
-        .push("all_ids".to_string(), id.to_string())
+        .set_add("all_ids".to_string(), id.to_string())
         .map_err(|e| anyhow::anyhow!(e))?;
 
     Ok(todo)
@@ -53,7 +53,7 @@ fn create_todo(input: InputTodo) -> Result<Todo> {
 
 fn get_all_todos() -> Result<Vec<Todo>> {
     let ids = kv::default()
-        .range("all_ids".to_string(), 0, -1)
+        .set_query("all_ids".to_string())
         .map_err(|e| anyhow::anyhow!(e))?
         .values;
 
@@ -74,9 +74,10 @@ fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
         ("/", "GET") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
         (_, _) => Ok(http::Response::not_found()),
     }
-    .or_else(|_| {
-        Ok(http::Response::internal_server_error(
-            "Something went wrong",
-        ))
+    .or_else(|e| {
+        Ok(http::Response::internal_server_error(&format!(
+            "Something went wrong: {:?}",
+            e
+        )))
     })
 }
