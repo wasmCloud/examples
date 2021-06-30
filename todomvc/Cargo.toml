@@ -1,5 +1,5 @@
 [package]
-name = "kvcounter"
+name = "todomvc"
 version = "0.2.0"
 authors = ["wasmCloud Team"]
 edition = "2018"
