@@ -1,6 +1,6 @@
 use anyhow::Result;
 use guest::prelude::*;
-use serde::{ser, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use wapc_guest as guest;
 use wasmcloud_actor_core as actor;
 use wasmcloud_actor_http_server as http;
@@ -57,22 +57,21 @@ fn get_all_todos() -> Result<Vec<Todo>> {
         .map_err(|e| anyhow::anyhow!(e))?
         .values;
 
-    let result: Result<Vec<_>, _> = ids.into_iter().map(|id| kv::default().get(id)).collect();
-    let res_vec = result.map_err(|e| anyhow::anyhow!(e))?;
-    let todos = res_vec
-        .into_iter()
-        .map(|response| serde_json::from_str(&response.value))
-        .collect::<Result<Vec<Todo>, _>>()?;
+    ids.into_iter()
+        .map(|id| {
+            let todo_str = kv::default().get(id).map_err(|e| anyhow::anyhow!(e))?.value;
+            let todo = serde_json::from_str(&todo_str)?;
 
-    Ok(todos)
+            Ok(todo)
+        })
+        .collect()
 }
 
 fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
     match (msg.path.as_ref(), msg.method.as_ref()) {
         ("/", "POST") => create_todo(serde_json::from_slice(&msg.body)?)
             .map(|todo| http::Response::json(todo, 200, "OK")),
-        ("/", "GET") => get_all_todos()
-            .map(|todos| http::Response::json(todos, 200, "OK")),
+        ("/", "GET") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
         (_, _) => Ok(http::Response::not_found()),
     }
     .or_else(|_| {
