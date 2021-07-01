@@ -5,7 +5,7 @@ DEBUG = $(TARGET)/debug
 RELEASE = $(TARGET)/release
 KEYDIR ?= .keys
 VERSION = $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')
-CAPABILITIES = --keyvalue --logging -c wasmcloud:httpserver
+CAPABILITIES = -c wasmcloud:keyvalue -c wasmcloud:logging -c wasmcloud:httpserver
 
 .PHONY: all build check clean doc test update
 
