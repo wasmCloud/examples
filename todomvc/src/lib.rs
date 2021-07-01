@@ -81,14 +81,31 @@ fn delete_all_todos() -> Result<()> {
         .values;
 
     for id in ids {
-        kv::default()
-            .set_remove("all_ids".to_string(), id.clone())
-            .map_err(|e| anyhow::anyhow!(e))?;
-
-        kv::default().del(id).map_err(|e| anyhow::anyhow!(e))?;
+        delete_todo(id.parse()?)?
     }
 
     Ok(())
+}
+
+fn delete_todo(id: i32) -> Result<()> {
+    kv::default()
+        .set_remove("all_ids".to_string(), id.to_string())
+        .map_err(|e| anyhow::anyhow!(e))?;
+
+    kv::default()
+        .del(id.to_string())
+        .map_err(|e| anyhow::anyhow!(e))?;
+
+    Ok(())
+}
+
+fn handle_delete_todo(path: &str) -> Result<http::Response> {
+    if let Ok(id) = path.trim_matches('/').parse() {
+        delete_todo(id).map(|()| http::Response::json("", 200, "OK"))
+    } else {
+        warn!("path is not a number {}", path);
+        Ok(http::Response::not_found())
+    }
 }
 
 fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
@@ -108,6 +125,7 @@ fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
             }
         }
         ("DELETE", "/") => delete_all_todos().map(|_| http::Response::ok()),
+        ("DELETE", path) => handle_delete_todo(path).map(|_| http::Response::ok()),
         (_, _) => {
             warn!("not even a thing: {:?}", msg);
             Ok(http::Response::not_found())
