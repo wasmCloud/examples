@@ -108,6 +108,15 @@ fn handle_delete_todo(path: &str) -> Result<http::Response> {
     }
 }
 
+fn handle_get_todo(path: &str) -> Result<http::Response> {
+    if let Ok(id) = path.trim_matches('/').parse() {
+        get_todo(id).map(|todo| http::Response::json(todo, 200, "OK"))
+    } else {
+        warn!("path is not a number {}", path);
+        Ok(http::Response::not_found())
+    }
+}
+
 fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
     let trimmed_path = msg.path.trim_start_matches("/api");
     trace!("incoming msg: {:?}, path: {:?}", msg, trimmed_path);
@@ -116,16 +125,9 @@ fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
         ("POST", "/") => create_todo(serde_json::from_slice(&msg.body)?)
             .map(|todo| http::Response::json(todo, 200, "OK")),
         ("GET", "/") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
-        ("GET", path) => {
-            if let Ok(id) = path.trim_matches('/').parse() {
-                get_todo(id).map(|todo| http::Response::json(todo, 200, "OK"))
-            } else {
-                warn!("path is not a number {}", path);
-                Ok(http::Response::not_found())
-            }
-        }
+        ("GET", path) => handle_get_todo(path),
         ("DELETE", "/") => delete_all_todos().map(|_| http::Response::ok()),
-        ("DELETE", path) => handle_delete_todo(path).map(|_| http::Response::ok()),
+        ("DELETE", path) => handle_delete_todo(path),
         (_, _) => {
             warn!("not even a thing: {:?}", msg);
             Ok(http::Response::not_found())
