@@ -19,6 +19,11 @@ struct InputTodo {
     title: String,
 }
 #[derive(Serialize, Deserialize)]
+struct UpdateTodo {
+    title: Option<String>,
+    completed: Option<bool>,
+}
+#[derive(Serialize, Deserialize)]
 struct Todo {
     url: String,
     title: String,
@@ -55,9 +60,10 @@ fn create_todo(input: InputTodo) -> Result<Todo> {
     Ok(todo)
 }
 
-fn update_todo(url: &str, input: InputTodo) -> Result<Todo> {
+fn update_todo(url: &str, input: UpdateTodo) -> Result<Todo> {
     let mut todo = get_todo(url)?;
-    todo.title = input.title;
+    todo.title = input.title.unwrap_or(todo.title);
+    todo.completed = input.completed.unwrap_or(todo.completed);
 
     kv::default()
         .set(url.to_string(), serde_json::to_string(&todo)?, 0)
