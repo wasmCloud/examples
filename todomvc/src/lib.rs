@@ -1,6 +1,6 @@
 use anyhow::Result;
 use guest::prelude::*;
-use log::info;
+use log::{info, trace, warn};
 use serde::{Deserialize, Serialize};
 use wapc_guest as guest;
 use wasmcloud_actor_core as actor;
@@ -28,7 +28,7 @@ struct Todo {
 impl Todo {
     fn new(id: i32, title: String) -> Self {
         Self {
-            url: format!("/{}", id),
+            url: format!("/api/{}", id),
             title,
             completed: false,
         }
@@ -92,7 +92,10 @@ fn delete_all_todos() -> Result<()> {
 }
 
 fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
-    match (msg.path.as_ref(), msg.method.as_ref()) {
+    let trimmed_path = msg.path.trim_start_matches("/api");
+    trace!("incoming msg: {:?}, path: {:?}", msg, trimmed_path);
+
+    match (trimmed_path, msg.method.as_ref()) {
         ("/", "POST") => create_todo(serde_json::from_slice(&msg.body)?)
             .map(|todo| http::Response::json(todo, 200, "OK")),
         ("/", "GET") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
@@ -100,11 +103,15 @@ fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
             if let Ok(id) = path.trim_matches('/').parse() {
                 get_todo(id).map(|todo| http::Response::json(todo, 200, "OK"))
             } else {
+                warn!("path is not a number {}", path);
                 Ok(http::Response::not_found())
             }
         }
         ("/", "DELETE") => delete_all_todos().map(|_| http::Response::ok()),
-        (_, _) => Ok(http::Response::not_found()),
+        (_, _) => {
+            warn!("not even a thing: {:?}", msg);
+            Ok(http::Response::not_found())
+        }
     }
     .or_else(|e| {
         Ok(http::Response::internal_server_error(&format!(
