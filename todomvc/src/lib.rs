@@ -17,25 +17,29 @@ pub fn init() {
 #[derive(Serialize, Deserialize)]
 struct InputTodo {
     title: String,
+    order: Option<i32>,
 }
 #[derive(Serialize, Deserialize)]
 struct UpdateTodo {
     title: Option<String>,
     completed: Option<bool>,
+    order: Option<i32>,
 }
 #[derive(Serialize, Deserialize)]
 struct Todo {
     url: String,
     title: String,
     completed: bool,
+    order: i32,
 }
 
 impl Todo {
-    fn new(url: String, title: String) -> Self {
+    fn new(url: String, title: String, order: i32) -> Self {
         Self {
             url,
             title,
             completed: false,
+            order,
         }
     }
 }
@@ -47,7 +51,11 @@ fn create_todo(input: InputTodo) -> Result<Todo> {
         .map_err(|e| anyhow::anyhow!(e))?
         .value;
 
-    let todo = Todo::new(format!("/api/{}", id), input.title);
+    let todo = Todo::new(
+        format!("/api/{}", id),
+        input.title,
+        input.order.unwrap_or(0),
+    );
 
     kv::default()
         .set(todo.url.clone(), serde_json::to_string(&todo)?, 0)
@@ -64,6 +72,7 @@ fn update_todo(url: &str, input: UpdateTodo) -> Result<Todo> {
     let mut todo = get_todo(url)?;
     todo.title = input.title.unwrap_or(todo.title);
     todo.completed = input.completed.unwrap_or(todo.completed);
+    todo.order = input.order.unwrap_or(todo.order);
 
     kv::default()
         .set(url.to_string(), serde_json::to_string(&todo)?, 0)
