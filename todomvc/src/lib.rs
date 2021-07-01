@@ -95,11 +95,11 @@ fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
     let trimmed_path = msg.path.trim_start_matches("/api");
     trace!("incoming msg: {:?}, path: {:?}", msg, trimmed_path);
 
-    match (trimmed_path, msg.method.as_ref()) {
-        ("/", "POST") => create_todo(serde_json::from_slice(&msg.body)?)
+    match (msg.method.as_ref(), trimmed_path) {
+        ("POST", "/") => create_todo(serde_json::from_slice(&msg.body)?)
             .map(|todo| http::Response::json(todo, 200, "OK")),
-        ("/", "GET") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
-        (path, "GET") => {
+        ("GET", "/") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
+        ("GET", path) => {
             if let Ok(id) = path.trim_matches('/').parse() {
                 get_todo(id).map(|todo| http::Response::json(todo, 200, "OK"))
             } else {
@@ -107,7 +107,7 @@ fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
                 Ok(http::Response::not_found())
             }
         }
-        ("/", "DELETE") => delete_all_todos().map(|_| http::Response::ok()),
+        ("DELETE", "/") => delete_all_todos().map(|_| http::Response::ok()),
         (_, _) => {
             warn!("not even a thing: {:?}", msg);
             Ok(http::Response::not_found())
