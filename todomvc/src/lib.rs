@@ -1,14 +1,18 @@
 use anyhow::Result;
 use guest::prelude::*;
+use log::warn;
 use serde::{Deserialize, Serialize};
 use wapc_guest as guest;
 use wasmcloud_actor_core as actor;
 use wasmcloud_actor_http_server as http;
 use wasmcloud_actor_keyvalue as kv;
+use wasmcloud_actor_logging as logging;
 
 #[actor::init]
 pub fn init() {
     http::Handlers::register_handle_request(request_handler);
+    logging::enable_macros();
+    warn!("starting up");
 }
 
 #[derive(Serialize, Deserialize)]

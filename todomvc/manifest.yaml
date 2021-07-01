@@ -7,6 +7,8 @@ capabilities:
     link_name: default
   - image_ref: wasmcloud.azurecr.io/redis:0.11.2
     link_name: default
+  - image_ref: wasmcloud.azurecr.io/logging:0.9.4
+    link_name: default
 links:
   - actor: ${TODO_ACTOR:MA6E5YDNBGB23LHZ6ANRGEM7YIOAEQKHHW4QLVCUMOSRBWDZOENHPK43}
     provider_id: "VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M"
@@ -14,6 +16,10 @@ links:
     link_name: default
     values:
       PORT: 8082
+  - actor: ${TODO_ACTOR:MA6E5YDNBGB23LHZ6ANRGEM7YIOAEQKHHW4QLVCUMOSRBWDZOENHPK43}
+    contract_id: "wasmcloud:logging"
+    provider_id: "VCCANMDC7KONJK435W6T7JFEEL7S3ZG6GUZMZ3FHTBZ32OZHJQR5MJWZ"
+    link_name: default
   - actor: ${TODO_ACTOR:MA6E5YDNBGB23LHZ6ANRGEM7YIOAEQKHHW4QLVCUMOSRBWDZOENHPK43}
     contract_id: "wasmcloud:keyvalue"
     provider_id: "VAZVC4RX54J2NVCMCW7BPCAHGGG5XZXDBXFUMDUXGESTMQEJLC3YVZWB"

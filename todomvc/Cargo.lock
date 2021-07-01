@@ -158,12 +158,14 @@ name = "todomvc"
 version = "0.2.0"
 dependencies = [
  "anyhow",
+ "log",
  "serde",
  "serde_json",
  "wapc-guest",
  "wasmcloud-actor-core",
  "wasmcloud-actor-http-server",
  "wasmcloud-actor-keyvalue",
+ "wasmcloud-actor-logging",
 ]
 
 [[package]]
@@ -234,5 +236,19 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_json",
+ "wapc-guest",
+]
+
+[[package]]
+name = "wasmcloud-actor-logging"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "220d368da04838697fc7e4239273c99aa2c41a5cd6586973df9ca9965f14db01"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
  "wapc-guest",
 ]
