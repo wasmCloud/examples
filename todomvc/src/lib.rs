@@ -17,7 +17,7 @@ struct InputTodo {
 }
 #[derive(Serialize, Deserialize)]
 struct Todo {
-    id: i32,
+    url: String,
     title: String,
     completed: bool,
 }
@@ -25,7 +25,7 @@ struct Todo {
 impl Todo {
     fn new(id: i32, title: String) -> Self {
         Self {
-            id,
+            url: format!("/{}", id),
             title,
             completed: false,
         }
@@ -57,14 +57,17 @@ fn get_all_todos() -> Result<Vec<Todo>> {
         .map_err(|e| anyhow::anyhow!(e))?
         .values;
 
-    ids.into_iter()
-        .map(|id| {
-            let todo_str = kv::default().get(id).map_err(|e| anyhow::anyhow!(e))?.value;
-            let todo = serde_json::from_str(&todo_str)?;
+    ids.into_iter().map(|id| get_todo(id.parse()?)).collect()
+}
 
-            Ok(todo)
-        })
-        .collect()
+fn get_todo(id: i32) -> Result<Todo> {
+    let todo_str = kv::default()
+        .get(id.to_string())
+        .map_err(|e| anyhow::anyhow!(e))?
+        .value;
+    let todo = serde_json::from_str(&todo_str)?;
+
+    Ok(todo)
 }
 
 fn delete_all_todos() -> Result<()> {
@@ -89,6 +92,13 @@ fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
         ("/", "POST") => create_todo(serde_json::from_slice(&msg.body)?)
             .map(|todo| http::Response::json(todo, 200, "OK")),
         ("/", "GET") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
+        (path, "GET") => {
+            if let Ok(id) = path.trim_matches('/').parse() {
+                get_todo(id).map(|todo| http::Response::json(todo, 200, "OK"))
+            } else {
+                Ok(http::Response::not_found())
+            }
+        }
         ("/", "DELETE") => delete_all_todos().map(|_| http::Response::ok()),
         (_, _) => Ok(http::Response::not_found()),
     }
