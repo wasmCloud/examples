@@ -27,10 +27,8 @@ For a real test, use the TodoBackend test suite:
 ```
 git clone https://github.com/TodoBackend/todo-backend-js-spec
 cd todo-backend-js-spec
-pnpx live-server --proxy=/api:http://localhost:8082
+pnpx live-server --proxy=/api:http://localhost:8082 --open='/?/api'
 ```
-
-and then type `/api` in the box.
 
 ## Hacky "hot" reloader until I can think of a better one:
 
