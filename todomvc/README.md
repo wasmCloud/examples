@@ -14,7 +14,7 @@ Then `make` and `wash claims inspect target/wasm32-unknown-unknown/debug/todomvc
 
 Then `export TODO_ACTOR=<Actor id (called Module in the above output)>`.
 
-Then `wasmcloud -m manifest.yaml`.
+Then `RUST_LOG=info wasmcloud -m manifest.yaml`. This will trace all `info` type logs from all the capability providers including `wasmcloud:logging`.
 
 ## To test:
 
