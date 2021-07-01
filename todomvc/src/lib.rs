@@ -1,6 +1,6 @@
 use anyhow::Result;
 use guest::prelude::*;
-use log::{info, trace, warn};
+use log::{info, warn};
 use serde::{Deserialize, Serialize};
 use wapc_guest as guest;
 use wasmcloud_actor_core as actor;
@@ -52,6 +52,16 @@ fn create_todo(input: InputTodo) -> Result<Todo> {
         .set_add("all_urls".to_string(), todo.url.clone())
         .map_err(|e| anyhow::anyhow!(e))?;
 
+    Ok(todo)
+}
+
+fn update_todo(url: &str, input: InputTodo) -> Result<Todo> {
+    let mut todo = get_todo(url)?;
+    todo.title = input.title;
+
+    kv::default()
+        .set(url.to_string(), serde_json::to_string(&todo)?, 0)
+        .map_err(|e| anyhow::anyhow!(e))?;
     Ok(todo)
 }
 
@@ -118,6 +128,8 @@ fn request_handler(msg: http::Request) -> HandlerResult<http::Response> {
             .map(|todo| http::Response::json(todo, 200, "OK")),
         ("GET", "/api") => get_all_todos().map(|todos| http::Response::json(todos, 200, "OK")),
         ("GET", url) => handle_get_todo(url),
+        ("PATCH", url) => update_todo(url, serde_json::from_slice(&msg.body)?)
+            .map(|todo| http::Response::json(todo, 200, "OK")),
         ("DELETE", "/api") => delete_all_todos().map(|_| http::Response::ok()),
         ("DELETE", url) => handle_delete_todo(url),
         (_, _) => {
