@@ -36,12 +36,25 @@ cargo watch -c --shell 'make'
 
 - List todos with `curl localhost:8082/api`
 
-- To run the tests against todo backend spec, use the TodoBackend test suite:
+## Test with acceptance test suite
+
+To run the tests against todo backend spec, use the TodoBackend test suite:
 
 **Note: To be able to use `pnpx` follow [pnpm installation guide](https://pnpm.io/installation)**
 
 ```sh
 git clone https://github.com/TodoBackend/todo-backend-js-spec
 cd todo-backend-js-spec
-pnpx live-server  --proxy=/api:http://localhost:8082/api --open='/?/api'
+pnpx -y live-server  --proxy=/api:http://localhost:8082/api --open='/?/api'
+```
+
+## Test with client
+
+You can use the [Todo MVC client application](https://github.com/TodoBackend/todo-backend-client)
+
+```sh
+git clone https://github.com/TodoBackend/todo-backend-client.git
+cd todo-backend-client
+npm install && npm run build
+pnpx -y live-server  --proxy=/api:http://localhost:8082/api --open='/?/api'
 ```
