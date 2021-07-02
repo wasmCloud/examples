@@ -12,7 +12,7 @@ This actor makes use of the HTTP server (`wasmcloud:httpserver`) capability, the
 docker run -p 6379:6379 --name todo-backend-store -d redis
 ```
 
-- Run `make` and `wash claims inspect target/wasm32-unknown-unknown/debug/todo_backend_s.wasm` from which you can extract the `<Actor id>`.
+- Run `make` and `wash claims inspect ./target/wasm32-unknown-unknown/debug/todo_backend_s.wasm --output json | jq .module -r` from which you can extract the `<Actor id>`.
 
 - Run `export TODO_ACTOR=<Actor id (called Module in the above output)>`.
 

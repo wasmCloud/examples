@@ -43,6 +43,15 @@ impl Todo {
             order,
         }
     }
+
+    fn update(self, update: UpdateTodo) -> Todo {
+        Todo {
+            url: self.url,
+            title: update.title.unwrap_or(self.title),
+            completed: update.completed.unwrap_or(self.completed),
+            order: update.order.unwrap_or(self.order),
+        }
+    }
 }
 
 fn create_todo(input: InputTodo) -> Result<Todo> {
@@ -69,11 +78,9 @@ fn create_todo(input: InputTodo) -> Result<Todo> {
     Ok(todo)
 }
 
-fn update_todo(url: &str, input: UpdateTodo) -> Result<Todo> {
-    let mut todo = get_todo(url)?;
-    todo.title = input.title.unwrap_or(todo.title);
-    todo.completed = input.completed.unwrap_or(todo.completed);
-    todo.order = input.order.unwrap_or(todo.order);
+fn update_todo(url: &str, update: UpdateTodo) -> Result<Todo> {
+    let todo = get_todo(url)?;
+    let todo = todo.update(update);
 
     kv::default()
         .set(url.to_string(), serde_json::to_string(&todo)?, 0)
