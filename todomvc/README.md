@@ -18,15 +18,15 @@ docker run -p 6379:6379 --name todomvc-store -d redis
 
 - Run `RUST_LOG=info wasmcloud -m manifest.yaml`. This will trace all `info` type logs from all the capability providers including `wasmcloud:logging`.
 
-## How to run with a 'Hot' reloader:
+## How to run with a 'Hot' reloader
 
-```
+```sh
 watchexec --no-ignore --verbose --restart --watch=target/wasm32-unknown-unknown/debug/todomvc_s.wasm -- wasmcloud -m manifest.yaml
 ```
 
 and
 
-```
+```sh
 cargo watch -c --shell 'make'
 ```
 
@@ -40,7 +40,7 @@ cargo watch -c --shell 'make'
 
 **Note: To be able to use `pnpx` follow [pnpm installation guide](https://pnpm.io/installation)**
 
-```
+```sh
 git clone https://github.com/TodoBackend/todo-backend-js-spec
 cd todo-backend-js-spec
 pnpx live-server  --proxy=/api:http://localhost:8082/api --open='/?/api'
