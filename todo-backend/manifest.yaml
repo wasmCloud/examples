@@ -1,7 +1,7 @@
 labels:
-  sample: "wasmcloud todomvc"
+  sample: "wasmcloud todo-backend"
 actors:
-  - "./target/wasm32-unknown-unknown/debug/todomvc_s.wasm"
+  - "./target/wasm32-unknown-unknown/debug/todo_backend_s.wasm"
 capabilities:
   - image_ref: wasmcloud.azurecr.io/httpserver:0.11.1
     link_name: default

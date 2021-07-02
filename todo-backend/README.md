@@ -1,6 +1,6 @@
-# TodoMVC
+# TODO Backend
 
-This actor implements the [TodoMVC backend spec](https://github.com/TodoBackend/todo-backend-js-spec/blob/master/js/specs.js).
+This actor implements the [Todo backend spec](https://github.com/TodoBackend/todo-backend-js-spec/blob/master/js/specs.js).
 
 This actor makes use of the HTTP server (`wasmcloud:httpserver`) capability, the key-value store capability (`wasmcloud:keyvalue`) and the logging capability (`wasmcloud:logging`). As usual, it is worth noting that this actor does _not_ know where its HTTP server comes from, nor does it know which key-value implementation the host runtime has provided.
 
@@ -9,10 +9,10 @@ This actor makes use of the HTTP server (`wasmcloud:httpserver`) capability, the
 - To start off you will need redis:
 
 ```bash
-docker run -p 6379:6379 --name todomvc-store -d redis
+docker run -p 6379:6379 --name todo-backend-store -d redis
 ```
 
-- Run `make` and `wash claims inspect target/wasm32-unknown-unknown/debug/todomvc_s.wasm` from which you can extract the `<Actor id>`.
+- Run `make` and `wash claims inspect target/wasm32-unknown-unknown/debug/todo_backend_s.wasm` from which you can extract the `<Actor id>`.
 
 - Run `export TODO_ACTOR=<Actor id (called Module in the above output)>`.
 

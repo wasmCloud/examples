@@ -13,7 +13,7 @@ all: build
 
 build:
 	@$(CARGO) build	
-	wash claims sign $(DEBUG)/todomvc.wasm ${CAPABILITIES} --name "todomvc" --ver $(VERSION) --rev 0
+	wash claims sign $(DEBUG)/todo_backend.wasm ${CAPABILITIES} --name "todo-backend" --ver $(VERSION) --rev 0
 
 check:
 	@$(CARGO) check
@@ -32,4 +32,4 @@ update:
 
 release:
 	@$(CARGO) build --release	
-	wash claims sign $(RELEASE)/todomvc.wasm ${CAPABILITIES} --name "todomvc" --ver $(VERSION) --rev 0
+	wash claims sign $(RELEASE)/todo_backend.wasm ${CAPABILITIES} --name "todo-backend" --ver $(VERSION) --rev 0
