@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use guest::prelude::*;
-use http::{Request, Response};
+use http::{Method, Request, Response};
 use log::{info, trace, warn};
 use serde::{Deserialize, Serialize};
 use wapc_guest as guest;
@@ -134,22 +134,22 @@ fn request_handler(msg: Request) -> HandlerResult<Response> {
     let trimmed_path = msg.path.trim_end_matches('/');
     trace!("incoming msg: {:?}, path: {:?}", msg, trimmed_path);
 
-    match (msg.method.as_ref(), trimmed_path) {
-        ("POST", "/api") => create_todo(serde_json::from_slice(&msg.body)?)
+    match (msg.method(), trimmed_path) {
+        (Method::Post, "/api") => create_todo(serde_json::from_slice(&msg.body)?)
             .map(|todo| Response::json(todo, 200, "OK")),
 
-        ("GET", "/api") => get_all_todos().map(|todos| Response::json(todos, 200, "OK")),
+        (Method::Get, "/api") => get_all_todos().map(|todos| Response::json(todos, 200, "OK")),
 
-        ("GET", url) => get_todo(url)
+        (Method::Get, url) => get_todo(url)
             .map(|todo| Response::json(todo, 200, "OK"))
             .or_else(|_| Ok(Response::not_found())),
 
-        ("PATCH", url) => update_todo(url, serde_json::from_slice(&msg.body)?)
+        (Method::Patch, url) => update_todo(url, serde_json::from_slice(&msg.body)?)
             .map(|todo| Response::json(todo, 200, "OK")),
 
-        ("DELETE", "/api") => delete_all_todos().map(|_| Response::ok()),
+        (Method::Delete, "/api") => delete_all_todos().map(|_| Response::ok()),
 
-        ("DELETE", url) => delete_todo(url).map(|()| Response::ok()),
+        (Method::Delete, url) => delete_todo(url).map(|()| Response::ok()),
 
         (_, _) => {
             warn!("not even a thing: {:?}", msg);
