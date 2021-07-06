@@ -11,6 +11,7 @@ Example actors, capability providers, and other demonstrations
 | [kvcounter-as](https://github.com/wasmcloud/examples/tree/main/kvcounter-as) | Actor | The same actor as `kvcounter`, but written in AssemblyScript. This actor is meant to demonstrate the subtle differences between languages.  | wasmcloud.azurecr.io/kvcounter-as:0.1.0 |
 | [logger](https://github.com/wasmcloud/examples/tree/main/logger) | Actor | A simple actor that logs every HTTP Request Method it receives to `stdout` | wasmcloud.azurecr.io/logger:0.1.0 |
 | [subscriber](https://github.com/wasmcloud/examples/tree/main/subscriber) | Actor | A simple actor that logs every message it receives to `stdout` | wasmcloud.azurecr.io/subscriber:0.2.0 |
+| [todo-backend](https://github.com/wasmcloud/examples/tree/main/todo-backend) | Actor | An HTTP Server actor that implements the [TodoBackend](http://www.todobackend.com/) API | Not published |
 | [actor-to-actor](https://github.com/wasmcloud/examples/tree/main/actor-to-actor) | Actors | An example illustrating shared actor interface and actor-to-actor communication | Not Published |
 | [inmemory-keyvalue](https://github.com/wasmcloud/examples/tree/main/inmemory-keyvalue) | Provider | A sample in-memory Key-Value Store capability provider, used by the tutorial for creating a new capability provider | wasmcloud.azurecr.io/inmemory-keyvalue:0.4.0 |
 
