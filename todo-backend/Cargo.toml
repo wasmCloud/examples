@@ -1,0 +1,29 @@
+[package]
+authors = [
+    "Aayush Attri <aayush.attri@red-badger.com>",
+    "David Laban <david.laban@red-badger.com>",
+    "Stuart Harris <stuart.harris@red-badger.com>",
+]
+edition = "2018"
+name = "todo-backend"
+version = "0.2.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = "1.0.41"
+log = "0.4.14"
+serde = "1.0.126"
+serde_json = "1.0.64"
+wapc-guest = "0.4.0"
+wasmcloud-actor-core = { version="0.2.3", features=["guest"] }
+wasmcloud-actor-http-server = { version="0.1.2", features=["guest"] }
+wasmcloud-actor-keyvalue = { version="0.2.2", features=["guest"] }
+wasmcloud-actor-logging = { version="0.1.2", features=["guest"] }
+
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
