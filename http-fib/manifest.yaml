@@ -1,0 +1,43 @@
+# This manifest runs the required resources for the fibonacci sample.
+#
+# This includes a single actor, HTTP Fib, that accepts HTTP requests
+# in the following forms:
+# `curl localhost:8080/fib?NUM`
+# `curl localhost:8080/cachefib?NUM`
+#
+# `fib` computes a fibonacci number recursively, while `cachefib` will
+# use an inmemory cache to retrieve previously computed numbers.
+#
+# The actor in this example has these methods commented out initially, please
+# refer to the README in this repo for instructions on how to run this sample.
+#
+# For example:
+# `curl localhost:8080/fib/1`        returns 1
+# `curl localhost:8080/fib/11`       returns 89
+# `curl localhost:8080/fib/23`       returns 28657
+# `curl localhost:8080/cachefib/23`  returns 28657
+#
+# This actor can also be tested directly in the REPL via `ctl call`:
+# > ctl call ACTOR_KEY HandleRequest {"method": "GET", "body":"", "queryString":"", "header":{}, "path": "/cachefib/30"}
+# Response in OUTPUT window:
+# Call response (raw): ��statusCode�Ȧstatus�OK�header��body�832040
+#
+---
+labels:
+    sample: "wasmCloud Fibonacci"
+actors:
+    # Note: we will be specifying this with `wash up --watch`, so it won't be loaded from this manifest
+    - ./target/wasm32-unknown-unknown/debug/http_fib_s.wasm
+capabilities:
+    - image_ref: wasmcloud.azurecr.io/httpserver:0.12.1
+    - image_ref: wasmcloud.azurecr.io/inmemory-keyvalue:0.4.0
+links:
+  # configure the fib actor - httpserver and keyvalue
+  - actor: ${FIB_ACTOR:MDVUB2IKGSH634XUWJSKJPSCLLLUCPOZL3HTYYCE6IC34A42UOHWTQ4P}
+    contract_id: "wasmcloud:httpserver"
+    provider_id: "VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M"
+    values:
+      PORT: 8080
+  - actor: ${FIB_ACTOR:MDVUB2IKGSH634XUWJSKJPSCLLLUCPOZL3HTYYCE6IC34A42UOHWTQ4P}
+    contract_id: "wasmcloud:keyvalue"
+    provider_id: "VDRUOEIX7R3HYT23IQAVCPJ5ZNFSWHICMMKEL7OCOKJQGHTLCQ2W3KXG"
