@@ -2,7 +2,7 @@
 
 KEYDIR ?= .keys
 CARGO ?= cargo
-REVISION := 8
+REVISION := 0
 RUST_DEPS := Cargo.toml Makefile $(wildcard src/*.rs) .cargo/config.toml
 TARGET := target/wasm32-unknown-unknown
 VERSION := $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[] .version' | head -1)

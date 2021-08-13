@@ -18,11 +18,11 @@ serde = {version = "1.0", features = ["derive"]}
 
 [dependencies.wasmcloud-interface-httpserver]
 version = "0.1"
-path = "../../../interfaces/httpserver/rust"
+#path = "../../../interfaces/httpserver/rust"
 
 [dependencies.wasmbus-rpc]
 version = "0.3"
-path = "../../../weld/rpc-rs"
+#path = "../../../weld/rpc-rs"
 
 [profile.release]
 # Optimize for small code size

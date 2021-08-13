@@ -1,17 +1,19 @@
 # K/V Counter
 
-This actor accepts `GET` requests and for each URL it gets, 
-it will increment a call counter for that URL and return the result 
-in a JSON payload as follows:
+This actor accepts http GET requests, and 
+increments a counter whose name is based on the url path.
+Each unique url is associated a unique counter.
+The result is returned in a JSON payload as follows:
 
 ```json
 {
-    "count": 12
+    "counter": 12
 }
 ```
 
 This actor makes use of the HTTP server (`wasmcloud:httpserver`) capability 
 and the key-value store capability (`wasmcloud:keyvalue`). 
+
 As usual, it is worth noting that this actor does _not_ know 
 where its HTTP server comes from, nor does it know which 
 key-value implementation the host runtime has provided.
