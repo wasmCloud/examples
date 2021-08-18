@@ -12,7 +12,7 @@
 # VERSION      - The actor version number, usually semver format, X.Y.Z
 # REVISION     - A number that should be incremented with every build,
 #                whether or not VERSION has changed
-# REG_URL      - Registry url, e.g. 'localhost;5000' or 'wasmcloud.azurecr.io'
+# REG_URL      - Registry url, e.g. 'localhost:5000' or 'wasmcloud.azurecr.io'
 # PUSH_REG_CMD - Command to push to registry, for example:
 #                    wash reg push --insecure $(REG_URL)
 #
