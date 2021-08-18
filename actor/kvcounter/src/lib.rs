@@ -38,9 +38,7 @@ impl HttpServer for KvCounterActor {
 
 /// increment the counter by the amount, returning the new value
 async fn increment_counter(ctx: &Context, key: String, value: i32) -> RpcResult<i32> {
-    let tx = WasmHost::to_provider("wasmcloud:keyvalue", "default")?;
-    let kv = KeyValueSender::new(&tx);
-
+    let kv = KeyValueSender::new();
     let new_val = kv.increment(ctx, &IncrementRequest { key, value }).await?;
     Ok(new_val as i32)
 }
