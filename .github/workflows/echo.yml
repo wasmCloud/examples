@@ -24,9 +24,6 @@ jobs:
     - name: Build
       run: cargo build --verbose
       working-directory: ${{ env.working-directory }}
-    - name: Run tests
-      run: cargo test --verbose
-      working-directory: ${{ env.working-directory }}
     - name: Check fmt
       run: cargo fmt -- --check
       working-directory: ${{ env.working-directory }}
