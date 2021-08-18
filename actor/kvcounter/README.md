@@ -1,4 +1,4 @@
-# K/V Counter
+# Key value counter
 
 This actor accepts http GET requests, and 
 increments a counter whose name is based on the url path.
