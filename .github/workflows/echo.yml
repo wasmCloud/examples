@@ -4,15 +4,15 @@ on:
   push:
     branches: [ main ]
     paths:
-    - "echo/**"
+    - "actor/echo/**"
   pull_request:
     branches: [ main ]
     paths:
-    - "echo/**"
+    - "actor/echo/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./echo
+  working-directory: ./actor/echo
 
 jobs:
   cargo_check:
@@ -25,7 +25,7 @@ jobs:
       run: cargo build --verbose
       working-directory: ${{ env.working-directory }}
     - name: Run tests
-      run: cargo test --bins --verbose
+      run: cargo test --verbose
       working-directory: ${{ env.working-directory }}
     - name: Check fmt
       run: cargo fmt -- --check
