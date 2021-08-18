@@ -1,0 +1,14 @@
+---
+actors:
+  - ./pinger/target/wasm32-unknown-unknown/debug/pinger_s.wasm
+  - ./ponger/target/wasm32-unknown-unknown/debug/ponger_s.wasm
+capabilities:    
+    - image_ref: wasmcloud.azurecr.io/httpserver:0.12.1    
+links:    
+  # the ponger needs no link definition because it doesn't 
+  # use the HTTP server provider
+  - actor: ${PINGER_ACTOR}
+    contract_id: "wasmcloud:httpserver"
+    provider_id: "VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M"  
+    values:
+        PORT: 8080
