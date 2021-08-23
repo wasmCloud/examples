@@ -3,7 +3,7 @@
 This example actor demonstrates three capability providers:
 - wasmcloud:httpserver  for responding to http requests
 - wasmcloud:httpclient  for fetching http resources from the internet
-- wasmcloud:numberge for generating a random number.
+- wasmcloud:builtin:numbergen for generating a random number.
 
 When the actor runs, open a web browser to the http port
 (selected when linking to the httpserver)
