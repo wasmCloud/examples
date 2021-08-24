@@ -50,6 +50,8 @@ $(call check-var-defined,REVISION)
 $(call check-var-defined,REG_URL)
 $(call check-var-defined,PUSH_REG_CMD)
 
+all:: $(DIST_WASM)
+
 # default target is signed wasm file
 # sign it
 $(DIST_WASM): $(UNSIGNED_WASM) Makefile
