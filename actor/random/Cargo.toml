@@ -1,0 +1,22 @@
+[package]
+name = "example_random"
+version = "0.1.0"
+authors = [ "wasmcloud Team" ]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+async-trait = "0.1"
+futures = "0.3"
+serde_bytes = "0.11"
+serde = {version = "1.0", features = ["derive"]}
+wasmbus-rpc = "0.3"
+wasmcloud-interface-numbergen = "0.1"
+wasmcloud-example-runner = { path = "../../interface/runner/rust" }
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
