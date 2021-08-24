@@ -82,6 +82,8 @@ start:
 #	    $(shell make actor_id | tail -1) \
 #	    $(REG_URL) --timeout 3
 
+inventory:
+	$(WASH) ctl get inventory $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id")
 
 # if this is a test actor, run its start method
 # run a test if it's got a start method
