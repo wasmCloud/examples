@@ -44,7 +44,7 @@ fn n_factorial(n: u32) -> u64 {
             let mut result = 1u64;
             // add 1 because rust ranges exclude upper bound
             for v in 2..(n + 1) {
-                result = result * (v as u64);
+                result *= v as u64;
             }
             result
         }

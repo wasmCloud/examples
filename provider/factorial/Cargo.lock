@@ -2870,6 +2870,8 @@ dependencies = [
 [[package]]
 name = "wasmcloud-interface-factorial"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7421c4e35f4995e892491b03535da0bf9bd0896062a1f1e67a25098909ac519a"
 dependencies = [
  "async-trait",
  "futures",
