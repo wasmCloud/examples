@@ -8,6 +8,7 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+anyhow = "1.0.41"
 async-trait = "0.1"
 console_log = "0.2"
 form_urlencoded = "1.0"
