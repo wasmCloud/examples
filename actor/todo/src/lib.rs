@@ -67,6 +67,11 @@ impl HttpServer for TodoActor {
         trace!("incoming req: {:?}, path: {:?}", req, trimmed_path);
 
         match (req.method.as_ref(), trimmed_path) {
+            ("GET", "/") => Ok(HttpResponse {
+                body: "todo server lives at /api".to_string().into_bytes(),
+                ..Default::default()
+            }),
+
             ("POST", "/api") => {
                 create_todo(
                     ctx,
