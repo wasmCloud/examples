@@ -1,7 +1,12 @@
 [package]
-name = "kvcounter"
+name = "todo"
 version = "0.3.0"
-authors = [ "wasmcloud Team" ]
+authors = [ 
+    "Aayush Attri <aayush.attri@red-badger.com>",
+    "Chris Whealy <chris.whealy@red-badger.com>",
+    "David Laban <david.laban@red-badger.com>",
+    "Stuart Harris <stuart.harris@red-badger.com>",
+]
 edition = "2018"
 
 [lib]
