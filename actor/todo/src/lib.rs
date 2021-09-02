@@ -46,14 +46,14 @@ impl HttpResponseShim {
             ..Default::default()
         }
     }
-    // and also:
-    // /// Shortcut for creating a 400/Bad Request response
-    // pub fn bad_request() -> HttpResponse {
-    //     HttpResponse {
-    //         status_code: 400,
-    //         ..Default::default()
-    //     }
-    // }
+    /// Shortcut for creating a 400/Bad Request response
+    pub fn bad_request(msg: &str) -> HttpResponse {
+        HttpResponse {
+            status_code: 400,
+            body: msg.to_string().as_bytes().into(),
+            ..Default::default()
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -215,6 +215,54 @@ async fn delete_todo(ctx: &Context, url: &str) -> Result<()> {
     Ok(())
 }
 
+async fn handle_request(ctx: &Context, req: &HttpRequest) -> Result<HttpResponse, HttpResponse> {
+    let trimmed_path = req.path.trim_end_matches('/');
+    trace!("incoming req: {:?}, path: {:?}", req, trimmed_path);
+
+    match (req.method.as_ref(), trimmed_path) {
+        ("GET", "/") => Ok(HttpResponse {
+            body: "todo server lives at /api".to_string().into_bytes(),
+            ..Default::default()
+        }),
+
+        ("POST", "/api") => create_todo(
+            ctx,
+            serde_json::from_slice(&req.body)
+                .map_err(|e| HttpResponseShim::bad_request(&e.to_string()))?,
+        )
+        .await
+        .map(|todo| HttpResponseShim::json(todo, 200)),
+
+        ("GET", "/api") => get_all_todos(ctx)
+            .await
+            .map(|todos| HttpResponseShim::json(todos, 200)),
+
+        ("GET", url) => get_todo(ctx, url)
+            .await
+            .map(|todo| HttpResponseShim::json(todo, 200))
+            .or_else(|_| Ok(HttpResponseShim::not_found())),
+
+        ("PATCH", url) => update_todo(
+            ctx,
+            url,
+            serde_json::from_slice(&req.body)
+                .map_err(|e| HttpResponseShim::bad_request(&e.to_string()))?,
+        )
+        .await
+        .map(|todo| HttpResponseShim::json(todo, 200)),
+
+        ("DELETE", "/api") => delete_all_todos(ctx).await.map(|_| HttpResponseShim::ok()),
+
+        ("DELETE", url) => delete_todo(ctx, url).await.map(|()| HttpResponseShim::ok()),
+
+        (_, _) => {
+            warn!("not even a thing: {:?}", req);
+            Ok(HttpResponseShim::not_found())
+        }
+    }
+    .map_err(|e| HttpResponseShim::internal_server_error(&format!("Something went wrong: {:?}", e)))
+}
+
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
 struct TodoActor {}
@@ -223,61 +271,6 @@ struct TodoActor {}
 #[async_trait]
 impl HttpServer for TodoActor {
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
-        let trimmed_path = req.path.trim_end_matches('/');
-        trace!("incoming req: {:?}, path: {:?}", req, trimmed_path);
-
-        match (req.method.as_ref(), trimmed_path) {
-            ("GET", "/") => Ok(HttpResponse {
-                body: "todo server lives at /api".to_string().into_bytes(),
-                ..Default::default()
-            }),
-
-            ("POST", "/api") => {
-                create_todo(
-                    ctx,
-                    serde_json::from_slice(&req.body).map_err(
-                        // FIXME: this is very sad.
-                        |e| e.to_string(),
-                    )?,
-                )
-                .await
-                .map(|todo| HttpResponseShim::json(todo, 200))
-            }
-
-            ("GET", "/api") => get_all_todos(ctx)
-                .await
-                .map(|todos| HttpResponseShim::json(todos, 200)),
-
-            ("GET", url) => get_todo(ctx, url)
-                .await
-                .map(|todo| HttpResponseShim::json(todo, 200))
-                .or_else(|_| Ok(HttpResponseShim::not_found())),
-
-            ("PATCH", url) => update_todo(
-                ctx,
-                url,
-                serde_json::from_slice(&req.body).map_err(
-                    // FIXME: this is very sad.
-                    |e| e.to_string(),
-                )?,
-            )
-            .await
-            .map(|todo| HttpResponseShim::json(todo, 200)),
-
-            ("DELETE", "/api") => delete_all_todos(ctx).await.map(|_| HttpResponseShim::ok()),
-
-            ("DELETE", url) => delete_todo(ctx, url).await.map(|()| HttpResponseShim::ok()),
-
-            (_, _) => {
-                warn!("not even a thing: {:?}", req);
-                Ok(HttpResponseShim::not_found())
-            }
-        }
-        .or_else(|e| {
-            Ok(HttpResponseShim::internal_server_error(&format!(
-                "Something went wrong: {:?}",
-                e
-            )))
-        })
+        handle_request(ctx, req).await.or_else(|r| Ok(r))
     }
 }
