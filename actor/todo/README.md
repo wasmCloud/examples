@@ -1,4 +1,4 @@
-# TODO
+# Todo
 
 This actor implements the [Todo backend spec](https://github.com/TodoBackend/todo-backend-js-spec/blob/master/js/specs.js).
 
