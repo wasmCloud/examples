@@ -81,18 +81,21 @@ start:
 #	$(PUSH_REG_CMD) $(DIST_WASM)
 #	$(WASH) ctl update actor  \
 #        $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id") \
-#	    $(shell make actor_id | tail -1) \
+#	    $(shell make actor_id) \
 #	    $(REG_URL) --timeout 3
 
 inventory:
 	$(WASH) ctl get inventory $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id")
 
+ifneq ($(wildcard test-options.json),)
 # if this is a test actor, run its start method
-# run a test if it's got a start method
+# project makefile can set RPC_TEST_TIMEOUT to override default
+RPC_TEST_TIMEOUT ?= 2
 test::
-	$(WASH) call --test --data test-options.json --rpc-timeout 2 \
-	    $(shell make actor_id | tail -1) \
+	$(WASH) call --test --data test-options.json --rpc-timeout $(TEST_TIMEOUT) \
+	    $(shell make actor_id) \
 	    Start
+endif
 
 # generate release build
 release::
@@ -107,10 +110,23 @@ clean::
 	$(CARGO) clean
 	rm -rf build
 
-claims: $(DIST_WASM)
+inspect claims: $(DIST_WASM)
 	$(WASH) claims inspect $(DIST_WASM)
 
-actor_id: $(DIST_WASM)
-	$(WASH) claims inspect $(DIST_WASM) -o json | jq -r .module
+# need a signed wasm before we can print the id
+_actor_id: $(DIST_WASM)
+	@$(WASH) claims inspect $(DIST_WASM) -o json | jq -r .module
+
+actor_id:
+	@echo $(shell make _actor_id 2>/dev/null | tail -1)
+
+ifeq ($(wildcard codegen.toml),codegen.toml)
+# if there are interfaces here, enable lint and validate rules
+lint validate::
+	$(WASH) $@
+else
+lint validate::
+
+endif
 
 .PHONY: actor_id check clean clippy doc release test update
