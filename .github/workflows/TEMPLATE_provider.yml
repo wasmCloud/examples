@@ -1,22 +1,24 @@
 # Replace all occurrences of "EXAMPLE" with the example name (e.g. ECHO)
 # Replace workflow triggers with provider with the example name, should be the same as the folder path
-name: ECHO
+name: EXAMPLE
 
 on:
   push:
     branches: [ main ]
     paths:
-    - "actor/echo/**"
+    - "provider/example/**"
     tags:
-    - 'echo-v*'
+    - 'example-v*'
   pull_request:
     branches: [ main ]
     paths:
-    - "actor/echo/**"
+    - "provider/example/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./actor/echo
+  working-directory: ./provider/example
+  WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_EXAMPLE }}
 
 jobs:
   rust_check:
@@ -24,8 +26,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     # If your integration tests require nats or redis, run them here
-    - name: Add wasm32-unknown-unknown
-      run: rustup target add wasm32-unknown-unknown
     - id: rust-check-action
       uses: wasmcloud/common-actions/rust-check@main
       with:
@@ -54,9 +54,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
+      - uses: wasmcloud/common-actions/install-cross@main
 
-      - name: Build and Sign Module
-        run: make
+      - name: Build full provider archive
+        run: make par-full
         working-directory: ${{ env.working-directory }}
 
   artifact_release:
@@ -73,7 +74,7 @@ jobs:
       - name: Push provider archive to AzureCR
         uses: wasmcloud/common-actions/oci-artifact-release@main
         with:
-          artifact-path: ${{ env.working-directory }}/build/${{ env.oci-repository }}_s.wasm
+          artifact-path: ${{ env.working-directory }}/build/${{ env.oci-repository }}.par.gz
           oci-url: ${{ secrets.AZURECR_PUSH_URL }}
           oci-repository: ${{ env.oci-repository }}
           oci-version: ${{ env.oci-version }}

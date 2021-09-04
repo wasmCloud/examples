@@ -1,22 +1,22 @@
 # Replace all occurrences of "EXAMPLE" with the example name (e.g. ECHO)
 # Replace workflow triggers with provider with the example name, should be the same as the folder path
-name: ECHO
+name: EXAMPLE
 
 on:
   push:
     branches: [ main ]
     paths:
-    - "actor/echo/**"
+    - "actor/example/**"
     tags:
-    - 'echo-v*'
+    - 'example-v*'
   pull_request:
     branches: [ main ]
     paths:
-    - "actor/echo/**"
+    - "actor/example/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./actor/echo
+  working-directory: ./actor/example
 
 jobs:
   rust_check:
