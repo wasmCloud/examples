@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use anyhow::{anyhow, Result};
 use log::{info, trace, warn};
 use serde::{Deserialize, Serialize};
@@ -8,53 +6,6 @@ use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, Http
 use wasmcloud_interface_keyvalue::{
     IncrementRequest, KeyValue, KeyValueSender, SetAddRequest, SetDelRequest, SetRequest,
 };
-
-// FIXME: contribute this upstream
-struct HttpResponseShim {}
-impl HttpResponseShim {
-    /// Creates a response with a given status code and serializes the given payload as JSON
-    pub fn json<T>(payload: T, status_code: u16) -> HttpResponse
-    where
-        T: Serialize,
-    {
-        HttpResponse {
-            body: serde_json::to_string(&payload).unwrap().into_bytes(),
-            header: HashMap::new(),
-            status_code,
-        }
-    }
-    /// Handy shortcut for creating a 404/Not Found response
-    pub fn not_found() -> HttpResponse {
-        HttpResponse {
-            status_code: 404,
-            ..Default::default()
-        }
-    }
-    /// Useful shortcut for creating a 200/OK response
-    pub fn ok() -> HttpResponse {
-        HttpResponse {
-            status_code: 200,
-            ..Default::default()
-        }
-    }
-
-    /// Useful shortcut for creating a 500/Internal Server Error response
-    pub fn internal_server_error(msg: &str) -> HttpResponse {
-        HttpResponse {
-            status_code: 500,
-            body: msg.to_string().as_bytes().into(),
-            ..Default::default()
-        }
-    }
-    /// Shortcut for creating a 400/Bad Request response
-    pub fn bad_request(msg: &str) -> HttpResponse {
-        HttpResponse {
-            status_code: 400,
-            body: msg.to_string().as_bytes().into(),
-            ..Default::default()
-        }
-    }
-}
 
 #[derive(Serialize, Deserialize)]
 struct InputTodo {
@@ -228,39 +179,41 @@ async fn handle_request(ctx: &Context, req: &HttpRequest) -> Result<HttpResponse
         ("POST", "/api") => create_todo(
             ctx,
             serde_json::from_slice(&req.body)
-                .map_err(|e| HttpResponseShim::bad_request(&e.to_string()))?,
+                .map_err(|e| HttpResponse::bad_request(&e.to_string()))?,
         )
         .await
-        .map(|todo| HttpResponseShim::json(todo, 200)),
+        .map(|todo| HttpResponse::json(todo, 200).unwrap()),
 
         ("GET", "/api") => get_all_todos(ctx)
             .await
-            .map(|todos| HttpResponseShim::json(todos, 200)),
+            .map(|todos| HttpResponse::json(todos, 200).unwrap()),
 
         ("GET", url) => get_todo(ctx, url)
             .await
-            .map(|todo| HttpResponseShim::json(todo, 200))
-            .or_else(|_| Ok(HttpResponseShim::not_found())),
+            .map(|todo| HttpResponse::json(todo, 200).unwrap())
+            .or_else(|_| Ok(HttpResponse::not_found())),
 
         ("PATCH", url) => update_todo(
             ctx,
             url,
             serde_json::from_slice(&req.body)
-                .map_err(|e| HttpResponseShim::bad_request(&e.to_string()))?,
+                .map_err(|e| HttpResponse::bad_request(&e.to_string()))?,
         )
         .await
-        .map(|todo| HttpResponseShim::json(todo, 200)),
+        .map(|todo| HttpResponse::json(todo, 200).unwrap()),
 
-        ("DELETE", "/api") => delete_all_todos(ctx).await.map(|_| HttpResponseShim::ok()),
+        ("DELETE", "/api") => delete_all_todos(ctx).await.map(|_| HttpResponse::default()),
 
-        ("DELETE", url) => delete_todo(ctx, url).await.map(|()| HttpResponseShim::ok()),
+        ("DELETE", url) => delete_todo(ctx, url)
+            .await
+            .map(|()| HttpResponse::default()),
 
         (_, _) => {
             warn!("not even a thing: {:?}", req);
-            Ok(HttpResponseShim::not_found())
+            Ok(HttpResponse::not_found())
         }
     }
-    .map_err(|e| HttpResponseShim::internal_server_error(&format!("Something went wrong: {:?}", e)))
+    .map_err(|e| HttpResponse::internal_server_error(format!("Something went wrong: {:?}", e)))
 }
 
 #[derive(Debug, Default, Actor, HealthResponder)]
@@ -271,6 +224,6 @@ struct TodoActor {}
 #[async_trait]
 impl HttpServer for TodoActor {
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
-        handle_request(ctx, req).await.or_else(|r| Ok(r))
+        handle_request(ctx, req).await.or_else(Ok)
     }
 }

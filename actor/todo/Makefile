@@ -11,3 +11,4 @@ REG_URL  = localhost:5000/v2/$(PROJECT):$(REVISION)
 PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
 
 include ../../build/makefiles/actor.mk
+
