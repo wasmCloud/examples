@@ -1,13 +1,13 @@
 [package]
-name = "todo"
-version = "0.3.0"
-authors = [ 
-    "Aayush Attri <aayush.attri@red-badger.com>",
-    "Chris Whealy <chris.whealy@red-badger.com>",
-    "David Laban <david.laban@red-badger.com>",
-    "Stuart Harris <stuart.harris@red-badger.com>",
+authors = [
+  "Aayush Attri <aayush.attri@red-badger.com>",
+  "Chris Whealy <chris.whealy@red-badger.com>",
+  "David Laban <david.laban@red-badger.com>",
+  "Stuart Harris <stuart.harris@red-badger.com>",
 ]
 edition = "2018"
+name = "todo"
+version = "0.3.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -16,17 +16,16 @@ crate-type = ["cdylib", "rlib"]
 anyhow = "1.0.41"
 async-trait = "0.1"
 console_log = "0.2"
+env_logger = "0.9"
 form_urlencoded = "1.0"
 futures = "0.3"
-log = "0.4"
-env_logger = "0.9"
-serde_bytes = "0.11"
-serde_json ="1.0"
 serde = {version = "1.0", features = ["derive"]}
-
+serde_bytes = "0.11"
+serde_json = "1.0"
 wasmbus-rpc = "0.3"
-wasmcloud-interface-keyvalue = "0.2"
 wasmcloud-interface-httpserver = "0.1.9"
+wasmcloud-interface-keyvalue = "0.2.6"
+wasmcloud-interface-logging = "0.1.2"
 
 [profile.release]
 # Optimize for small code size

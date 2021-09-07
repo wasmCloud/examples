@@ -1,11 +1,11 @@
 use anyhow::{anyhow, Result};
-use log::{info, trace, warn};
 use serde::{Deserialize, Serialize};
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
 use wasmcloud_interface_keyvalue::{
     IncrementRequest, KeyValue, KeyValueSender, SetAddRequest, SetDelRequest, SetRequest,
 };
+use wasmcloud_interface_logging::{debug, info, warn};
 
 #[derive(Serialize, Deserialize)]
 struct InputTodo {
@@ -92,6 +92,8 @@ async fn create_todo(ctx: &Context, input: InputTodo) -> Result<Todo> {
 }
 
 async fn update_todo(ctx: &Context, url: &str, update: UpdateTodo) -> Result<Todo> {
+    info!("Updating a todo...");
+
     let todo = get_todo(ctx, url).await?;
     let todo = todo.update(update);
 
@@ -110,6 +112,8 @@ async fn update_todo(ctx: &Context, url: &str, update: UpdateTodo) -> Result<Tod
 }
 
 async fn get_all_todos(ctx: &Context) -> Result<Vec<Todo>> {
+    info!("Getting all todos...");
+
     let urls = KeyValueSender::new()
         .set_query(ctx, "all_urls")
         .await
@@ -123,6 +127,8 @@ async fn get_all_todos(ctx: &Context) -> Result<Vec<Todo>> {
 }
 
 async fn get_todo(ctx: &Context, url: &str) -> Result<Todo> {
+    info!("Getting a todo...");
+
     let todo_str = KeyValueSender::new()
         .get(ctx, url)
         .await
@@ -134,6 +140,8 @@ async fn get_todo(ctx: &Context, url: &str) -> Result<Todo> {
 }
 
 async fn delete_all_todos(ctx: &Context) -> Result<()> {
+    info!("Deleting all todos...");
+
     let urls = KeyValueSender::new()
         .set_query(ctx, "all_urls")
         .await
@@ -147,6 +155,8 @@ async fn delete_all_todos(ctx: &Context) -> Result<()> {
 }
 
 async fn delete_todo(ctx: &Context, url: &str) -> Result<()> {
+    info!("Deleting a todo...");
+
     KeyValueSender::new()
         .set_del(
             ctx,
@@ -166,54 +176,63 @@ async fn delete_todo(ctx: &Context, url: &str) -> Result<()> {
     Ok(())
 }
 
-async fn handle_request(ctx: &Context, req: &HttpRequest) -> Result<HttpResponse, HttpResponse> {
-    let trimmed_path = req.path.trim_end_matches('/');
-    trace!("incoming req: {:?}, path: {:?}", req, trimmed_path);
+async fn handle_request(ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
+    debug!("incoming req: {:?}", req);
 
+    let trimmed_path = req.path.trim_end_matches('/');
     match (req.method.as_ref(), trimmed_path) {
         ("GET", "/") => Ok(HttpResponse {
             body: "todo server lives at /api".to_string().into_bytes(),
             ..Default::default()
         }),
 
-        ("POST", "/api") => create_todo(
-            ctx,
-            serde_json::from_slice(&req.body)
-                .map_err(|e| HttpResponse::bad_request(&e.to_string()))?,
-        )
-        .await
-        .map(|todo| HttpResponse::json(todo, 200).unwrap()),
+        ("POST", "/api") => match serde_json::from_slice(&req.body) {
+            Ok(input) => match create_todo(ctx, input).await {
+                Ok(todo) => HttpResponse::json(todo, 200),
+                Err(e) => Err(RpcError::ActorHandler(format!("creating todo: {:?}", e))),
+            },
+            Err(e) => Ok(HttpResponse::bad_request(format!(
+                "malformed body: {:?}",
+                e
+            ))),
+        },
 
-        ("GET", "/api") => get_all_todos(ctx)
-            .await
-            .map(|todos| HttpResponse::json(todos, 200).unwrap()),
+        ("GET", "/api") => match get_all_todos(ctx).await {
+            Ok(todos) => HttpResponse::json(todos, 200),
+            Err(e) => Err(RpcError::ActorHandler(format!("getting all todos: {}", e))),
+        },
 
-        ("GET", url) => get_todo(ctx, url)
-            .await
-            .map(|todo| HttpResponse::json(todo, 200).unwrap())
-            .or_else(|_| Ok(HttpResponse::not_found())),
+        ("GET", url) => match get_todo(ctx, url).await {
+            Ok(todo) => HttpResponse::json(todo, 200),
+            Err(_) => Ok(HttpResponse::not_found()),
+        },
 
-        ("PATCH", url) => update_todo(
-            ctx,
-            url,
-            serde_json::from_slice(&req.body)
-                .map_err(|e| HttpResponse::bad_request(&e.to_string()))?,
-        )
-        .await
-        .map(|todo| HttpResponse::json(todo, 200).unwrap()),
+        ("PATCH", url) => match serde_json::from_slice(&req.body) {
+            Ok(update) => match update_todo(ctx, url, update).await {
+                Ok(todo) => HttpResponse::json(todo, 200),
+                Err(e) => Err(RpcError::ActorHandler(format!("updating todo: {}", e))),
+            },
+            Err(e) => Ok(HttpResponse::bad_request(format!(
+                "malformed body: {:?}",
+                e
+            ))),
+        },
 
-        ("DELETE", "/api") => delete_all_todos(ctx).await.map(|_| HttpResponse::default()),
+        ("DELETE", "/api") => match delete_all_todos(ctx).await {
+            Ok(_) => Ok(HttpResponse::default()),
+            Err(e) => Err(RpcError::ActorHandler(format!("deleting all todos: {}", e))),
+        },
 
-        ("DELETE", url) => delete_todo(ctx, url)
-            .await
-            .map(|()| HttpResponse::default()),
+        ("DELETE", url) => match delete_todo(ctx, url).await {
+            Ok(_) => Ok(HttpResponse::default()),
+            Err(e) => Err(RpcError::ActorHandler(format!("deleting todo: {}", e))),
+        },
 
         (_, _) => {
-            warn!("not even a thing: {:?}", req);
+            warn!("no route for this request: {:?}", req);
             Ok(HttpResponse::not_found())
         }
     }
-    .map_err(|e| HttpResponse::internal_server_error(format!("Something went wrong: {:?}", e)))
 }
 
 #[derive(Debug, Default, Actor, HealthResponder)]
@@ -224,6 +243,6 @@ struct TodoActor {}
 #[async_trait]
 impl HttpServer for TodoActor {
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
-        handle_request(ctx, req).await.or_else(Ok)
+        handle_request(ctx, req).await
     }
 }
