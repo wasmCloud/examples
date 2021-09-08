@@ -1,0 +1,23 @@
+# This docker-compose file loads 
+#   nats with JetStream enabled
+#   a local OCI registry
+#   redis (for the kvredis capability provider)
+
+version: "3"
+services:
+  nats:
+    image: nats:2.3
+    ports:
+      - "4222:4222"
+      - "6222:6222"
+      - "8222:8222"
+    command: [ "-js" ]
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
+  registry:
+    image: registry:latest
+    ports:
+      - "5000:5000"
+
