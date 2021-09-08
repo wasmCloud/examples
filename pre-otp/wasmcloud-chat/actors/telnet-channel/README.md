@@ -1,3 +1,0 @@
-# Telnet Channel
-
-TBD

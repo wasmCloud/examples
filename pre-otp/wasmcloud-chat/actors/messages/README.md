@@ -1,3 +1,0 @@
-# Messages Actor
-
-TBD
