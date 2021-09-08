@@ -1,3 +1,0 @@
-# Presence Actor
-
-TBD

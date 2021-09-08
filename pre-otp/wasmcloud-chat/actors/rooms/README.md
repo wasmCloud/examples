@@ -1,3 +1,0 @@
-# Rooms Actor
-
-TBD
