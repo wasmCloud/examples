@@ -26,7 +26,6 @@ wasmbus-rpc = "0.3"
 
 # test dependencies
 [dev-dependencies]
-
 wasmcloud-test-util = "0.1"
 
 [[bin]]
