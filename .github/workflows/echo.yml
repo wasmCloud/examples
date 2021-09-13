@@ -17,6 +17,8 @@ on:
 env:
   CARGO_TERM_COLOR: always
   working-directory: ./actor/echo
+  WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_ECHO }}
 
 jobs:
   rust_check:
@@ -30,14 +32,18 @@ jobs:
       uses: wasmcloud/common-actions/rust-check@main
       with:
         working-directory: ${{ env.working-directory }}
+        test-options: '--verbose --doc'
 
   build_artifact:
-    needs: rust_check
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    needs: rust_check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
+
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
 
       - name: Build wasmcloud actor
         run: make
@@ -69,8 +75,8 @@ jobs:
         draft: false
 
   artifact_release:
-    needs: build_artifact
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    needs: build_artifact
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
