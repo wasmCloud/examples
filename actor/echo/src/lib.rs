@@ -14,7 +14,7 @@ impl HttpServer for EchoActor {
             "method": &value.method,
             "path": &value.path,
             "query_string": &value.query_string,
-            "body": b"".to_vec(),
+            "body": &value.body,
         });
         let resp = HttpResponse {
             body: serde_json::to_vec(&body)
