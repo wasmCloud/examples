@@ -17,6 +17,8 @@ on:
 env:
   CARGO_TERM_COLOR: always
   working-directory: ./actor/example
+  WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_EXAMPLE }}
 
 jobs:
   rust_check:
@@ -30,6 +32,8 @@ jobs:
       uses: wasmcloud/common-actions/rust-check@main
       with:
         working-directory: ${{ env.working-directory }}
+        # The `--doc` is required for wasm, as cargo cannot execute wasm tests by default
+        test-options: '--verbose --doc'
 
   build_artifact:
     needs: rust_check
@@ -38,6 +42,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
+
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
 
       - name: Build wasmcloud actor
         run: make
