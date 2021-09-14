@@ -1,6 +1,6 @@
 # Makefile for wasmCloud examples/provider
 
-subdirs = factorial
+subdirs = factorial fakepay
 
 include ../build/makefiles/common.mk
 
