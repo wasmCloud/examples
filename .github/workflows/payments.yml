@@ -1,20 +1,20 @@
-name: RUNNER
+name: PAYMENTS
 
 on:
   push:
     branches: [ main ]
     paths:
-    - "interface/runner/rust/**"
+    - "interface/payments/rust/**"
     tags:
-    - 'runner-v*'
+    - 'payments-v*'
   pull_request:
     branches: [ main ]
     paths:
-    - "interface/runner/rust/**"
+    - "interface/payments/rust/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./interface/runner/rust
+  working-directory: ./interface/payments/rust
 
 jobs:
   rust_check:

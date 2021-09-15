@@ -2,7 +2,7 @@
 
 PROJECT  = echo
 VERSION  = $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[] .version' | head -1)
-REVISION = 0
+REVISION = 4
 # list of all contract claims for actor signing (space-separated)
 CLAIMS   = wasmcloud:httpserver
 # registry url for our actor

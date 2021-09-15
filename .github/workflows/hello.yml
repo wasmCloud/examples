@@ -1,22 +1,22 @@
-name: ECHO
+name: HELLO
 
 on:
   push:
     branches: [ main ]
     paths:
-    - "actor/echo/**"
+    - "actor/hello/**"
     tags:
-    - 'echo-v*'
+    - 'hello-v*'
   pull_request:
     branches: [ main ]
     paths:
-    - "actor/echo/**"
+    - "actor/hello/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./actor/echo
+  working-directory: ./actor/hello
   WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_ECHO }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_HELLO }}
 
 jobs:
   rust_check:
@@ -30,11 +30,12 @@ jobs:
       uses: wasmcloud/common-actions/rust-check@main
       with:
         working-directory: ${{ env.working-directory }}
+        # The `--doc` is required for wasm, as cargo cannot execute wasm tests by default
         test-options: '--verbose --doc'
 
   build_artifact:
-    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: rust_check
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -73,8 +74,8 @@ jobs:
         draft: false
 
   artifact_release:
-    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: build_artifact
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -99,4 +100,3 @@ jobs:
           oci-version: ${{ env.oci-version }}
           oci-username: ${{ secrets.AZURECR_PUSH_USER }}
           oci-password: ${{ secrets.AZURECR_PUSH_PASSWORD }}
-
