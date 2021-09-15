@@ -18,12 +18,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Factorial capability provider implementation
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Provider)]
+#[services(Factorial)]
 struct FactorialProvider {}
 
 /// use default implementations of provider message handlers
 impl ProviderDispatch for FactorialProvider {}
-impl FactorialReceiver for FactorialProvider {}
 impl ProviderHandler for FactorialProvider {}
 
 /// Handle Factorial methods
@@ -48,28 +48,5 @@ fn n_factorial(n: u32) -> u64 {
             }
             result
         }
-    }
-}
-
-/// Handle incoming rpc messages and dispatch to applicable trait handler.
-#[async_trait]
-impl MessageDispatch for FactorialProvider {
-    async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> RpcResult<Message<'_>> {
-        let op = match message.method.split_once('.') {
-            Some((cls, op)) if cls == "Factorial" => op,
-            None => message.method,
-            _ => {
-                return Err(RpcError::MethodNotHandled(message.method.to_string()));
-            }
-        };
-        FactorialReceiver::dispatch(
-            self,
-            ctx,
-            &Message {
-                method: op,
-                arg: message.arg,
-            },
-        )
-        .await
     }
 }
