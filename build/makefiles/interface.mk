@@ -59,4 +59,4 @@ make-vars:
 	@echo "top_targets    : $(top_targets)"
 
 
-.PHONY: all build release clean lint validate test $(weld)
+.PHONY: all build release clean lint validate test

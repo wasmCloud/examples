@@ -61,6 +61,13 @@ $(DIST_WASM): $(UNSIGNED_WASM) Makefile
 		--name "$(PROJECT)" --ver $(VERSION) --rev $(REVISION) \
 		--destination $@
 
+# rules to print file name and path of build target
+target-path:
+	@echo $(DIST_WASM)
+target-path-abs:
+	@echo $(abspath $(DIST_WASM))
+target-file:
+	@echo $(notdir $(DIST_WASM))
 
 # the wasm should be rebuilt if any source files change
 $(UNSIGNED_WASM): $(RUST_DEPS)

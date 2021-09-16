@@ -12,9 +12,9 @@ PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
 
 include ../../build/makefiles/actor.mk
 
-# you can get this provider id by running `make inspect` 
-# in the nats capability-provider folder
-MESSAGING_PROVIDER_ID = VB4JCG7SLE2OYZ7ZWZWJATWRHFM7BOA6WFTRQMRZN7GNIUIDZ6DRJ5JN
+# messaging provider id from wasmcloud.azurecr.io/nats
+# If you built it from source, get the provider id with `make inspect` in the source folder
+MESSAGING_PROVIDER_ID = VADNMSIML2XGO2X4TPIONTIC55R2UUQGPPDZPAVSC2QD7E76CR77SPW7
 
 link:
 	# link to messaging provider
