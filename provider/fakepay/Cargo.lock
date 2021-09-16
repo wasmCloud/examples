@@ -2823,6 +2823,8 @@ dependencies = [
 [[package]]
 name = "wasmcloud-examples-payments"
 version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f3d2cba484d738ff581e8f888c0ec9df6e01368594deb45d005da89e9446be8"
 dependencies = [
  "async-trait",
  "futures 0.3.17",

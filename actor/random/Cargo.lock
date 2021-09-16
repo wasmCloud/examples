@@ -2813,6 +2813,8 @@ dependencies = [
 [[package]]
 name = "wasmcloud-example-runner"
 version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "294026075447ec2e4d0c324be80f8482971f7538b7de8ba29ab04ccbcca25cdf"
 dependencies = [
  "async-trait",
  "log",

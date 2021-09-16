@@ -14,7 +14,7 @@ serde_bytes = "0.11"
 serde = {version = "1.0", features = ["derive"]}
 wasmbus-rpc = "0.4"
 wasmcloud-interface-logging = "0.1"
-wasmcloud-example-runner = { path = "../../interface/runner/rust" }
+wasmcloud-example-runner = "0.1"
 
 [profile.release]
 # Optimize for small code size
