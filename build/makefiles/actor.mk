@@ -61,6 +61,13 @@ $(DIST_WASM): $(UNSIGNED_WASM) Makefile
 		--name "$(PROJECT)" --ver $(VERSION) --rev $(REVISION) \
 		--destination $@
 
+# rules to print file name and path of build target
+target-path:
+	@echo $(DIST_WASM)
+target-path-abs:
+	@echo $(abspath $(DIST_WASM))
+target-file:
+	@echo $(notdir $(DIST_WASM))
 
 # the wasm should be rebuilt if any source files change
 $(UNSIGNED_WASM): $(RUST_DEPS)
@@ -81,7 +88,7 @@ start:
 #	$(PUSH_REG_CMD) $(DIST_WASM)
 #	$(WASH) ctl update actor  \
 #        $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id") \
-#	    $(shell make actor_id) \
+#	    $(shell make --silent actor_id) \
 #	    $(REG_URL) --timeout 3
 
 inventory:
@@ -93,7 +100,7 @@ ifneq ($(wildcard test-options.json),)
 RPC_TEST_TIMEOUT ?= 2
 test::
 	$(WASH) call --test --data test-options.json --rpc-timeout $(TEST_TIMEOUT) \
-	    $(shell make actor_id) \
+	    $(shell make --silent actor_id) \
 	    Start
 endif
 
@@ -118,7 +125,7 @@ _actor_id: $(DIST_WASM)
 	@$(WASH) claims inspect $(DIST_WASM) -o json | jq -r .module
 
 actor_id:
-	@echo $(shell make _actor_id 2>/dev/null | tail -1)
+	@echo $(shell make --silent _actor_id 2>/dev/null | tail -1)
 
 ifeq ($(wildcard codegen.toml),codegen.toml)
 # if there are interfaces here, enable lint and validate rules

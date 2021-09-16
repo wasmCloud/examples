@@ -5,6 +5,7 @@
 #
 
 html_target     ?= html
+project_dir     ?= $(abspath $(shell pwd))
 codegen_config  ?= $(project_dir)/codegen.toml
 top_targets     ?= all build clean lint validate test
 WASH            ?= wash
@@ -58,4 +59,4 @@ make-vars:
 	@echo "top_targets    : $(top_targets)"
 
 
-.PHONY: all build release clean lint validate test $(weld)
+.PHONY: all build release clean lint validate test
