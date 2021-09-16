@@ -36,6 +36,7 @@ pub trait Runner {
 
 /// RunnerReceiver receives messages defined in the Runner service trait
 /// The Runner interface has a single Run method
+#[doc(hidden)]
 #[async_trait]
 pub trait RunnerReceiver: MessageDispatch + Runner {
     async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
@@ -72,6 +73,27 @@ impl<T: Transport> RunnerSender<T> {
         Self { transport }
     }
 }
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> RunnerSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl RunnerSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
 #[async_trait]
 impl<T: Transport + std::marker::Sync + std::marker::Send> Runner for RunnerSender<T> {
     #[allow(unused)]
@@ -86,7 +108,7 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Runner for RunnerSend
             .send(
                 ctx,
                 Message {
-                    method: "Run",
+                    method: "Runner.Run",
                     arg: Cow::Borrowed(&arg),
                 },
                 None,

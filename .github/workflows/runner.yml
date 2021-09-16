@@ -6,7 +6,7 @@ on:
     paths:
     - "interface/runner/rust/**"
     tags:
-    - 'runner-v*'
+    - 'wasmcloud-examples-runner-v*'
   pull_request:
     branches: [ main ]
     paths:

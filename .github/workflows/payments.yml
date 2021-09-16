@@ -6,7 +6,7 @@ on:
     paths:
     - "interface/payments/rust/**"
     tags:
-    - 'payments-v*'
+    - 'wasmcloud-examples-payments-v*'
   pull_request:
     branches: [ main ]
     paths:
