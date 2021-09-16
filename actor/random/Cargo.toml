@@ -1,6 +1,6 @@
 [package]
 name = "example-random"
-version = "0.1.0"
+version = "0.1.1"
 authors = [ "wasmcloud Team" ]
 edition = "2018"
 
@@ -12,9 +12,9 @@ async-trait = "0.1"
 futures = "0.3"
 serde_bytes = "0.11"
 serde = {version = "1.0", features = ["derive"]}
-wasmbus-rpc = "0.3"
+wasmbus-rpc = "0.4"
 wasmcloud-interface-numbergen = "0.1"
-wasmcloud-example-runner = { path = "../../interface/runner/rust" }
+wasmcloud-example-runner = "0.1"
 
 [profile.release]
 # Optimize for small code size
