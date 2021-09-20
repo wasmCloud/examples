@@ -58,7 +58,7 @@ $(DIST_WASM): $(UNSIGNED_WASM) Makefile
 	@mkdir -p $(dir $@)
 	$(WASH) claims sign $< \
 		-a $(CALL_ALIAS) \
-		--name "Pet Clinic Customers" --ver $(VERSION) --rev $(REVISION) \
+		--name "Pet Clinic Vets" --ver $(VERSION) --rev $(REVISION) \
 		--destination $@
 
 
@@ -81,7 +81,7 @@ start:
 #	$(PUSH_REG_CMD) $(DIST_WASM)
 #	$(WASH) ctl update actor  \
 #        $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id") \
-#	    $(shell make actor_id) \
+#	    $(shell make --silent actor_id) \
 #	    $(REG_URL) --timeout 3
 
 inventory:
@@ -91,10 +91,9 @@ ifneq ($(wildcard test-options.json),)
 # if this is a test actor, run its start method
 # project makefile can set RPC_TEST_TIMEOUT to override default
 RPC_TEST_TIMEOUT ?= 2
+ACTOR_ID=$(shell make --silent actor_id)
 test::
-	$(WASH) call --test --data test-options.json --rpc-timeout $(TEST_TIMEOUT) \
-	    $(shell make actor_id) \
-	    Start
+	$(WASH) call $(ACTOR_ID) --test --data test-options.json --rpc-timeout $(RPC_TEST_TIMEOUT) Start
 endif
 
 # generate release build
@@ -118,7 +117,7 @@ _actor_id: $(DIST_WASM)
 	@$(WASH) claims inspect $(DIST_WASM) -o json | jq -r .module
 
 actor_id:
-	@echo $(shell make _actor_id 2>/dev/null | tail -1)
+	@echo $(shell make --silent _actor_id 2>/dev/null | tail -1)
 
 ifeq ($(wildcard codegen.toml),codegen.toml)
 # if there are interfaces here, enable lint and validate rules

@@ -64,5 +64,5 @@ structure Visit {
     petId: U64,
     /// ID of the veterinarian who saw the given pet on this visit
     @required
-    vedId: U64
+    vetId: U64
 }

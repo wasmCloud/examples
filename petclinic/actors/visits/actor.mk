@@ -45,7 +45,6 @@ UNSIGNED_WASM = $(TARGET_DIR)/$(WASM_TARGET)/release/$(PROJECT).wasm
 check-var-defined = $(if $(strip $($1)),,$(error Required variable "$1" is not defined))
 
 $(call check-var-defined,PROJECT)
-$(call check-var-defined,CLAIMS)
 $(call check-var-defined,VERSION)
 $(call check-var-defined,REVISION)
 $(call check-var-defined,REG_URL)
@@ -58,7 +57,6 @@ all:: $(DIST_WASM)
 $(DIST_WASM): $(UNSIGNED_WASM) Makefile
 	@mkdir -p $(dir $@)
 	$(WASH) claims sign $< \
-		$(foreach claim,$(CLAIMS), -c $(claim) ) \
 		-a $(CALL_ALIAS) \
 		--name "Pet Clinic Visits" --ver $(VERSION) --rev $(REVISION) \
 		--destination $@

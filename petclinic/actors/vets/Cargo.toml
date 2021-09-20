@@ -1,0 +1,23 @@
+[package]
+name = "vets"
+version = "0.1.0"
+authors = [ "" ]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "vets"
+
+[dependencies]
+async-trait = "0.1"
+futures = "0.3"
+form_urlencoded = "1.0"
+serde_bytes = "0.11"
+serde = {version = "1.0", features = ["derive"]}
+wasmbus-rpc = "0.4"
+petclinic-interface = { path = "../../petclinic-interface/rust"}
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
