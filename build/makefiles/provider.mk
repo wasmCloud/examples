@@ -3,6 +3,10 @@
 # common rules for building capability providers
 # Some of these rules depend on GNUMakefile >= 4.0
 #
+# before including this, local project makefile should define the following
+# (to override defaults)
+# top_targets      # list of targets that are applicable for this project
+#
 
 top_targets     ?= all par par-full test clean 
 
@@ -31,14 +35,6 @@ oci_url      ?= $(oci_url_base)/$(bin_name):$(VERSION)
 ifeq ($(WASH_REG_USER),)
 	oci_insecure := --insecure
 endif
-
-# rules to print file name and path of build target
-target-path:
-	@echo $(dest_par)
-target-path-abs:
-	@echo $(abspath $(dest_par))
-target-file:
-	@echo $(notdir $(dest_par))
 
 par_targets ?= \
 	x86_64-unknown-linux-gnu \
@@ -140,12 +136,18 @@ target/%/release/$(bin_name): $(RUST_DEPS)
 
 endif
 
+# rules to print file name and path of build target
+target-path:
+	@echo $(dest_par)
+target-path-abs:
+	@echo $(abspath $(dest_par))
+target-file:
+	@echo $(notdir $(dest_par))
+
+
 # push par file to registry
 push: $(dest_par)
 	$(WASH) reg push $(oci_insecure) $(oci_url) $(dest_par)
-
-
-
 
 # start provider
 start:
