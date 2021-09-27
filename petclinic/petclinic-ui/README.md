@@ -6,7 +6,9 @@
 
 ## Build
 
-1. Run `npm run build`
+1. Run `npm install`
+
+2. Run `npm run build`
 
 ## Development
 
