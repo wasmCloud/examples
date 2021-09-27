@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ErrorBoundary from './ErrorBoundary';
 import Nav from './Nav';
 import Owners from './Owners';
 import PetTypes from './PetTypes';
@@ -24,7 +25,9 @@ function App() {
     <div>
       <Nav changePage={(page) => setPage(page)} />
       <div className="container mx-auto pt-8">
-        {renderPage()}
+        <ErrorBoundary>
+          {renderPage()}
+        </ErrorBoundary>
       </div>
     </div>
   );

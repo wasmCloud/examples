@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import api from './Api';
+import ErrorBoundary from './ErrorBoundary';
 
 export function Modal(props) {
 
@@ -14,8 +16,12 @@ export function Modal(props) {
 
   const renderModalContent = () => {
     return (
-      <div className="relative p-6 flex-auto">
-        {props.children}
+      <div>
+        <ErrorBoundary>
+          <div className="relative p-6 flex-auto">
+            {props.children}
+          </div>
+        </ErrorBoundary>
       </div>
     )
   }
@@ -238,6 +244,30 @@ export function VisitsModal(props) {
       [e.target.id]: e.target.value
     })
   }
+
+  useEffect(() => {
+    async function fetchVisits() {
+      try {
+        const response = await api.getPetVisits(props.owner.id, props.pet.id);
+        setVisits(response);
+      } catch (err) {
+        throw err;
+      }
+    }
+    fetchVisits();
+  }, [props.owner.id, props.pet.id]);
+
+
+  const addVisit = async (visit) => {
+    try {
+      const response = await api.createPetVisit(this.props.owner.id, this.state.pet.id, visit);
+      setVisits([response, ...visits]);
+      setVisit({})
+    } catch (err) {
+      throw err;
+    }
+  }
+
   return (
     <div className="px-8 pt-6 pb-8">
       <form className="mb-4">
@@ -269,13 +299,7 @@ export function VisitsModal(props) {
           <button
             className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
             type="button"
-            onClick={() => {
-              setVisits([{
-                ...visit,
-                id: visits.length + 1
-              }, ...visits]);
-              setVisit({})
-            }}
+            onClick={() => addVisit(visit)}
           >
             Add Visit
           </button>
@@ -292,10 +316,8 @@ export function VisitsModal(props) {
                 </li>
               )
             })}
-
           </ul>
         </div>
-
       </div>
     </div >
   );

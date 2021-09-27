@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import api from './Api';
 import { fakeOwners } from './fake';
 import { Modal, OwnerModal } from './Modal';
 import Owner from './Owner';
@@ -21,16 +22,25 @@ export default function Owners() {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    // async function fetchOwners() {
-    //   const response = await fetch('/owners').catch((err) => { throw err });
-    //   const data = await response.json().catch((err) => { throw err });
-    //   return data;
-    // }
-    setOwners(fakeOwners);
+    async function fetchOwners() {
+      try {
+        const owners = await api.getOwners()
+        setOwners(owners);
+      } catch (err) {
+        console.log("IN CATCH", err);
+        throw err;
+      }
+    }
+    fetchOwners();
   }, [])
 
-  const addOwner = (owner) => {
-    setOwners([owner, ...owners])
+  const addOwner = async (owner) => {
+    try {
+      const response = await api.createOwner(owner);
+      setOwners([response, ...owners])
+    } catch (err) {
+      throw err;
+    }
   }
 
   const renderModal = () => {

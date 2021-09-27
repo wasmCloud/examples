@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Modal, OwnerModal, PetModal, VisitsModal } from './Modal';
+import api from './Api';
 /*
 {
   id: 1,
@@ -29,35 +30,51 @@ export default class Owner extends Component {
   }
 
   componentDidMount() {
-    // fetchPets(owner.id);
-    // this.setState({
-    //   pets: fakePets,
-    // })
+    this.getPets()
   }
 
-  updateOwner(owner) {
-    this.setState({
-      owner: owner,
-      showModal: false,
-    })
+  async updateOwner(owner) {
+    try {
+      const response = await api.updateOwner(this.props.owner.id, owner);
+      this.setState({
+        owner: response,
+        showModal: false
+      })
+    } catch (err) {
+      throw err;
+    }
   }
 
-  addOrEditPet(pet) {
-    this.setState({
-      pets: !this.state.pet ?
-        [pet, ...this.state.pets]
-        :
-        this.state.pets.map(p => p.id === pet.id ? pet : p),
-      showModal: false,
-      pet: false
-    })
+  async getPets() {
+    try {
+      const response = await api.getPets(this.props.owner.id);
+      this.setState({
+        pets: response,
+      })
+    } catch (err) {
+      throw err;
+    }
   }
 
-  addVisit(visit) {
-    this.setState({
-      showModal: false,
-      pet: false,
-    })
+  async addOrEditPet(pet) {
+    let response;
+    try {
+      if (this.state.pet) {
+        response = await api.updatePet(this.props.owner.id, pet.id, pet)
+      } else {
+        response = await api.createPet(this.props.owner.id, pet);
+      }
+      this.setState({
+        pets: !this.state.pet ?
+          [response, ...this.state.pets]
+          :
+          this.state.pets.map(p => p.id === response.id ? response : p),
+        showModal: false,
+        pet: false
+      })
+    } catch (err) {
+      throw err;
+    }
   }
 
   renderOwner() {
@@ -176,7 +193,7 @@ export default class Owner extends Component {
           <Modal
             modalTitle={`Visits for ${this.state.pet.name}`}
             setShowModal={(val) => closeModal(val)}>
-            <VisitsModal pet={this.state.pet} />
+            <VisitsModal owner={this.state.owner} pet={this.state.pet} />
           </Modal>
         )
       case false:
