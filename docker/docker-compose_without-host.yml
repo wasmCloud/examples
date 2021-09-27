@@ -2,7 +2,6 @@
 #   nats with JetStream enabled
 #   a local OCI registry
 #   redis (for the kvredis capability provider)
-#   wasmcloud_host
 
 version: "3"
 services:
@@ -21,12 +20,4 @@ services:
     image: registry:2.7
     ports:
       - "5000:5000"
-  wasmcloud:
-    image: wasmcloud/wasmcloud_host:latest
-    environment:
-      WASMCLOUD_RPC_HOST: nats
-      WASMCLOUD_CTL_HOST: nats
-      WASMCLOUD_PROV_RPC_HOST: nats
-    ports:
-      - "4000:4000"
-      - "8080-8089:8080-8089" # Allows exposing examples on ports 8080-8089
+
