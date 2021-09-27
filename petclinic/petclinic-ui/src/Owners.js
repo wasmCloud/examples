@@ -27,7 +27,6 @@ export default function Owners() {
         const owners = await api.getOwners()
         setOwners(owners);
       } catch (err) {
-        console.log("IN CATCH", err);
         throw err;
       }
     }
