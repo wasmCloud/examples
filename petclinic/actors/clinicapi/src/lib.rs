@@ -261,10 +261,7 @@ fn get_pet_type(pts: &[PetType], id: u64) -> AugmentedPetType {
 }
 
 fn deser<'de, T: Deserialize<'de>>(raw: &'de [u8]) -> RpcResult<T> {
-    match serde_json::from_slice(raw) {
-        Ok(t) => t,
-        Err(e) => Err(RpcError::Deser(format!("{}", e))),
-    }
+    serde_json::from_slice(raw).map_err(|e| RpcError::Deser(format!("{}", e)))
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
