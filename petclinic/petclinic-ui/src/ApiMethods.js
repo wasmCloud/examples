@@ -42,7 +42,7 @@ export function getPetVisits(ownerId, petId) {
 }
 
 export function createPetVisit(ownerId, petId, visit) {
-  return this.modifyRequest(`/owners/${ownerId}/pets/${petId}`, 'POST', visit);
+  return this.modifyRequest(`/owners/${ownerId}/pets/${petId}/visits`, 'POST', visit);
 }
 
 // Vets - [/vets]

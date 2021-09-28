@@ -5,7 +5,10 @@ import api from './Api';
 {
   id: 1,
   name: '',
-  petType: 1,
+  petType: {
+    id: 1,
+    name: ''
+  },
   birthdate: '',
 }
 
@@ -36,7 +39,7 @@ export default class Owner extends Component {
   async updateOwner(owner) {
     const response = await api.updateOwner(this.props.owner.id, owner).catch((err) => { return err })
     this.setState({
-      owner: response,
+      owner: owner,
       showModal: false
     })
   }
@@ -57,9 +60,9 @@ export default class Owner extends Component {
     }
     this.setState({
       pets: !this.state.pet ?
-        [response, ...this.state.pets]
+        [pet, ...this.state.pets]
         :
-        this.state.pets.map(p => p.id === response.id ? response : p),
+        this.state.pets.map(p => p.id === pet.id ? pet : p),
       showModal: false,
       pet: false
     })
@@ -91,7 +94,7 @@ export default class Owner extends Component {
                 })
               }}
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mb-2">
-              Add Pets
+              Add Pet
             </button>
           </div>
         </div>
@@ -108,7 +111,7 @@ export default class Owner extends Component {
             <div key={idx} className="pr-2 pb-2">
               <div className="p-8 bg-white shadow-md">
                 <h2 className="text-2xl font-bold text-gray-800">{pet.name}</h2>
-                <p className="text-gray-600 italic">{pet.petType}</p>
+                <p className="text-gray-600 italic">{pet.petType.name}</p>
                 <p className="text-gray-600">{pet.birthdate.month}/{pet.birthdate.day}/{pet.birthdate.year}</p>
                 <div className="mt-2">
                   <button
@@ -169,6 +172,9 @@ export default class Owner extends Component {
             <PetModal
               pet={this.state.pet}
               petCallback={(pet) => {
+                if (!this.state.pet) {
+                  pet.id = this.state.pets.length + 1;
+                }
                 this.addOrEditPet(pet);
               }}
             />

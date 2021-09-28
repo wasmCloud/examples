@@ -29,12 +29,9 @@ export default function Owners() {
   }, [])
 
   const addOwner = async (owner) => {
-    try {
-      const response = await api.createOwner(owner);
-      setOwners([response, ...owners])
-    } catch (err) {
-      throw err;
-    }
+    owner.id = owners.length + 1;
+    const response = await api.createOwner(owner).catch((err) => { return err })
+    setOwners([owner, ...owners])
   }
 
   const renderModal = () => {

@@ -182,6 +182,9 @@ export function PetModal(props) {
         year: petBirthdate.getUTCFullYear()
       }
     }
+    if (e.target.id === 'petType') {
+      val = parseInt(e.target.value);
+    }
     setPet({
       ...pet,
       [e.target.id]: val
@@ -219,7 +222,7 @@ export function PetModal(props) {
           Pet Type
         </label>
         <select
-          value={pet.petType || ''}
+          value={pet.petType ? pet.petType.id : ''}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="petType">
@@ -250,6 +253,7 @@ export function PetModal(props) {
 export function VisitsModal(props) {
   const [visits, setVisits] = useState([]);
   const [visit, setVisit] = useState({});
+  const [vets, setVets] = useState([]);
 
   const onChange = (e) => {
     let val = e.target.value;
@@ -272,13 +276,24 @@ export function VisitsModal(props) {
       const response = await api.getPetVisits(props.owner.id, props.pet.id).catch((err) => { return err })
       setVisits(response);
     }
+    async function fetchVets() {
+      const response = await api.getVets().catch((err) => { return err });
+      setVets(response);
+    }
     fetchVisits();
+    fetchVets();
   }, [props.owner.id, props.pet.id]);
 
 
   const addVisit = async (visit) => {
-    const response = await api.createPetVisit(this.props.owner.id, this.state.pet.id, visit).catch((err) => { return err })
-    setVisits([response, ...visits]);
+    visit.petId = props.pet.id;
+    visit.time = {
+      hour: 12,
+      minute: 0,
+    }
+    visit.vetId = 1;
+    const response = await api.createPetVisit(props.owner.id, props.pet.id, visit).catch((err) => { return err })
+    setVisits([visit, ...visits]);
     setVisit({})
   }
 
@@ -308,6 +323,23 @@ export function VisitsModal(props) {
             id="date"
             type="date"
             placeholder="Date" />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="petType">
+            Vet
+          </label>
+          <select
+            value={visit.vetId || ''}
+            onChange={(e) => onChange(e)}
+            className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="vetId">
+            <option value=''>Choose vet...</option>
+            {vets.map((vet, idx) => {
+              return (
+                <option key={idx} value={vet.id}>{`${vet.firstName} ${vet.lastName}`}</option>
+              )
+            })}
+          </select>
         </div>
         <div className="mb-4">
           <button
