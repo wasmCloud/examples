@@ -1,45 +1,45 @@
 import * as apiMethods from './ApiMethods';
 
 class Api {
-    url;
-    constructor(endpoint) {
-      this.url = endpoint || 'http://localhost:8080';
-    }
+  url;
+  constructor(endpoint) {
+    this.url = endpoint || 'http://localhost:8080';
+  }
 
-    async checkApiError(response) {
-      if (response.status > 399) {
-        if (response.status === 404) {
-          throw new Error('not found');
-        } else {
-          const err = await response.json();
-          throw new Error(err);
-        }
+  async checkApiError(response) {
+    if (response.status > 399) {
+      if (response.status === 404) {
+        throw new Error('not found');
       } else {
-        const data = await response.json();
-        return data;
+        const err = await response.json();
+        throw new Error(err);
       }
+    } else {
+      const data = await response.json();
+      return data;
     }
+  }
 
-    async getRequest(url) {
-      const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      };
+  async getRequest(url) {
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
 
-      const response = await fetch(url, {
-        headers,
-      })
-      return this.checkApiError(response);
-    }
+    const response = await fetch(`${this.url}${url}`, {
+      headers,
+    })
+    return this.checkApiError(response);
+  }
 
-    async modifyRequest(url, method, body) {
-      const response = await fetch(url, {
-        method: method,
-        body: body ? JSON.stringify(body) : null,
-      })
+  async modifyRequest(url, method, body) {
+    const response = await fetch(`${this.url}${url}`, {
+      method: method,
+      body: body ? JSON.stringify(body) : null,
+    })
 
-      return this.checkApiError(response);
-    }
+    return this.checkApiError(response);
+  }
 
 }
 

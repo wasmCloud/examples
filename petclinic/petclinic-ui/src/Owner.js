@@ -121,7 +121,7 @@ export default class Owner extends Component {
               <div className="p-8 bg-white shadow-md">
                 <h2 className="text-2xl font-bold text-gray-800">{pet.name}</h2>
                 <p className="text-gray-600 italic">{pet.petType}</p>
-                <p className="text-gray-600">{pet.birthdate}</p>
+                <p className="text-gray-600">{pet.birthdate.month}/{pet.birthdate.day}/{pet.birthdate.year}</p>
                 <div className="mt-2">
                   <button
                     onClick={() => {

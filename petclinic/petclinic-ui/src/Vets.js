@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import api from './Api';
 import { fakeVets } from './fake';
 /*
 {
@@ -13,12 +14,15 @@ export default function Vets() {
   const [vets, setVets] = useState([]);
 
   useEffect(() => {
-    // async function fetchVets() {
-    //   const response = await fetch('/vets').catch((err) => { throw err });
-    //   const data = await response.json().catch((err) => { throw err });
-    //   return data;
-    // }
-    setVets(fakeVets);
+    async function fetchVets() {
+      const response = await api.getVets();
+      setVets(response);
+    }
+    try {
+      fetchVets()
+    } catch (err) {
+      throw err;
+    }
   }, [])
 
 
