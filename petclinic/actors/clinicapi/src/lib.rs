@@ -1,11 +1,11 @@
 use petclinic_interface::{
-    AddPetRequest, Customers, CustomersSender, ListVisitsRequest, Owner, Pet, RecordVisitRequest,
-    Vets, VetsSender, Visit, Visits, VisitsSender,
+    AddPetRequest, Customers, CustomersSender, Date, ListVisitsRequest, Owner, Pet, PetType,
+    RecordVisitRequest, Vets, VetsSender, Visit, Visits, VisitsSender,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
-use wasmcloud_interface_logging::{debug, error, info};
+use wasmcloud_interface_logging::debug;
 
 const VETS_ACTOR: &str = "petclinic/vets";
 const CUSTOMERS_ACTOR: &str = "petclinic/customers";
@@ -108,7 +108,17 @@ async fn get_pet(ctx: &Context, _owner_id: &str, pet_id: &str) -> RpcResult<Http
         .await?
         .pet
     {
-        HttpResponse::json(p, 200)
+        let pts = CustomersSender::to_actor(CUSTOMERS_ACTOR)
+            .list_pet_types(ctx)
+            .await?;
+        let ap = AugmentedPet {
+            birthdate: p.birthdate,
+            id: p.id,
+            name: p.name,
+            pet_type: get_pet_type(&pts, p.pet_type),
+        };
+
+        HttpResponse::json(ap, 200)
     } else {
         Ok(HttpResponse::not_found())
     }
@@ -165,7 +175,19 @@ async fn get_pets(ctx: &Context, owner_id: &str) -> RpcResult<HttpResponse> {
     let x = CustomersSender::to_actor(CUSTOMERS_ACTOR)
         .list_pets(ctx, &oid)
         .await?;
-    HttpResponse::json(x, 200)
+    let pts = CustomersSender::to_actor(CUSTOMERS_ACTOR)
+        .list_pet_types(ctx)
+        .await?;
+    let ax: Vec<_> = x
+        .iter()
+        .map(|p| AugmentedPet {
+            birthdate: p.birthdate.clone(),
+            id: p.id,
+            name: p.name.to_string(),
+            pet_type: get_pet_type(&pts, p.pet_type),
+        })
+        .collect();
+    HttpResponse::json(ax, 200)
 }
 
 async fn update_owner(ctx: &Context, _owner_id: &str, owner: Owner) -> RpcResult<HttpResponse> {
@@ -225,9 +247,38 @@ async fn get_owner(ctx: &Context, owner_id: &str) -> RpcResult<HttpResponse> {
     }
 }
 
+fn get_pet_type(pts: &[PetType], id: u64) -> AugmentedPetType {
+    pts.iter().find(|p| p.id == id).map_or_else(
+        || AugmentedPetType {
+            id: 0,
+            name: "Unknown".to_string(),
+        },
+        |p| AugmentedPetType {
+            id: id,
+            name: p.name.to_string(),
+        },
+    )
+}
+
 fn deser<'de, T: Deserialize<'de>>(raw: &'de [u8]) -> RpcResult<T> {
     match serde_json::from_slice(raw) {
         Ok(t) => t,
         Err(e) => Err(RpcError::Deser(format!("{}", e))),
     }
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+struct AugmentedPet {
+    pub birthdate: Date,
+    pub id: u64,
+    #[serde(default)]
+    pub name: String,
+    #[serde(rename = "petType")]
+    pub pet_type: AugmentedPetType,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+struct AugmentedPetType {
+    pub id: u64,
+    pub name: String,
 }
