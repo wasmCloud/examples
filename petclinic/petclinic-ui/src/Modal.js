@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import api from './Api';
-import ErrorBoundary from './ErrorBoundary';
+
+function parseDateString(day, month, year) {
+  return new Date(Date.parse(`${year}-${month}-${day}`)).toISOString().split('T')[0]
+}
 
 export function Modal(props) {
 
@@ -17,11 +20,9 @@ export function Modal(props) {
   const renderModalContent = () => {
     return (
       <div>
-        <ErrorBoundary>
-          <div className="relative p-6 flex-auto">
-            {props.children}
-          </div>
-        </ErrorBoundary>
+        <div className="relative p-6 flex-auto">
+          {props.children}
+        </div>
       </div>
     )
   }
@@ -148,10 +149,7 @@ export function OwnerModal(props) {
           className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
           type="button"
           onClick={() => {
-            props.ownerCallback({
-              ...owner,
-              id: owner.id || props.ownerLen + 1
-            });
+            props.ownerCallback(owner);
             setOwner({})
           }}
         >
@@ -164,11 +162,29 @@ export function OwnerModal(props) {
 
 export function PetModal(props) {
   const [pet, setPet] = useState(props.pet || {})
+  const [petTypes, setPetTypes] = useState([]);
+
+  useEffect(() => {
+    async function fetchPetTypes() {
+      const response = await api.getPetTypes().catch((err) => { return err })
+      setPetTypes(response);
+    }
+    fetchPetTypes();
+  }, [])
 
   const onChange = (e) => {
+    let val = e.target.value;
+    if (e.target.id === 'birthdate') {
+      const petBirthdate = new Date(e.target.value);
+      val = {
+        day: petBirthdate.getUTCDate(),
+        month: petBirthdate.getUTCMonth() + 1,
+        year: petBirthdate.getUTCFullYear()
+      }
+    }
     setPet({
       ...pet,
-      [e.target.id]: e.target.value
+      [e.target.id]: val
     })
   }
 
@@ -191,7 +207,7 @@ export function PetModal(props) {
           Birthdate
         </label>
         <input
-          value={pet.birthdate || ''}
+          value={pet.birthdate ? parseDateString(pet.birthdate.day, pet.birthdate.month, pet.birthdate.year) : ''}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="birthdate"
@@ -208,11 +224,11 @@ export function PetModal(props) {
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="petType">
           <option value=''>Choose pet type...</option>
-          <option value="Dog">Dog</option>
-          <option value="Cat">Cat</option>
-          <option value="Snake">Snake</option>
-          <option value="Hamster">Hamster</option>
-          <option value="Parrot">Parrot</option>
+          {petTypes.map((petType, idx) => {
+            return (
+              <option key={idx} value={petType.id}>{petType.name}</option>
+            )
+          })}
         </select>
       </div>
       <div className="mb-4">
@@ -220,10 +236,7 @@ export function PetModal(props) {
           className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
           type="button"
           onClick={() => {
-            props.petCallback({
-              ...pet,
-              id: pet.id || props.petsLen + 1
-            });
+            props.petCallback(pet);
             setPet({})
           }}
         >
@@ -239,33 +252,34 @@ export function VisitsModal(props) {
   const [visit, setVisit] = useState({});
 
   const onChange = (e) => {
+    let val = e.target.value;
+    if (e.target.id === 'date') {
+      const visitDate = new Date(e.target.value);
+      val = {
+        day: visitDate.getUTCDate(),
+        month: visitDate.getUTCMonth() + 1,
+        year: visitDate.getUTCFullYear()
+      }
+    }
     setVisit({
       ...visit,
-      [e.target.id]: e.target.value
+      [e.target.id]: val
     })
   }
 
   useEffect(() => {
     async function fetchVisits() {
-      try {
-        const response = await api.getPetVisits(props.owner.id, props.pet.id);
-        setVisits(response);
-      } catch (err) {
-        throw err;
-      }
+      const response = await api.getPetVisits(props.owner.id, props.pet.id).catch((err) => { return err })
+      setVisits(response);
     }
     fetchVisits();
   }, [props.owner.id, props.pet.id]);
 
 
   const addVisit = async (visit) => {
-    try {
-      const response = await api.createPetVisit(this.props.owner.id, this.state.pet.id, visit);
-      setVisits([response, ...visits]);
-      setVisit({})
-    } catch (err) {
-      throw err;
-    }
+    const response = await api.createPetVisit(this.props.owner.id, this.state.pet.id, visit).catch((err) => { return err })
+    setVisits([response, ...visits]);
+    setVisit({})
   }
 
   return (
@@ -288,7 +302,7 @@ export function VisitsModal(props) {
             Date
           </label>
           <input
-            value={visit.date || ''}
+            value={visit.date ? parseDateString(visit.date.day, visit.date.month, visit.date.year) : ''}
             onChange={(e) => onChange(e)}
             className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="date"
@@ -311,7 +325,7 @@ export function VisitsModal(props) {
             {visits.map((v, idx) => {
               return (
                 <li key={idx} className="p-3">
-                  <span className="italic">{v.date}</span>
+                  <span className="italic">{v.date.month}/{v.date.day}/{v.date.year}</span>
                   <p className="font-bold">{v.description}</p>
                 </li>
               )

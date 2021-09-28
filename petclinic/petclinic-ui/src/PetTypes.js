@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import api from './Api';
-import { fakePetTypes } from './fake';
 /*
 {
   id: 1,
@@ -13,12 +12,8 @@ export default function PetTypes() {
 
   useEffect(() => {
     async function fetchPetTypes() {
-      try {
-        const response = await api.getPetTypes();
-        setPetTypes(response);
-      } catch (err) {
-        throw err;
-      }
+      const response = await api.getPetTypes().catch((err) => { return err })
+      setPetTypes(response);
     }
     fetchPetTypes();
   }, [])

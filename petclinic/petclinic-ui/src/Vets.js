@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import api from './Api';
-import { fakeVets } from './fake';
 /*
 {
   id: 1,
@@ -15,14 +14,10 @@ export default function Vets() {
 
   useEffect(() => {
     async function fetchVets() {
-      const response = await api.getVets();
+      const response = await api.getVets().catch((err) => { return err })
       setVets(response);
     }
-    try {
-      fetchVets()
-    } catch (err) {
-      throw err;
-    }
+    fetchVets();
   }, [])
 
 
@@ -36,7 +31,7 @@ export default function Vets() {
         </tr>
       </thead>
       <tbody>
-        {vets.map((vet, idx) => {
+        {vets && vets.map((vet, idx) => {
           return (
             <tr onClick={() => console.log(vet)} key={idx} className="border cursor-pointer">
               <td className="px-8 py-4">{`${vet.firstName} ${vet.lastName}`}</td>

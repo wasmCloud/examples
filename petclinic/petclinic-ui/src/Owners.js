@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import api from './Api';
-import { fakeOwners } from './fake';
 import { Modal, OwnerModal } from './Modal';
 import Owner from './Owner';
 /*
@@ -23,12 +22,8 @@ export default function Owners() {
 
   useEffect(() => {
     async function fetchOwners() {
-      try {
-        const owners = await api.getOwners()
-        setOwners(owners);
-      } catch (err) {
-        throw err;
-      }
+      const owners = await api.getOwners().catch((err) => { return err })
+      setOwners(owners);
     }
     fetchOwners();
   }, [])
@@ -69,8 +64,8 @@ export default function Owners() {
           <thead className="bg-blue-500 border">
             <tr>
               <th className="text-left px-8 py-4">Name</th>
-              <th className="text-left px-8 py-4">Address</th>
-              <th className="text-left px-8 py-4">Telephone</th>
+              {/* <th className="text-left px-8 py-4">Address</th>
+              <th className="text-left px-8 py-4">Telephone</th> */}
               <th className="text-left px-8 py-4">Email</th>
             </tr>
           </thead>
@@ -79,8 +74,8 @@ export default function Owners() {
               return (
                 <tr onClick={() => setOwner(owner)} key={idx} className="border cursor-pointer">
                   <td className="px-8 py-4">{`${owner.firstName} ${owner.lastName}`}</td>
-                  <td className="px-8 py-4">{`${owner.address}, ${owner.city}`}</td>
-                  <td className="px-8 py-4">{owner.telephone}</td>
+                  {/* <td className="px-8 py-4">{`${owner.address}, ${owner.city}`}</td>
+                  <td className="px-8 py-4">{owner.telephone}</td> */}
                   <td className="px-8 py-4">{owner.email}</td>
                 </tr>
               )

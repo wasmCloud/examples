@@ -11,7 +11,9 @@ class Api {
       if (response.status === 404) {
         throw new Error('not found');
       } else {
-        const err = await response.json();
+        const err = await response.json().catch((err) => {
+          throw err;
+        });
         throw new Error(err);
       }
     } else {

@@ -34,47 +34,35 @@ export default class Owner extends Component {
   }
 
   async updateOwner(owner) {
-    try {
-      const response = await api.updateOwner(this.props.owner.id, owner);
-      this.setState({
-        owner: response,
-        showModal: false
-      })
-    } catch (err) {
-      throw err;
-    }
+    const response = await api.updateOwner(this.props.owner.id, owner).catch((err) => { return err })
+    this.setState({
+      owner: response,
+      showModal: false
+    })
   }
 
   async getPets() {
-    try {
-      const response = await api.getPets(this.props.owner.id);
-      this.setState({
-        pets: response,
-      })
-    } catch (err) {
-      throw err;
-    }
+    const response = await api.getPets(this.props.owner.id).catch((err) => { return err })
+    this.setState({
+      pets: response,
+    })
   }
 
   async addOrEditPet(pet) {
     let response;
-    try {
-      if (this.state.pet) {
-        response = await api.updatePet(this.props.owner.id, pet.id, pet)
-      } else {
-        response = await api.createPet(this.props.owner.id, pet);
-      }
-      this.setState({
-        pets: !this.state.pet ?
-          [response, ...this.state.pets]
-          :
-          this.state.pets.map(p => p.id === response.id ? response : p),
-        showModal: false,
-        pet: false
-      })
-    } catch (err) {
-      throw err;
+    if (this.state.pet) {
+      response = await api.updatePet(this.props.owner.id, pet.id, pet).catch((err) => { return err })
+    } else {
+      response = await api.createPet(this.props.owner.id, pet).catch((err) => { return err })
     }
+    this.setState({
+      pets: !this.state.pet ?
+        [response, ...this.state.pets]
+        :
+        this.state.pets.map(p => p.id === response.id ? response : p),
+      showModal: false,
+      pet: false
+    })
   }
 
   renderOwner() {
@@ -83,9 +71,9 @@ export default class Owner extends Component {
       <div className="w-1/3 pr-2">
         <div className="p-8 bg-white shadow-md">
           <h2 className="text-2xl font-bold text-gray-800">{`${owner.firstName} ${owner.lastName}`}</h2>
-          <p className="text-gray-600">{`${owner.address}, ${owner.city}`}</p>
+          {/* <p className="text-gray-600">{`${owner.address}, ${owner.city}`}</p> */}
           <p className="text-gray-600">{owner.email}</p>
-          <p className="text-gray-600">{owner.telephone}</p>
+          {/* <p className="text-gray-600">{owner.telephone}</p> */}
           <div className="mt-2">
             <button
               onClick={() => {
@@ -170,7 +158,6 @@ export default class Owner extends Component {
               ownerCallback={(owner) => {
                 this.updateOwner(owner);
               }}
-              ownerLen={this.props.ownerLen}
             />
           </Modal>
         );
@@ -184,7 +171,6 @@ export default class Owner extends Component {
               petCallback={(pet) => {
                 this.addOrEditPet(pet);
               }}
-              petsLen={this.state.pets.length}
             />
           </Modal>
         )
