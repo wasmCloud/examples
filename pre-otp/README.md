@@ -1,4 +1,7 @@
-# wasmCloud Examples
+# DEPRECATED
+The following content and all content within the `pre-otp` directory is deprecated and will eventually be removed. It is left here only as a useful resource for those looking for samples compatible with `v0.18` and earlier.
+
+## wasmCloud Examples
 
 Example actors, capability providers, and other demonstrations
 
