@@ -57,6 +57,7 @@ all:: $(DIST_WASM)
 $(DIST_WASM): $(UNSIGNED_WASM) Makefile
 	@mkdir -p $(dir $@)
 	$(WASH) claims sign $< \
+		$(foreach claim,$(CLAIMS), -c $(claim) ) \
 		-a $(CALL_ALIAS) \
 		--name "Pet Clinic Customers" --ver $(VERSION) --rev $(REVISION) \
 		--destination $@
