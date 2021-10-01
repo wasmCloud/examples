@@ -495,7 +495,6 @@ dependencies = [
  "serde",
  "serde_bytes",
  "wasmbus-rpc",
- "wasmcloud-interface-numbergen",
  "wasmcloud-interface-sqldb",
 ]
 
@@ -2851,21 +2850,6 @@ dependencies = [
  "uuid",
  "wascap",
  "wasmbus-macros",
- "weld-codegen",
-]
-
-[[package]]
-name = "wasmcloud-interface-numbergen"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb6ca7c6e61105e5a1a702f322e69311ac306d259659fdfdb9789b62f61d7df5"
-dependencies = [
- "async-trait",
- "futures 0.3.17",
- "serde",
- "serde_bytes",
- "serde_json",
- "wasmbus-rpc",
  "weld-codegen",
 ]
 
