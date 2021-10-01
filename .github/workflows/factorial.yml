@@ -24,6 +24,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     # If your integration tests require nats or redis, run them here
+    - id: run-nats
+      uses: wasmcloud/common-actions/run-nats@main
     - id: rust-check-action
       uses: wasmcloud/common-actions/rust-check@main
       with:
