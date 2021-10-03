@@ -1,0 +1,16 @@
+{
+  "address": "127.0.0.1:9000",
+  "tls": {
+    "cert_file": "/path/to/example.com.pem",
+    "priv_key_file": "/path/to/example.com-key.pem"
+  },
+  "cors": {
+    "allowed_origins": [],
+    "allowed_headers": [
+      "accept", "accept-language", "content-language", "content-type", "accept-encoding"
+    ],
+    "allowed_methods": [ "GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS" ],
+    "exposed_headers": [],
+    "max_age_secs": 300
+  }
+}
