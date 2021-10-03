@@ -1,0 +1,33 @@
+[package]
+authors = [
+  "Aayush Attri <aayush.attri@red-badger.com>",
+  "Chris Whealy <chris.whealy@red-badger.com>",
+  "David Laban <david.laban@red-badger.com>",
+  "Stuart Harris <stuart.harris@red-badger.com>",
+  "wasmcloud team",
+]
+edition = "2018"
+name = "todo-sql"
+version = "0.1.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+async-trait = "0.1"
+futures = "0.3"
+once_cell = "1.8"
+regex = "1.5"
+serde = {version = "1.0", features = ["derive"]}
+serde_bytes = "0.11"
+serde_json = "1.0"
+wasmbus-rpc = "0.4.4"
+wasmcloud-interface-httpserver = "0.1.11"
+wasmcloud-interface-numbergen = "0.1"
+wasmcloud-interface-sqldb = "0.1.0"
+wasmcloud-interface-logging = "0.1.4"
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
