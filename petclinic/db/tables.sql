@@ -27,3 +27,14 @@ create table if not exists pettypes (
     name varchar(50) not null,
     
 );
+create table if not exists visits {
+    day int not null,
+    month int not null,
+    year int not null,
+    description varchar(255) not null,
+    petid bigint not null,
+    vetid bigint not null,
+    ownerid bigint not null,
+    hour int not null,
+    minute int not null
+}

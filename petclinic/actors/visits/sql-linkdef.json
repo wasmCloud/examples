@@ -1,0 +1,9 @@
+{
+    "uri": "postgresql://postgres:postgres@localhost/petclinic",
+    "pool" : {
+        "max_connections": 2,
+        "min_idle": 1,
+        "max_lifetime_secs": 300,
+        "idle_timeout_secs": 300
+    }
+}

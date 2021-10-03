@@ -4,6 +4,7 @@ use petclinic_interface::{
 };
 
 use wasmbus_rpc::actor::prelude::*;
+use wasmcloud_interface_logging::error;
 use wasmcloud_interface_sqldb::SqlDbSender;
 
 pub(crate) type Db = SqlDbSender<WasmHost>;
@@ -23,10 +24,13 @@ impl Customers for CustomersActor {
                 id: owner.id,
                 success: true,
             },
-            Err(_e) => CreateOwnerReply {
-                id: 0,
-                success: false,
-            },
+            Err(e) => {
+                error!("Failed to create owner: {}", e);
+                CreateOwnerReply {
+                    id: 0,
+                    success: false,
+                }
+            }
         })
     }
 
@@ -47,7 +51,10 @@ impl Customers for CustomersActor {
         let db = SqlDbSender::new();
         Ok(match db::update_owner(&ctx, &db, arg).await {
             Ok(_) => UpdateOwnerReply { success: true },
-            Err(_e) => UpdateOwnerReply { success: false },
+            Err(e) => {
+                error!("Failed to update owner: {}", e);
+                UpdateOwnerReply { success: false }
+            }
         })
     }
 
@@ -61,7 +68,10 @@ impl Customers for CustomersActor {
         let db = SqlDbSender::new();
         Ok(match db::add_pet(&ctx, &db, arg.owner_id, &arg.pet).await {
             Ok(_) => true,
-            Err(_e) => false,
+            Err(e) => {
+                error!("Failed to add pet: {}", e);
+                false
+            }
         })
     }
 
@@ -69,7 +79,10 @@ impl Customers for CustomersActor {
         let db = SqlDbSender::new();
         Ok(match db::delete_pet(&ctx, &db, *arg).await {
             Ok(_) => true,
-            Err(_e) => false,
+            Err(e) => {
+                error!("Failed to remove pet: {}", e);
+                false
+            }
         })
     }
 
@@ -77,7 +90,10 @@ impl Customers for CustomersActor {
         let db = SqlDbSender::new();
         Ok(match db::update_pet(&ctx, &db, arg).await {
             Ok(_) => true,
-            Err(_e) => false,
+            Err(e) => {
+                error!("Failed to update pet: {}", e);
+                false
+            }
         })
     }
 

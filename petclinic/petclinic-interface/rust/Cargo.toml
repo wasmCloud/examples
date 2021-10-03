@@ -2,7 +2,7 @@
 name = "petclinic-interface"
 version = "0.1.0"
 description = "Pet Clinic Actor Interface"
-authors = [ "" ]
+authors = [ "wasmcCloud Team" ]
 edition = "2018"
 license = "Apache-2.0"
 

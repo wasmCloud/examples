@@ -25,7 +25,7 @@ const TABLE_PETS: &str = "pets";
 const TABLE_PETTYPES: &str = "pettypes";
 
 static REGEX: Lazy<regex::Regex> = Lazy::new(|| {
-    let re = regex::Regex::new(r"^[a-zA-Z0-9 ,._-/]+$").unwrap();
+    let re = regex::Regex::new(r"^[-a-zA-Z0-9 ,._/]+$").unwrap();
     re
 });
 

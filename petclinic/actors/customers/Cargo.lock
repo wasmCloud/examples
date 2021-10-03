@@ -487,7 +487,6 @@ name = "customers"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "form_urlencoded",
  "futures 0.3.17",
  "once_cell",
  "petclinic-interface",
@@ -495,6 +494,7 @@ dependencies = [
  "serde",
  "serde_bytes",
  "wasmbus-rpc",
+ "wasmcloud-interface-logging",
  "wasmcloud-interface-sqldb",
 ]
 
@@ -2850,6 +2850,22 @@ dependencies = [
  "uuid",
  "wascap",
  "wasmbus-macros",
+ "weld-codegen",
+]
+
+[[package]]
+name = "wasmcloud-interface-logging"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d0f1742be67cef6dab78b1b555a8e87a613f3079cdce4124dfa5d0fd99f7f8a"
+dependencies = [
+ "async-trait",
+ "cfg-if 1.0.0",
+ "futures 0.3.17",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "wasmbus-rpc",
  "weld-codegen",
 ]
 
