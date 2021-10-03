@@ -38,3 +38,9 @@ create table if not exists visits {
     hour int not null,
     minute int not null
 }
+create table if not exists vets {
+    id bigint not null,
+    firstname varchar(50) not null,
+    lastname varchar(50) not null,
+    specialties varchar(1000) not null
+}

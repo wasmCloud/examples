@@ -1,5 +1,11 @@
-use petclinic_interface::{Vet, VetList, Vets, VetsReceiver};
+use petclinic_interface::{VetList, Vets, VetsReceiver};
 use wasmbus_rpc::actor::prelude::*;
+
+use wasmcloud_interface_sqldb::SqlDbSender;
+
+pub(crate) type Db = SqlDbSender<WasmHost>;
+
+mod db;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, Vets)]
@@ -7,24 +13,9 @@ struct VetsActor {}
 
 #[async_trait]
 impl Vets for VetsActor {
-    async fn list_vets(&self, _ctx: &Context) -> RpcResult<VetList> {
-        Ok(vec![
-            Vet {
-                first_name: "Alice".to_string(),
-                id: 1,
-                last_name: "Vetsworth".to_string(),
-                specialties: vec![
-                    "Cats".to_string(),
-                    "Dogs".to_string(),
-                    "Cryptography".to_string(),
-                ],
-            },
-            Vet {
-                first_name: "Bob".to_string(),
-                id: 2,
-                last_name: "Vetsworth".to_string(),
-                specialties: vec!["Dogs".to_string(), "Cryptography".to_string()],
-            },
-        ])
+    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList> {
+        let db = SqlDbSender::new();
+        let vets = db::list_vets(ctx, &db).await?;
+        Ok(vets.iter().cloned().map(|v| v.into()).collect())
     }
 }
