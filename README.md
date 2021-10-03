@@ -4,11 +4,13 @@ Example actors, capability providers, and other demonstrations
 
 ## Actors
 
+The following actors run as WebAssembly on wasmCloud hosts.
+
 | Example | Description | OCI Reference <br/> (refer to example for latest version) |
 |---|---|---|
 | [echo](https://github.com/wasmcloud/examples/tree/main/actor/echo) | An actor that listens on an HTTP port and returns a JSON payload describing the incoming request |  `wasmcloud.azurecr.io/echo` |
-| [echo-messaging](https://github.com/wasmcloud/examples/tree/main/actor/echo-messaging) | An actor that listens on an messaging topic and replies |  `wasmcloud.azurecr.io/echo-messaging` |
-| [hello](https://github.com/wasmcloud/examples/tree/main/actor/hello) | A "hello world" actor that listens on an HTTP port and replies with a greeting |  `wasmcloud.azurecr.io/hello` |
+| [echo-messaging](https://github.com/wasmcloud/examples/tree/main/actor/echo-messaging) | An actor that listens on a message broker topic and replies |  `wasmcloud.azurecr.io/echo-messaging` |
+| [hello](https://github.com/wasmcloud/examples/tree/main/actor/hello) | Canonical "hello world" actor that listens on an HTTP port and replies with a greeting |  `wasmcloud.azurecr.io/hello` |
 | [kvcounter](https://github.com/wasmcloud/examples/tree/main/actor/kvcounter) | An actor that uses the key-value store to increment a counter and return a value for every HTTP request it receives | `wasmcloud.azurecr.io/kvcounter` |
 | [logging](https://github.com/wasmcloud/examples/tree/main/actor/logging) | An actor that demonstrates the builtin logging capability provider | `wasmcloud.azurecr.io/logging` |
 | [random](https://github.com/wasmcloud/examples/tree/main/actor/random) | An actor that demonstrates the builtin random number generation capability provider | `wasmcloud.azurecr.io/random` |
@@ -19,6 +21,8 @@ Example actors, capability providers, and other demonstrations
 
 ## Interfaces
 
+The following example interfaces are defined by [Smithy](https://awslabs.github.io/smithy/) models.
+
 | Example | Description | Capability contract | Rust crate |
 | --- | --- | --- | --- |
 | [payments](https://github.com/wasmcloud/examples/tree/main/interface/payments) | A simple interface for a payments capability provider (used in the [Creating an Interface](https://wasmcloud.dev/app-dev/create-provider/new-interface/) tutorial) |  `wasmcloud:example:payments` | `wasmcloud-examples-payments` |
@@ -26,6 +30,8 @@ Example actors, capability providers, and other demonstrations
 
 
 ## Capability providers
+
+Providers of capabilities for wasmCloud actors
 
 | Example | Description | Capability contract | OCI Reference |
 | --- | --- | --- | --- |
@@ -40,7 +46,7 @@ Example actors, capability providers, and other demonstrations
 | [petclinic](https://github.com/wasmcloud/examples/tree/main/petclinic) |  A WebAssembly and wasmCloud-based reimagining of the classic [Spring Boot microservices Pet Clinic](https://github.com/spring-petclinic/spring-petclinic-microservices). The wasmCloud Pet Clinic consists of multiple actors, and uses a relational database capability provider and an http server capability provider. |
 
 
-## Pre-OTP examples have moved
+## ⚠️ Pre-OTP examples have moved ⚠️
 
 Examples compatible with the 0.18 wasmcloud host have been moved to the
 pre-otp folder.
