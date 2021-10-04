@@ -13,6 +13,7 @@ RUN apt-get update -y \
     && npm install -g serve
 
 COPY --chown=node:node \
+    .env \
     craco.config.js \
     package.json \
     package-lock.json \
@@ -25,4 +26,4 @@ RUN npm install \
     && chown -R node:node /home/node
 
 USER node
-CMD [ "serve", "-s", "build" ]
+CMD [ "serve", "-s", "build", "-p", "3000"]
