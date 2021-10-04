@@ -68,7 +68,7 @@ services:
       WASMCLOUD_OCI_ALLOWED_INSECURE: registry:5000
       WASMCLOUD_RPC_HOST: nats
       WASMCLOUD_CTL_HOST: nats
-      WASMCLOUD_PROV_RPC_HOST: najts
+      WASMCLOUD_PROV_RPC_HOST: nats
       WASMCLOUD_CLUSTER_SEED: ${WASMCLOUD_CLUSTER_SEED}
     ports:
       - "127.0.0.1:4000:4000"  # washboard
