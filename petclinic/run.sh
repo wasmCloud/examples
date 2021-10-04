@@ -144,7 +144,6 @@ cat > .pgadmin_init.json <<__PGADMIN_INIT
       "Port": 5432,
       "MaintenanceDB": "postgres",
       "Username": "$DB_ROOT_USER",
-      "Passfile": "/var/lib/pgadmin/passfile",
       "SSLMode": "prefer"
     }
   }
@@ -171,6 +170,8 @@ psql_cli_root() {
 }
 
 wait_for_postgres() {
+    # This might be overkill and could be replaced with a sleep
+    # otherwise 'nc' would have to be on the required dependencies list
     until nc localhost 5432 -w1 -z ; do
         echo Waiting for postgres to start ...
         sleep 1
