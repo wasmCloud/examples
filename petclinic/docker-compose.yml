@@ -44,7 +44,6 @@ services:
       - PGADMIN_LISTEN_ADDRESS=0.0.0.0
     volumes:
       - $PWD/.pgadmin_init.json:/pgadmin4/servers.json
-      #- $PWD/.pgadmin_root:/var/lib/pgadmin/pgpass
     ports:
       - 127.0.0.1:9999:80
 
