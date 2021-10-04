@@ -1,8 +1,15 @@
 use petclinic_interface::{
-    AddPetRequest, CreateOwnerReply, Customers, CustomersReceiver, Date, FindOwnerReply,
-    FindPetReply, Owner, OwnersList, Pet, PetList, PetType, PetTypeList, UpdateOwnerReply,
+    AddPetRequest, CreateOwnerReply, Customers, CustomersReceiver, FindOwnerReply, FindPetReply,
+    Owner, OwnersList, Pet, PetList, PetTypeList, UpdateOwnerReply,
 };
+
 use wasmbus_rpc::actor::prelude::*;
+use wasmcloud_interface_logging::error;
+use wasmcloud_interface_sqldb::SqlDbSender;
+
+pub(crate) type Db = SqlDbSender<WasmHost>;
+
+mod db;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, Customers)]
@@ -10,109 +17,96 @@ struct CustomersActor {}
 
 #[async_trait]
 impl Customers for CustomersActor {
-    async fn create_owner(&self, _ctx: &Context, _arg: &Owner) -> RpcResult<CreateOwnerReply> {
-        Ok(CreateOwnerReply {
-            id: 1,
-            success: true,
+    async fn create_owner(&self, ctx: &Context, owner: &Owner) -> RpcResult<CreateOwnerReply> {
+        let db = SqlDbSender::new();
+        Ok(match db::create_owner(&ctx, &db, owner).await {
+            Ok(_) => CreateOwnerReply {
+                id: owner.id,
+                success: true,
+            },
+            Err(e) => {
+                error!("Failed to create owner: {}", e);
+                CreateOwnerReply {
+                    id: 0,
+                    success: false,
+                }
+            }
         })
     }
 
-    async fn find_owner(&self, _ctx: &Context, _arg: &u64) -> RpcResult<FindOwnerReply> {
+    async fn find_owner(&self, ctx: &Context, arg: &u64) -> RpcResult<FindOwnerReply> {
+        let db = SqlDbSender::new();
         Ok(FindOwnerReply {
-            owner: Some(Owner {
-                first_name: "Bob".to_string(),
-                last_name: Some("PetLover".to_string()),
-                email: "bob@lovespets.com".to_string(),
-                id: 1,
-                ..Default::default()
-            }),
+            owner: db::find_owner(&ctx, &db, *arg).await?.map(|o| o.into()),
         })
     }
 
-    async fn list_owners(&self, _ctx: &Context) -> RpcResult<OwnersList> {
-        Ok(vec![
-            Owner {
-                first_name: "Bob".to_string(),
-                last_name: Some("PetLover".to_string()),
-                email: "bob@lovespets.com".to_string(),
-                id: 1,
-                ..Default::default()
-            },
-            Owner {
-                first_name: "Alice".to_string(),
-                last_name: Some("PetLover".to_string()),
-                email: "alice@lovespets.com".to_string(),
-                id: 2,
-                ..Default::default()
-            },
-        ])
+    async fn list_owners(&self, ctx: &Context) -> RpcResult<OwnersList> {
+        let db = SqlDbSender::new();
+        let owners = db::list_all_owners(&ctx, &db).await?;
+        Ok(owners.iter().cloned().map(|o| o.into()).collect())
     }
 
-    async fn update_owner(&self, _ctx: &Context, _arg: &Owner) -> RpcResult<UpdateOwnerReply> {
-        Ok(UpdateOwnerReply { success: true })
+    async fn update_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<UpdateOwnerReply> {
+        let db = SqlDbSender::new();
+        Ok(match db::update_owner(&ctx, &db, arg).await {
+            Ok(_) => UpdateOwnerReply { success: true },
+            Err(e) => {
+                error!("Failed to update owner: {}", e);
+                UpdateOwnerReply { success: false }
+            }
+        })
     }
 
-    async fn list_pet_types(&self, _ctx: &Context) -> RpcResult<PetTypeList> {
-        Ok(vec![
-            PetType {
-                id: 1,
-                name: "Cat".to_string(),
-            },
-            PetType {
-                id: 2,
-                name: "Dog".to_string(),
-            },
-            PetType {
-                id: 3,
-                name: "Anaconda".to_string(),
-            },
-        ])
+    async fn list_pet_types(&self, ctx: &Context) -> RpcResult<PetTypeList> {
+        let db = SqlDbSender::new();
+        let pettypes = db::list_all_pet_types(&ctx, &db).await?;
+        Ok(pettypes.iter().cloned().map(|o| o.into()).collect())
     }
 
-    async fn add_pet(&self, _ctx: &Context, _arg: &AddPetRequest) -> RpcResult<bool> {
-        Ok(true)
+    async fn add_pet(&self, ctx: &Context, arg: &AddPetRequest) -> RpcResult<bool> {
+        let db = SqlDbSender::new();
+        Ok(match db::add_pet(&ctx, &db, arg.owner_id, &arg.pet).await {
+            Ok(_) => true,
+            Err(e) => {
+                error!("Failed to add pet: {}", e);
+                false
+            }
+        })
     }
 
-    async fn remove_pet(&self, _ctx: &Context, _arg: &u64) -> RpcResult<bool> {
-        Ok(true)
+    async fn remove_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<bool> {
+        let db = SqlDbSender::new();
+        Ok(match db::delete_pet(&ctx, &db, *arg).await {
+            Ok(_) => true,
+            Err(e) => {
+                error!("Failed to remove pet: {}", e);
+                false
+            }
+        })
     }
 
-    async fn update_pet(&self, _ctx: &Context, _arg: &Pet) -> RpcResult<bool> {
-        Ok(true)
+    async fn update_pet(&self, ctx: &Context, arg: &Pet) -> RpcResult<bool> {
+        let db = SqlDbSender::new();
+        Ok(match db::update_pet(&ctx, &db, arg).await {
+            Ok(_) => true,
+            Err(e) => {
+                error!("Failed to update pet: {}", e);
+                false
+            }
+        })
     }
 
-    async fn list_pets(&self, _ctx: &Context, _arg: &u64) -> RpcResult<PetList> {
-        Ok(vec![
-            Pet {
-                birthdate: Date {
-                    day: 1,
-                    month: 1,
-                    year: 2010,
-                },
-                id: 1,
-                name: "Pickles".to_string(),
-                pet_type: 1,
-            },
-            Pet {
-                birthdate: Date {
-                    day: 1,
-                    month: 1,
-                    year: 2011,
-                },
-                id: 2,
-                name: "Whiskers".to_string(),
-                pet_type: 2,
-            },
-        ])
+    async fn list_pets(&self, ctx: &Context, arg: &u64) -> RpcResult<PetList> {
+        let db = SqlDbSender::new();
+        let pets = db::list_pets_by_owner(&ctx, &db, *arg).await?;
+        Ok(pets.iter().cloned().map(|o| o.into()).collect())
     }
 
-    async fn find_pet(&self, _ctx: &Context, arg: &u64) -> RpcResult<FindPetReply> {
+    async fn find_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<FindPetReply> {
+        let db = SqlDbSender::new();
         Ok(FindPetReply {
-            pet: Some(Pet {
-                id: *arg,
-                name: "Located Pet".to_string(),
-                ..Default::default()
-            }),
+            pet: db::find_pet(ctx, &db, *arg).await?.map(|p| p.into()),
         })
     }
 }

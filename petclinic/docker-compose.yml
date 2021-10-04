@@ -1,0 +1,86 @@
+# docker-compose.yml for PetClinic
+#
+# Start all the services.
+# Before running this, secrets need to be created. The easiest thing to do
+# is to use './run.sh all' to start all services.
+#
+# What's here:
+#   wasmcloud host
+#   local registry
+#   javascript front-end
+#   postgres backend
+#   pgadmin
+#
+# Ports open on localhost:
+#  - 8080,443 httpserver to clinicapi (depending on whether tls is enabled)
+#  - 8081 javascript ui
+#  - 4000 phoenix ui (washboard)
+#  - 4222,6222,8000 nats
+#  - 5000 registry
+#  - 5432 postgres
+#
+# Data is not saved in volumes, to make it easier to start
+#   with a clean image
+#
+version: '3.1'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      # must be on a port accessible to the capability provider
+      - 127.0.0.1:5432:5432
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4:5
+    depends_on:
+      - "db"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=postgres@example.com
+      - PGADMIN_DEFAULT_PASSWORD=postgres
+      - PGADMIN_LISTEN_ADDRESS=0.0.0.0
+    volumes:
+      - $PWD/.pgadmin_init.json:/pgadmin4/servers.json
+    ports:
+      - 127.0.0.1:9999:80
+
+  nats:
+    image: nats:2.3
+    ports:
+      - "127.0.0.1:4222:4222"
+      - "127.0.0.1:6222:6222"
+      - "127.0.0.1:8222:8222"
+    command: [ "-js" ]
+
+  registry:
+    image: registry:2.7
+    ports:
+      - "127.0.0.1:5000:5000"
+
+  wasmcloud:
+    image: wasmcloud/wasmcloud_host:latest
+    environment:
+      LC_ALL: en_US.UTF-8
+      WASMCLOUD_OCI_ALLOWED_INSECURE: registry:5000
+      WASMCLOUD_RPC_HOST: nats
+      WASMCLOUD_CTL_HOST: nats
+      WASMCLOUD_PROV_RPC_HOST: nats
+      WASMCLOUD_CLUSTER_SEED: ${WASMCLOUD_CLUSTER_SEED}
+    ports:
+      - "127.0.0.1:4000:4000"  # washboard
+      - "127.0.0.1:443:8443"   # httpserver HTTPS port
+      - "127.0.0.1:8080:8080"
+
+  ui:
+    build: ./petclinic-ui
+    ports:
+      - "127.0.0.1:8081:3000"
+    # select either the debug or non-debug version below
+    # run debug
+    command: npm run start
+    # run non-debug 
+    #command: serve -l 3000 -b build
+

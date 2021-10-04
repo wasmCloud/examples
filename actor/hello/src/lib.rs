@@ -8,7 +8,6 @@ struct HelloActor {}
 /// Implementation of HttpServer methods
 #[async_trait]
 impl HttpServer for HelloActor {
-
     /// Returns a greeting, "Hello World", in the response body.
     /// If the request contains a query parameter 'name=NAME', the
     /// response is changed to "Hello NAME"

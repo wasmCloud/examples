@@ -9,3 +9,5 @@ REVISION = 0
 
 include ../../build/makefiles/provider.mk
 
+test:
+	cargo test -- --nocapture
