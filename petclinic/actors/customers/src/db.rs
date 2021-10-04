@@ -18,7 +18,7 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_sqldb::{minicbor, SqlDb, SqlDbError};
+use wasmcloud_interface_sqldb::{minicbor, FetchResult, SqlDb, SqlDbError};
 
 const TABLE_OWNERS: &str = "owners";
 const TABLE_PETS: &str = "pets";
@@ -192,7 +192,7 @@ pub(crate) async fn find_owner(
     if resp.rows.is_empty() {
         Ok(None)
     } else {
-        let rows: Vec<Owner> = minicbor::decode(&resp.rows)?;
+        let rows: Vec<Owner> = safe_decode(&resp)?;
         Ok(Some(rows.get(0).cloned().unwrap())) // this unwrap is safe, we know we have at least a row
     }
 }
@@ -216,7 +216,7 @@ pub(crate) async fn find_pet(
     if resp.rows.is_empty() {
         Ok(None)
     } else {
-        let rows: Vec<Pet> = minicbor::decode(&resp.rows)?;
+        let rows: Vec<Pet> = safe_decode(&resp)?;
         Ok(Some(rows.get(0).cloned().unwrap()))
     }
 }
@@ -233,7 +233,7 @@ pub(crate) async fn list_all_owners(ctx: &Context, client: &Db) -> Result<Vec<Ow
         )
         .await?;
 
-    let rows: Vec<Owner> = minicbor::decode(&resp.rows)?;
+    let rows: Vec<Owner> = safe_decode(&resp)?;
     Ok(rows)
 }
 
@@ -245,7 +245,7 @@ pub(crate) async fn list_all_pet_types(
     let resp = client
         .fetch(&ctx, &format!("select id, name FROM {}", TABLE_PETTYPES))
         .await?;
-    let rows: Vec<PetType> = minicbor::decode(&resp.rows)?;
+    let rows: Vec<PetType> = safe_decode(&resp)?;
     Ok(rows)
 }
 
@@ -266,7 +266,7 @@ pub(crate) async fn list_pets_by_owner(
         )
         .await?;
 
-    let rows: Vec<Pet> = minicbor::decode(&resp.rows)?;
+    let rows: Vec<Pet> = safe_decode(&resp)?;
     Ok(rows)
 }
 
@@ -447,5 +447,18 @@ impl TryFrom<petclinic_interface::Owner> for Owner {
             telephone,
         };
         Ok(owner)
+    }
+}
+
+/// When using this to decode Vecs, will get an empty vec
+/// as a response when no rows are returned
+fn safe_decode<'b, T>(resp: &'b FetchResult) -> Result<T, minicbor::decode::Error>
+where
+    T: minicbor::Decode<'b> + Default,
+{
+    if resp.num_rows == 0 {
+        Ok(T::default())
+    } else {
+        minicbor::decode(&resp.rows)
     }
 }
