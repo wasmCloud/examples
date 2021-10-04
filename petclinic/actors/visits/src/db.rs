@@ -58,9 +58,9 @@ pub(crate) async fn list_visits_by_owner_and_pet(
                 .collect::<Vec::<_>>()
                 .join(",")
         );
-        format!("select day, month, year, description, petid, vetid, ownerid, hour, minute from {} where ownerid == {} AND petid IN {}", TABLE_VISITS, owner_id, petids)
+        format!("select day, month, year, description, petid, vetid, ownerid, hour, minute from {} where ownerid = {} AND petid IN {}", TABLE_VISITS, owner_id, petids)
     } else {
-        format!("select day, month, year, description, petid, vetid, ownerid, hour, minute from {} where ownerid == {}", TABLE_VISITS, owner_id)
+        format!("select day, month, year, description, petid, vetid, ownerid, hour, minute from {} where ownerid = {}", TABLE_VISITS, owner_id)
     };
 
     let resp = client.fetch(ctx, &sql).await?;
