@@ -2,9 +2,9 @@
   "uri": "DB_URI"
   ,
   "pool": {
-    "max_connections": 2,
+    "max_connections": 5,
     "min_idle": 1,
-    "max_lifetime_secs": 300,
-    "idle_timeout_secs": 300
+    "max_lifetime_secs": 3600,
+    "idle_timeout_secs": 600
   }
 }
