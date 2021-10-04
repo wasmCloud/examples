@@ -93,7 +93,7 @@ pub(crate) async fn delete_pet(ctx: &Context, client: &Db, id: u64) -> Result<()
             &ctx,
             &format!(
                 r#"
-            delete from {} where id == {}
+            delete from {} where id = {}
             "#,
                 TABLE_PETS, id
             ),
@@ -184,7 +184,7 @@ pub(crate) async fn find_owner(
     let resp=client.fetch(
         &ctx,
         &format!(
-            "select id, address, city, email, firstname, lastname, telephone from {} where id == {}",
+            "select id, address, city, email, firstname, lastname, telephone from {} where id = {}",
             TABLE_OWNERS, id
         )
     ).await?;
@@ -207,7 +207,7 @@ pub(crate) async fn find_pet(
         .fetch(
             &ctx,
             &format!(
-                "select id, pettype, name, bday, bmonth, byear, ownerid from {} where id == {}",
+                "select id, pettype, name, bday, bmonth, byear, ownerid from {} where id = {}",
                 TABLE_PETS, id
             ),
         )
@@ -260,8 +260,8 @@ pub(crate) async fn list_pets_by_owner(
             &ctx,
             &format!(
                 "select id, pettype, name, bday, bmonth, byear, ownerid from {}
-                where ownerid == {}",
-                TABLE_OWNERS, owner_id
+                where ownerid = {}",
+                TABLE_PETS, owner_id
             ),
         )
         .await?;
@@ -293,7 +293,7 @@ pub(crate) async fn update_pet(
                     bmonth = {},
                     byear = {},
                     ownerid = {}
-            WHERE id == {}
+            WHERE id = {}
             "#,
                 TABLE_PETS,
                 pet.pettype,
@@ -329,7 +329,7 @@ pub(crate) async fn update_owner(
                 update {}
                 SET address = '{}', city = '{}', email = '{}',
                 firstname = '{}', lastname = '{}', telephone = '{}'
-                WHERE id == {}                
+                WHERE id = {}                
                 "#,
                 TABLE_OWNERS,
                 owner.address,
