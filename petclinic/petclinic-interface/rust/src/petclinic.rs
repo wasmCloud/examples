@@ -164,6 +164,127 @@ pub type VisitList = Vec<Visit>;
 
 /// wasmbus.actorReceive
 #[async_trait]
+pub trait Visits {
+    /// Retrieve a list of visits for a given owner and an optional
+    /// list of pet IDs
+    async fn list_visits(&self, ctx: &Context, arg: &ListVisitsRequest) -> RpcResult<VisitList>;
+    /// Records a new visit
+    async fn record_visit(&self, ctx: &Context, arg: &RecordVisitRequest) -> RpcResult<bool>;
+}
+
+/// VisitsReceiver receives messages defined in the Visits service trait
+#[doc(hidden)]
+#[async_trait]
+pub trait VisitsReceiver: MessageDispatch + Visits {
+    async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
+        match message.method {
+            "ListVisits" => {
+                let value: ListVisitsRequest = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Visits::list_visits(self, ctx, &value).await?;
+                let buf = Cow::Owned(serialize(&resp)?);
+                Ok(Message {
+                    method: "Visits.ListVisits",
+                    arg: buf,
+                })
+            }
+            "RecordVisit" => {
+                let value: RecordVisitRequest = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Visits::record_visit(self, ctx, &value).await?;
+                let buf = Cow::Owned(serialize(&resp)?);
+                Ok(Message {
+                    method: "Visits.RecordVisit",
+                    arg: buf,
+                })
+            }
+            _ => Err(RpcError::MethodNotHandled(format!(
+                "Visits::{}",
+                message.method
+            ))),
+        }
+    }
+}
+
+/// VisitsSender sends messages to a Visits service
+/// client for sending Visits messages
+#[derive(Debug)]
+pub struct VisitsSender<T: Transport> {
+    transport: T,
+}
+
+impl<T: Transport> VisitsSender<T> {
+    /// Constructs a VisitsSender with the specified transport
+    pub fn via(transport: T) -> Self {
+        Self { transport }
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> VisitsSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl VisitsSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
+#[async_trait]
+impl<T: Transport + std::marker::Sync + std::marker::Send> Visits for VisitsSender<T> {
+    #[allow(unused)]
+    /// Retrieve a list of visits for a given owner and an optional
+    /// list of pet IDs
+    async fn list_visits(&self, ctx: &Context, arg: &ListVisitsRequest) -> RpcResult<VisitList> {
+        let arg = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Visits.ListVisits",
+                    arg: Cow::Borrowed(&arg),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListVisits", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    /// Records a new visit
+    async fn record_visit(&self, ctx: &Context, arg: &RecordVisitRequest) -> RpcResult<bool> {
+        let arg = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Visits.RecordVisit",
+                    arg: Cow::Borrowed(&arg),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "RecordVisit", e)))?;
+        Ok(value)
+    }
+}
+
+/// wasmbus.actorReceive
+#[async_trait]
 pub trait Customers {
     async fn create_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<CreateOwnerReply>;
     async fn find_owner(&self, ctx: &Context, arg: &u64) -> RpcResult<FindOwnerReply>;
@@ -600,127 +721,6 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Petclinic for Petclin
             .await?;
         let value = deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("response to {}: {}", "Convert", e)))?;
-        Ok(value)
-    }
-}
-
-/// wasmbus.actorReceive
-#[async_trait]
-pub trait Visits {
-    /// Retrieve a list of visits for a given owner and an optional
-    /// list of pet IDs
-    async fn list_visits(&self, ctx: &Context, arg: &ListVisitsRequest) -> RpcResult<VisitList>;
-    /// Records a new visit
-    async fn record_visit(&self, ctx: &Context, arg: &RecordVisitRequest) -> RpcResult<bool>;
-}
-
-/// VisitsReceiver receives messages defined in the Visits service trait
-#[doc(hidden)]
-#[async_trait]
-pub trait VisitsReceiver: MessageDispatch + Visits {
-    async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
-        match message.method {
-            "ListVisits" => {
-                let value: ListVisitsRequest = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Visits::list_visits(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Visits.ListVisits",
-                    arg: buf,
-                })
-            }
-            "RecordVisit" => {
-                let value: RecordVisitRequest = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Visits::record_visit(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Visits.RecordVisit",
-                    arg: buf,
-                })
-            }
-            _ => Err(RpcError::MethodNotHandled(format!(
-                "Visits::{}",
-                message.method
-            ))),
-        }
-    }
-}
-
-/// VisitsSender sends messages to a Visits service
-/// client for sending Visits messages
-#[derive(Debug)]
-pub struct VisitsSender<T: Transport> {
-    transport: T,
-}
-
-impl<T: Transport> VisitsSender<T> {
-    /// Constructs a VisitsSender with the specified transport
-    pub fn via(transport: T) -> Self {
-        Self { transport }
-    }
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-impl<'send> VisitsSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
-    /// Constructs a Sender using an actor's LinkDefinition,
-    /// Uses the provider's HostBridge for rpc
-    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
-        Self {
-            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
-        }
-    }
-}
-#[cfg(target_arch = "wasm32")]
-impl VisitsSender<wasmbus_rpc::actor::prelude::WasmHost> {
-    /// Constructs a client for actor-to-actor messaging
-    /// using the recipient actor's public key
-    pub fn to_actor(actor_id: &str) -> Self {
-        let transport =
-            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
-        Self { transport }
-    }
-}
-#[async_trait]
-impl<T: Transport + std::marker::Sync + std::marker::Send> Visits for VisitsSender<T> {
-    #[allow(unused)]
-    /// Retrieve a list of visits for a given owner and an optional
-    /// list of pet IDs
-    async fn list_visits(&self, ctx: &Context, arg: &ListVisitsRequest) -> RpcResult<VisitList> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Visits.ListVisits",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListVisits", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    /// Records a new visit
-    async fn record_visit(&self, ctx: &Context, arg: &RecordVisitRequest) -> RpcResult<bool> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Visits.RecordVisit",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "RecordVisit", e)))?;
         Ok(value)
     }
 }
