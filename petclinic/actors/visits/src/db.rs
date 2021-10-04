@@ -2,7 +2,7 @@ use super::Db;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_sqldb::{minicbor, SqlDb, SqlDbError};
+use wasmcloud_interface_sqldb::{FetchResult, SqlDb, SqlDbError, minicbor};
 
 const TABLE_VISITS: &str = "visits";
 
@@ -65,7 +65,7 @@ pub(crate) async fn list_visits_by_owner_and_pet(
 
     let resp = client.fetch(ctx, &sql).await?;
 
-    let rows: Vec<DbVisit> = minicbor::decode(&resp.rows)?;
+    let rows: Vec<DbVisit> = safe_decode(&resp)?;
     Ok(rows)
 }
 
@@ -127,5 +127,18 @@ impl From<DbVisit> for petclinic_interface::Visit {
             },
             vet_id: source.vetid,
         }
+    }
+}
+
+/// When using this to decode Vecs, will get an empty vec
+/// as a response when no rows are returned
+fn safe_decode<'b, T>(resp: &'b FetchResult) -> Result<T, minicbor::decode::Error>
+where
+    T: minicbor::Decode<'b> + Default,
+{
+    if resp.num_rows == 0 {
+        Ok(T::default())
+    } else {
+        minicbor::decode(&resp.rows)
     }
 }
