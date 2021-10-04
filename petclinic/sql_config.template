@@ -1,0 +1,10 @@
+{
+  "uri": "DB_URI"
+  ,
+  "pool": {
+    "max_connections": 2,
+    "min_idle": 1,
+    "max_lifetime_secs": 300,
+    "idle_timeout_secs": 300
+  }
+}
