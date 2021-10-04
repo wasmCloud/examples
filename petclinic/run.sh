@@ -36,7 +36,7 @@ REG_SERVER=registry:5000
 # actor to link to httpsrever. there can be only one since there's one listen port
 HTTP_ACTOR=actors/clinicapi
 # actors to link to sqldb-postgres
-SQLDB_ACTORS="actors/customers actors/visits"
+SQLDB_ACTORS="actors/customers actors/vets actors/visits"
 
 DB_HOST=127.0.0.1
 DB_PORT=5432
