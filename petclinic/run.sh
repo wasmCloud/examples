@@ -56,6 +56,8 @@ SQL_CONFIG_TEMPLATE=sql_config.template
 
 # command to generate passwords
 MKPASS=uuidgen
+# command to base64 encode stdin to stdout
+BASE64_ENC=base64
 
 # uncomment this line to echo all database commands to terminal
 PSQL_VERBOSE=-e
@@ -64,7 +66,6 @@ PSQL_VERBOSE=-e
 SECRETS=.secrets
 PSQL_ROOT=.psql_root
 PSQL_APP=.psql_app
-PGADMIN_ROOT=.pgadmin_root
 CREATE_APP_SQL=.create_app.sql
 CLUSTER_SEED=.cluster.nk
 
@@ -74,13 +75,21 @@ ALL_SECRET_FILES="$SECRETS $PSQL_ROOT $PSQL_APP $SQL_CONFIG $CREATE_APP_SQL $CLU
 ## END CONFIGURATION
 ## ---------------------------------------------------------------
 
-# stop docker and wipe all data (databse, nats cache, host provider/actors, etc.)
+# stop docker and wipe all data (database, nats cache, host provider/actors, etc.)
 wipe_all() {
-    docker-compose stop
-    docker-compose rm -f
+
+    cat >$SECRETS <<__WIPE
+POSTGRES_PASSWORD=
+WASMCLOUD_CLUSTER_SEED=
+POSTGRES_PASSWORD=
+WASMCLOUD_CLUSTER_SEED=
+__WIPE
+
+    docker-compose --env-file $SECRETS stop
+    docker-compose --env-file $SECRETS rm -f
     wash drain all
 
-    rm -f $ALL_SECRET_FILES .pgadmin_init.json $PGADMIN_ROOT
+    rm -f $ALL_SECRET_FILES .pgadmin_init.json 
 }
 
 create_seed() {
@@ -106,11 +115,6 @@ cat > $PSQL_ROOT << __PSQL_ROOT
 $DB_HOST:$DB_PORT:postgres:$DB_ROOT_USER:$root_pass
 __PSQL_ROOT
 
-# how pgadmin will connect to db
-#cat > $PGADMIN_ROOT << __PGADMIN_ROOT
-#$APP_DB_HOST:$DB_PORT:postgres:$DB_ROOT_USER:$root_pass
-#__PGADMIN_ROOT
-
 # hostname:port:database:username:password
 cat > $PSQL_APP << __PSQL_APP
 $DB_HOST:$DB_PORT:$APP_DB_NAME:$APP_DB_USER:$app_pass
@@ -123,9 +127,9 @@ __PSQL_APP
 # the sql line is at the end of the json file. Instead, let the template put the
 # comma(s) in the right place
 cat > $SQL_CONFIG << __SQL_CONFIG
-$(grep -B100 DB_URI $SQL_CONFIG_TEMPLATE | head -n -1)
+$(awk 'BEGIN{p=0;} /DB_URI/{p=1;} p==0 {print;}' $SQL_CONFIG_TEMPLATE)
     "uri": "postgresql://$APP_DB_USER:$app_pass@$APP_DB_HOST:$DB_PORT/$APP_DB_NAME"
-$(grep -A100 DB_URI $SQL_CONFIG_TEMPLATE | tail -n +2)
+$(awk 'BEGIN {p=0;} p==1 {print;} /DB_URI/ {p=1;}' $SQL_CONFIG_TEMPLATE)
 __SQL_CONFIG
 
 cat > $CREATE_APP_SQL << __CREATE
@@ -133,7 +137,7 @@ CREATE USER $APP_DB_USER LOGIN PASSWORD '$app_pass';
 CREATE DATABASE $APP_DB_NAME OWNER=$APP_DB_USER;
 __CREATE
 
-# create auto-import file for pgadmin
+# create Server import file for pgadmin
 cat > .pgadmin_init.json <<__PGADMIN_INIT
 {
   "Servers": {
@@ -172,13 +176,14 @@ psql_cli_root() {
 wait_for_postgres() {
     # This might be overkill and could be replaced with a sleep
     # otherwise 'nc' would have to be on the required dependencies list
-    until nc localhost 5432 -w1 -z ; do
+    until nc localhost $DB_PORT -w1 -z ; do
         echo Waiting for postgres to start ...
         sleep 1
     done
 }
 
 # start docker services
+# idempotent
 start_services() {
 
     # ensure we have secrets
@@ -206,6 +211,7 @@ init_db() {
 }
 
 # drop the app database and user
+# idempotent
 drop_db() {
 
     psql -X "postgresql://$DB_ROOT_USER@$DB_HOST:$DB_PORT?passfile=$PSQL_ROOT" \
@@ -225,7 +231,13 @@ start_providers() {
 	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout 15
 }
 
+# base-64 encode file into a string
+b64_encode_file() {
+    cat "$1" | $BASE64_ENC | tr -d ' \r\n'
+}
+
 # link actors with providers
+# idempotent
 link_providers() {
     local _host_id=$(host_id)
     local _actor_id
@@ -234,13 +246,13 @@ link_providers() {
     # link gateway actor to http server
     _actor_id=$(make -C $HTTP_ACTOR --silent actor_id)
     wash ctl link put $_actor_id $HTTPSERVER_ID     \
-        wasmcloud:httpserver config_b64=$(base64 -w0 $HTTP_CONFIG )
+        wasmcloud:httpserver config_b64=$(b64_encode_file $HTTP_CONFIG )
 
     # link actors to sqldb-postgres
     for _a in $SQLDB_ACTORS; do
         _actor_id=$(make -C $_a --silent actor_id)
 	    wash ctl link put $_actor_id $SQLDB_POSTGRES_ID \
-            wasmcloud:sqldb config_b64=$(base64 -w0 $SQL_CONFIG )
+            wasmcloud:sqldb config_b64=$(b64_encode_file $SQL_CONFIG )
     done
 }
 
@@ -289,7 +301,7 @@ run_all() {
     # start capability providers: httpserver and sqldb 
     start_providers
 
-    # link providers with main actor
+    # link providers with actors
     link_providers
 }
 
