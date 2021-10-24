@@ -4,12 +4,11 @@
 //
 
 // Tell the code generator how to reference symbols defined in this namespace
-metadata package = [
-    {
-        namespace: "org.wasmcloud.example.runner",
-        crate: "wasmcloud_example_runner"
-     }
-]
+metadata package = [{
+    namespace: "org.wasmcloud.example.runner",
+    crate: "wasmcloud_example_runner",
+    py_module: "wasmcloud_example_runner",
+}]
 
 namespace org.wasmcloud.example.runner
 

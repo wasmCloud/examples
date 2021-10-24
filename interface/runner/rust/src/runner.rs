@@ -1,17 +1,13 @@
-// This file is generated automatically using wasmcloud-weld and smithy model definitions
+// This file is generated automatically using wasmcloud/weld-codegen and smithy model definitions
 //
 
-#![allow(clippy::ptr_arg)]
-#[allow(unused_imports)]
+#![allow(unused_imports, clippy::ptr_arg, clippy::needless_lifetimes)]
 use async_trait::async_trait;
-#[allow(unused_imports)]
 use serde::{Deserialize, Serialize};
-#[allow(unused_imports)]
-use std::{borrow::Cow, string::ToString};
-#[allow(unused_imports)]
+use std::{borrow::Cow, io::Write, string::ToString};
 use wasmbus_rpc::{
     deserialize, serialize, Context, Message, MessageDispatch, RpcError, RpcResult, SendOpts,
-    Transport,
+    Timestamp, Transport,
 };
 
 pub const SMITHY_VERSION: &str = "1.0";
@@ -45,10 +41,10 @@ pub trait RunnerReceiver: MessageDispatch + Runner {
                 let value: StringList = deserialize(message.arg.as_ref())
                     .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
                 let resp = Runner::run(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
+                let buf = serialize(&resp)?;
                 Ok(Message {
                     method: "Runner.Run",
-                    arg: buf,
+                    arg: Cow::Owned(buf),
                 })
             }
             _ => Err(RpcError::MethodNotHandled(format!(
@@ -71,6 +67,10 @@ impl<T: Transport> RunnerSender<T> {
     /// Constructs a RunnerSender with the specified transport
     pub fn via(transport: T) -> Self {
         Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
     }
 }
 
@@ -102,14 +102,14 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Runner for RunnerSend
     /// is dependent on the implementation.
     /// Either input or output arrays may be empty.
     async fn run(&self, ctx: &Context, arg: &StringList) -> RpcResult<StringList> {
-        let arg = serialize(arg)?;
+        let buf = serialize(arg)?;
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
                     method: "Runner.Run",
-                    arg: Cow::Borrowed(&arg),
+                    arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
