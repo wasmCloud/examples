@@ -6,9 +6,9 @@ authors = [
   "Stuart Harris <stuart.harris@red-badger.com>",
   "wasmcloud team",
 ]
-edition = "2018"
+edition = "2021"
 name = "todo-sql"
-version = "0.1.1"
+version = "0.1.2"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -21,11 +21,11 @@ regex = "1.5"
 serde = {version = "1.0", features = ["derive"]}
 serde_bytes = "0.11"
 serde_json = "1.0"
-wasmbus-rpc = "0.4.4"
-wasmcloud-interface-httpserver = "0.1.11"
-wasmcloud-interface-numbergen = "0.1"
-wasmcloud-interface-sqldb = "0.1.0"
-wasmcloud-interface-logging = "0.1.4"
+wasmbus-rpc = "0.5.2"
+wasmcloud-interface-httpserver = "0.2.0"
+wasmcloud-interface-numbergen = "0.2.0"
+wasmcloud-interface-sqldb = "0.2.0"
+wasmcloud-interface-logging = "0.2.0"
 
 [profile.release]
 # Optimize for small code size
