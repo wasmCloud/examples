@@ -281,7 +281,7 @@ async fn handle_request(ctx: &Context, req: &HttpRequest) -> RpcResult<HttpRespo
             }),
             Err(e) => Err(RpcError::ActorHandler(format!(
                 "creating table: {}",
-                e.to_string()
+                e
             ))),
         },
 
@@ -300,7 +300,7 @@ async fn handle_request(ctx: &Context, req: &HttpRequest) -> RpcResult<HttpRespo
             Ok(todos) => HttpResponse::json(todos, 200),
             Err(e) => Err(RpcError::ActorHandler(format!(
                 "getting all todos: {}",
-                e.to_string()
+                e
             ))),
         },
 
@@ -314,7 +314,7 @@ async fn handle_request(ctx: &Context, req: &HttpRequest) -> RpcResult<HttpRespo
                 Ok(todo) => HttpResponse::json(todo, 200),
                 Err(e) => Err(RpcError::ActorHandler(format!(
                     "updating todo: {}",
-                    e.to_string()
+                    e
                 ))),
             },
             Err(e) => Ok(HttpResponse::bad_request(format!(
@@ -327,7 +327,7 @@ async fn handle_request(ctx: &Context, req: &HttpRequest) -> RpcResult<HttpRespo
             Ok(_) => Ok(HttpResponse::default()),
             Err(e) => Err(RpcError::ActorHandler(format!(
                 "deleting all todos: {}",
-                e.to_string()
+                e
             ))),
         },
 
@@ -335,7 +335,7 @@ async fn handle_request(ctx: &Context, req: &HttpRequest) -> RpcResult<HttpRespo
             Ok(_) => Ok(HttpResponse::default()),
             Err(e) => Err(RpcError::ActorHandler(format!(
                 "deleting todo: {}",
-                e.to_string()
+                e
             ))),
         },
 
