@@ -5,9 +5,9 @@ authors = [
   "David Laban <david.laban@red-badger.com>",
   "Stuart Harris <stuart.harris@red-badger.com>",
 ]
-edition = "2018"
+edition = "2021"
 name = "todo"
-version = "0.3.2"
+version = "0.3.3"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -19,10 +19,10 @@ futures = "0.3"
 serde = {version = "1.0", features = ["derive"]}
 serde_bytes = "0.11"
 serde_json = "1.0"
-wasmbus-rpc = "0.4"
-wasmcloud-interface-httpserver = "0.1.11"
-wasmcloud-interface-keyvalue = "0.2.8"
-wasmcloud-interface-logging = "0.1.4"
+wasmbus-rpc = "0.5.2"
+wasmcloud-interface-httpserver = "0.2.0"
+wasmcloud-interface-keyvalue = "0.3.0"
+wasmcloud-interface-logging = "0.2.0"
 
 [profile.release]
 # Optimize for small code size
