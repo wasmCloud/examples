@@ -9,7 +9,7 @@ CLAIMS   = wasmcloud:httpserver
 REG_URL  = localhost:5000/v2/$(PROJECT):$(VERSION)
 # command to upload to registry (without last wasm parameter)
 PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
-ACTOR_ALIAS=hello
+ACTOR_ALIAS=wasmcloud_example_hello
 
 include ../../build/makefiles/actor.mk
 
