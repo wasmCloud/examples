@@ -30,6 +30,3 @@ wasmcloud-test-util = "0.1.8"
 [[bin]]
 name = "factorial"
 path = "src/main.rs"
-
-[other]
-foo = "bar"
