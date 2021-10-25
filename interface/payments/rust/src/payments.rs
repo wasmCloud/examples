@@ -1,17 +1,13 @@
-// This file is generated automatically using wasmcloud-weld and smithy model definitions
+// This file is generated automatically using wasmcloud/weld-codegen and smithy model definitions
 //
 
-#![allow(clippy::ptr_arg)]
-#[allow(unused_imports)]
+#![allow(unused_imports, clippy::ptr_arg, clippy::needless_lifetimes)]
 use async_trait::async_trait;
-#[allow(unused_imports)]
 use serde::{Deserialize, Serialize};
-#[allow(unused_imports)]
-use std::{borrow::Cow, string::ToString};
-#[allow(unused_imports)]
+use std::{borrow::Cow, io::Write, string::ToString};
 use wasmbus_rpc::{
     deserialize, serialize, Context, Message, MessageDispatch, RpcError, RpcResult, SendOpts,
-    Transport,
+    Timestamp, Transport,
 };
 
 pub const SMITHY_VERSION: &str = "1.0";
@@ -138,28 +134,28 @@ pub trait PaymentsReceiver: MessageDispatch + Payments {
                 let value: AuthorizePaymentRequest = deserialize(message.arg.as_ref())
                     .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
                 let resp = Payments::authorize_payment(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
+                let buf = serialize(&resp)?;
                 Ok(Message {
                     method: "Payments.AuthorizePayment",
-                    arg: buf,
+                    arg: Cow::Owned(buf),
                 })
             }
             "CompletePayment" => {
                 let value: CompletePaymentRequest = deserialize(message.arg.as_ref())
                     .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
                 let resp = Payments::complete_payment(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
+                let buf = serialize(&resp)?;
                 Ok(Message {
                     method: "Payments.CompletePayment",
-                    arg: buf,
+                    arg: Cow::Owned(buf),
                 })
             }
             "GetPaymentMethods" => {
                 let resp = Payments::get_payment_methods(self, ctx).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
+                let buf = serialize(&resp)?;
                 Ok(Message {
                     method: "Payments.GetPaymentMethods",
-                    arg: buf,
+                    arg: Cow::Owned(buf),
                 })
             }
             _ => Err(RpcError::MethodNotHandled(format!(
@@ -181,6 +177,10 @@ impl<T: Transport> PaymentsSender<T> {
     /// Constructs a PaymentsSender with the specified transport
     pub fn via(transport: T) -> Self {
         Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
     }
 }
 
@@ -219,14 +219,14 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Payments for Payments
         ctx: &Context,
         arg: &AuthorizePaymentRequest,
     ) -> RpcResult<AuthorizePaymentResponse> {
-        let arg = serialize(arg)?;
+        let buf = serialize(arg)?;
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
                     method: "Payments.AuthorizePayment",
-                    arg: Cow::Borrowed(&arg),
+                    arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
@@ -244,14 +244,14 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Payments for Payments
         ctx: &Context,
         arg: &CompletePaymentRequest,
     ) -> RpcResult<CompletePaymentResponse> {
-        let arg = serialize(arg)?;
+        let buf = serialize(arg)?;
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
                     method: "Payments.CompletePayment",
-                    arg: Cow::Borrowed(&arg),
+                    arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
@@ -271,14 +271,14 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Payments for Payments
     /// supplied their credit card and user-friendly labels for those methods
     /// like "personal" and "work", etc.
     async fn get_payment_methods(&self, ctx: &Context) -> RpcResult<PaymentMethods> {
-        let arg = *b"";
+        let buf = *b"";
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
                     method: "Payments.GetPaymentMethods",
-                    arg: Cow::Borrowed(&arg),
+                    arg: Cow::Borrowed(&buf),
                 },
                 None,
             )

@@ -4,12 +4,11 @@
 //
 
 // Tell the code generator how to reference symbols defined in this namespace
-metadata package = [
-    {
-        namespace: "org.wasmcloud.examples.payments",
-        crate: "wasmcloud_example_payments"
-     }
-]
+metadata package = [{
+    namespace: "org.wasmcloud.examples.payments",
+    crate: "wasmcloud_example_payments",
+    py_module: "wasmcloud_example_payments",
+}]
 
 namespace org.wasmcloud.examples.payments
 
@@ -61,22 +60,27 @@ operation GetPaymentMethods {
 structure AuthorizePaymentRequest {
     /// Amount of transaction, in cents.
     @required
+    @n(0)
     amount: U32,
 
     /// Amount of tax applied to this transaction, in cents
     @required
+    @n(1)
     tax: U32,
 
     /// Token of the payment method to be used
     @required
+    @n(2)
     paymentMethod: String,
 
     /// The entity (customer) requesting this payment
     @required
+    @n(3)
     paymentEntity: String,
 
     /// Opaque Reference ID (e.g. order number)
     @required
+    @n(4)
     referenceId: String,
 }
 
