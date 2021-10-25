@@ -15,7 +15,7 @@ async fn run_all() {
     let res = run_selected_spawn!(&opts, health_check, factorial_0_1, factorial_more);
     print_test_results(&res);
 
-    let passed = res.iter().filter(|tr| tr.pass).count();
+    let passed = res.iter().filter(|tr| tr.passed).count();
     let total = res.len();
     assert_eq!(passed, total, "{} passed out of {}", passed, total);
 
