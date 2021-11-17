@@ -484,7 +484,7 @@ dependencies = [
 
 [[package]]
 name = "customers"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "futures 0.3.17",
@@ -590,9 +590,9 @@ dependencies = [
 
 [[package]]
 name = "directories"
-version = "3.0.2"
+version = "4.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e69600ff1703123957937708eb27f7a564e48885c537782722ed0ba3189ce1d7"
+checksum = "f51c5d4ddabd36886dd3e1438cb358cdcb0d7c499cb99cb4ac2e38e18b5cb210"
 dependencies = [
  "dirs-sys",
 ]
@@ -1303,9 +1303,9 @@ dependencies = [
 
 [[package]]
 name = "nats"
-version = "0.13.1"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33f47fab79b62a75d2bf97663f049bfd1ade8c9c5fdae1512ec65a66d0b6c282"
+checksum = "9d777a1844c3c5f4148df755a978fd99bb27c898d9bf016de723cf3ffcea5f5d"
 dependencies = [
  "base64",
  "base64-url",
@@ -1327,6 +1327,7 @@ dependencies = [
  "rustls-native-certs",
  "serde",
  "serde_json",
+ "url",
  "webpki",
  "winapi",
 ]
@@ -1579,7 +1580,7 @@ dependencies = [
 
 [[package]]
 name = "petclinic-interface"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "futures 0.3.17",
@@ -2822,9 +2823,9 @@ dependencies = [
 
 [[package]]
 name = "wasmbus-rpc"
-version = "0.4.4"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3242159c8e62fb93b5de695f6b84f52d346c8583aed6d68538f20c38c65518da"
+checksum = "1cbed14115ac35e0d42cfba16fd85c93d96e0915396e35802f310026af0ac46c"
 dependencies = [
  "async-trait",
  "base64",
@@ -2834,6 +2835,7 @@ dependencies = [
  "data-encoding",
  "futures 0.3.17",
  "log",
+ "minicbor",
  "nats",
  "once_cell",
  "pin-utils",
@@ -2855,9 +2857,9 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-interface-logging"
-version = "0.1.4"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d0f1742be67cef6dab78b1b555a8e87a613f3079cdce4124dfa5d0fd99f7f8a"
+checksum = "da3f46d0563f6a9a5d7bfaa03eab1359760696f6737d2587d9da4ce405f8acc8"
 dependencies = [
  "async-trait",
  "cfg-if 1.0.0",
@@ -2871,9 +2873,9 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-interface-sqldb"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a53c9ff178d55d34cbedaaa96ca01af0f8aca9bcf196096c6d82d4dca7190059"
+checksum = "2fc4740cb22c411aa63b7a90e6e2d49e90ee13b4bcd39254ca04cc95fec7f240"
 dependencies = [
  "async-trait",
  "futures 0.3.17",
@@ -2907,9 +2909,9 @@ dependencies = [
 
 [[package]]
 name = "weld-codegen"
-version = "0.1.18"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae17c832db339500d1de2420c545efa6f6121caac9c86c4884fb7c70abe2285d"
+checksum = "ad4b02d834c2a2d6a8c045d1325269942850309fa3af8037935e37db9d49f7bc"
 dependencies = [
  "Inflector",
  "atelier_assembler",
@@ -2923,6 +2925,7 @@ dependencies = [
  "handlebars",
  "lazy_static",
  "lexical-sort",
+ "minicbor",
  "reqwest",
  "rustc-hash",
  "serde",

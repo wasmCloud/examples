@@ -1,14 +1,10 @@
-// This file is generated automatically using wasmcloud-weld and smithy model definitions
+// This file is generated automatically using wasmcloud/weld-codegen and smithy model definitions
 //
 
-#![allow(clippy::ptr_arg)]
-#[allow(unused_imports)]
+#![allow(unused_imports, clippy::ptr_arg, clippy::needless_lifetimes)]
 use async_trait::async_trait;
-#[allow(unused_imports)]
 use serde::{Deserialize, Serialize};
-#[allow(unused_imports)]
-use std::{borrow::Cow, string::ToString};
-#[allow(unused_imports)]
+use std::{borrow::Cow, io::Write, string::ToString};
 use wasmbus_rpc::{
     deserialize, serialize, Context, Message, MessageDispatch, RpcError, RpcResult, SendOpts,
     Timestamp, Transport,
@@ -164,6 +160,94 @@ pub type VisitList = Vec<Visit>;
 
 /// wasmbus.actorReceive
 #[async_trait]
+pub trait Vets {
+    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList>;
+}
+
+/// VetsReceiver receives messages defined in the Vets service trait
+#[doc(hidden)]
+#[async_trait]
+pub trait VetsReceiver: MessageDispatch + Vets {
+    async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
+        match message.method {
+            "ListVets" => {
+                let resp = Vets::list_vets(self, ctx).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Vets.ListVets",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            _ => Err(RpcError::MethodNotHandled(format!(
+                "Vets::{}",
+                message.method
+            ))),
+        }
+    }
+}
+
+/// VetsSender sends messages to a Vets service
+/// client for sending Vets messages
+#[derive(Debug)]
+pub struct VetsSender<T: Transport> {
+    transport: T,
+}
+
+impl<T: Transport> VetsSender<T> {
+    /// Constructs a VetsSender with the specified transport
+    pub fn via(transport: T) -> Self {
+        Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> VetsSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl VetsSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
+#[async_trait]
+impl<T: Transport + std::marker::Sync + std::marker::Send> Vets for VetsSender<T> {
+    #[allow(unused)]
+    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList> {
+        let buf = *b"";
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Vets.ListVets",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListVets", e)))?;
+        Ok(value)
+    }
+}
+
+/// wasmbus.actorReceive
+#[async_trait]
 pub trait Visits {
     /// Retrieve a list of visits for a given owner and an optional
     /// list of pet IDs
@@ -182,20 +266,20 @@ pub trait VisitsReceiver: MessageDispatch + Visits {
                 let value: ListVisitsRequest = deserialize(message.arg.as_ref())
                     .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
                 let resp = Visits::list_visits(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
+                let buf = serialize(&resp)?;
                 Ok(Message {
                     method: "Visits.ListVisits",
-                    arg: buf,
+                    arg: Cow::Owned(buf),
                 })
             }
             "RecordVisit" => {
                 let value: RecordVisitRequest = deserialize(message.arg.as_ref())
                     .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
                 let resp = Visits::record_visit(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
+                let buf = serialize(&resp)?;
                 Ok(Message {
                     method: "Visits.RecordVisit",
-                    arg: buf,
+                    arg: Cow::Owned(buf),
                 })
             }
             _ => Err(RpcError::MethodNotHandled(format!(
@@ -217,6 +301,10 @@ impl<T: Transport> VisitsSender<T> {
     /// Constructs a VisitsSender with the specified transport
     pub fn via(transport: T) -> Self {
         Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
     }
 }
 
@@ -246,14 +334,14 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Visits for VisitsSend
     /// Retrieve a list of visits for a given owner and an optional
     /// list of pet IDs
     async fn list_visits(&self, ctx: &Context, arg: &ListVisitsRequest) -> RpcResult<VisitList> {
-        let arg = serialize(arg)?;
+        let buf = serialize(arg)?;
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
                     method: "Visits.ListVisits",
-                    arg: Cow::Borrowed(&arg),
+                    arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
@@ -265,363 +353,20 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Visits for VisitsSend
     #[allow(unused)]
     /// Records a new visit
     async fn record_visit(&self, ctx: &Context, arg: &RecordVisitRequest) -> RpcResult<bool> {
-        let arg = serialize(arg)?;
+        let buf = serialize(arg)?;
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
                     method: "Visits.RecordVisit",
-                    arg: Cow::Borrowed(&arg),
+                    arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
             .await?;
         let value = deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("response to {}: {}", "RecordVisit", e)))?;
-        Ok(value)
-    }
-}
-
-/// wasmbus.actorReceive
-#[async_trait]
-pub trait Customers {
-    async fn create_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<CreateOwnerReply>;
-    async fn find_owner(&self, ctx: &Context, arg: &u64) -> RpcResult<FindOwnerReply>;
-    async fn list_owners(&self, ctx: &Context) -> RpcResult<OwnersList>;
-    async fn update_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<UpdateOwnerReply>;
-    async fn list_pet_types(&self, ctx: &Context) -> RpcResult<PetTypeList>;
-    async fn add_pet(&self, ctx: &Context, arg: &AddPetRequest) -> RpcResult<bool>;
-    async fn remove_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<bool>;
-    async fn update_pet(&self, ctx: &Context, arg: &Pet) -> RpcResult<bool>;
-    async fn list_pets(&self, ctx: &Context, arg: &u64) -> RpcResult<PetList>;
-    async fn find_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<FindPetReply>;
-}
-
-/// CustomersReceiver receives messages defined in the Customers service trait
-#[doc(hidden)]
-#[async_trait]
-pub trait CustomersReceiver: MessageDispatch + Customers {
-    async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
-        match message.method {
-            "CreateOwner" => {
-                let value: Owner = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Customers::create_owner(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.CreateOwner",
-                    arg: buf,
-                })
-            }
-            "FindOwner" => {
-                let value: u64 = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Customers::find_owner(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.FindOwner",
-                    arg: buf,
-                })
-            }
-            "ListOwners" => {
-                let resp = Customers::list_owners(self, ctx).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.ListOwners",
-                    arg: buf,
-                })
-            }
-            "UpdateOwner" => {
-                let value: Owner = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Customers::update_owner(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.UpdateOwner",
-                    arg: buf,
-                })
-            }
-            "ListPetTypes" => {
-                let resp = Customers::list_pet_types(self, ctx).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.ListPetTypes",
-                    arg: buf,
-                })
-            }
-            "AddPet" => {
-                let value: AddPetRequest = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Customers::add_pet(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.AddPet",
-                    arg: buf,
-                })
-            }
-            "RemovePet" => {
-                let value: u64 = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Customers::remove_pet(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.RemovePet",
-                    arg: buf,
-                })
-            }
-            "UpdatePet" => {
-                let value: Pet = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Customers::update_pet(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.UpdatePet",
-                    arg: buf,
-                })
-            }
-            "ListPets" => {
-                let value: u64 = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Customers::list_pets(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.ListPets",
-                    arg: buf,
-                })
-            }
-            "FindPet" => {
-                let value: u64 = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
-                let resp = Customers::find_pet(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
-                Ok(Message {
-                    method: "Customers.FindPet",
-                    arg: buf,
-                })
-            }
-            _ => Err(RpcError::MethodNotHandled(format!(
-                "Customers::{}",
-                message.method
-            ))),
-        }
-    }
-}
-
-/// CustomersSender sends messages to a Customers service
-/// client for sending Customers messages
-#[derive(Debug)]
-pub struct CustomersSender<T: Transport> {
-    transport: T,
-}
-
-impl<T: Transport> CustomersSender<T> {
-    /// Constructs a CustomersSender with the specified transport
-    pub fn via(transport: T) -> Self {
-        Self { transport }
-    }
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-impl<'send> CustomersSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
-    /// Constructs a Sender using an actor's LinkDefinition,
-    /// Uses the provider's HostBridge for rpc
-    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
-        Self {
-            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
-        }
-    }
-}
-#[cfg(target_arch = "wasm32")]
-impl CustomersSender<wasmbus_rpc::actor::prelude::WasmHost> {
-    /// Constructs a client for actor-to-actor messaging
-    /// using the recipient actor's public key
-    pub fn to_actor(actor_id: &str) -> Self {
-        let transport =
-            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
-        Self { transport }
-    }
-}
-#[async_trait]
-impl<T: Transport + std::marker::Sync + std::marker::Send> Customers for CustomersSender<T> {
-    #[allow(unused)]
-    async fn create_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<CreateOwnerReply> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.CreateOwner",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "CreateOwner", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn find_owner(&self, ctx: &Context, arg: &u64) -> RpcResult<FindOwnerReply> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.FindOwner",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "FindOwner", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn list_owners(&self, ctx: &Context) -> RpcResult<OwnersList> {
-        let arg = *b"";
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.ListOwners",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListOwners", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn update_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<UpdateOwnerReply> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.UpdateOwner",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "UpdateOwner", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn list_pet_types(&self, ctx: &Context) -> RpcResult<PetTypeList> {
-        let arg = *b"";
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.ListPetTypes",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListPetTypes", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn add_pet(&self, ctx: &Context, arg: &AddPetRequest) -> RpcResult<bool> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.AddPet",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "AddPet", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn remove_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<bool> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.RemovePet",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "RemovePet", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn update_pet(&self, ctx: &Context, arg: &Pet) -> RpcResult<bool> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.UpdatePet",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "UpdatePet", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn list_pets(&self, ctx: &Context, arg: &u64) -> RpcResult<PetList> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.ListPets",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListPets", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn find_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<FindPetReply> {
-        let arg = serialize(arg)?;
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Customers.FindPet",
-                    arg: Cow::Borrowed(&arg),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "FindPet", e)))?;
         Ok(value)
     }
 }
@@ -649,10 +394,10 @@ pub trait PetclinicReceiver: MessageDispatch + Petclinic {
                 let value: String = deserialize(message.arg.as_ref())
                     .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
                 let resp = Petclinic::convert(self, ctx, &value).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
+                let buf = serialize(&resp)?;
                 Ok(Message {
                     method: "Petclinic.Convert",
-                    arg: buf,
+                    arg: Cow::Owned(buf),
                 })
             }
             _ => Err(RpcError::MethodNotHandled(format!(
@@ -675,6 +420,10 @@ impl<T: Transport> PetclinicSender<T> {
     /// Constructs a PetclinicSender with the specified transport
     pub fn via(transport: T) -> Self {
         Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
     }
 }
 
@@ -707,14 +456,14 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Petclinic for Petclin
         ctx: &Context,
         arg: &TS,
     ) -> RpcResult<String> {
-        let arg = serialize(&arg.to_string())?;
+        let buf = serialize(&arg.to_string())?;
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
                     method: "Petclinic.Convert",
-                    arg: Cow::Borrowed(&arg),
+                    arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
@@ -727,48 +476,149 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Petclinic for Petclin
 
 /// wasmbus.actorReceive
 #[async_trait]
-pub trait Vets {
-    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList>;
+pub trait Customers {
+    async fn create_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<CreateOwnerReply>;
+    async fn find_owner(&self, ctx: &Context, arg: &u64) -> RpcResult<FindOwnerReply>;
+    async fn list_owners(&self, ctx: &Context) -> RpcResult<OwnersList>;
+    async fn update_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<UpdateOwnerReply>;
+    async fn list_pet_types(&self, ctx: &Context) -> RpcResult<PetTypeList>;
+    async fn add_pet(&self, ctx: &Context, arg: &AddPetRequest) -> RpcResult<bool>;
+    async fn remove_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<bool>;
+    async fn update_pet(&self, ctx: &Context, arg: &Pet) -> RpcResult<bool>;
+    async fn list_pets(&self, ctx: &Context, arg: &u64) -> RpcResult<PetList>;
+    async fn find_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<FindPetReply>;
 }
 
-/// VetsReceiver receives messages defined in the Vets service trait
+/// CustomersReceiver receives messages defined in the Customers service trait
 #[doc(hidden)]
 #[async_trait]
-pub trait VetsReceiver: MessageDispatch + Vets {
+pub trait CustomersReceiver: MessageDispatch + Customers {
     async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
         match message.method {
-            "ListVets" => {
-                let resp = Vets::list_vets(self, ctx).await?;
-                let buf = Cow::Owned(serialize(&resp)?);
+            "CreateOwner" => {
+                let value: Owner = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Customers::create_owner(self, ctx, &value).await?;
+                let buf = serialize(&resp)?;
                 Ok(Message {
-                    method: "Vets.ListVets",
-                    arg: buf,
+                    method: "Customers.CreateOwner",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "FindOwner" => {
+                let value: u64 = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Customers::find_owner(self, ctx, &value).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.FindOwner",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "ListOwners" => {
+                let resp = Customers::list_owners(self, ctx).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.ListOwners",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "UpdateOwner" => {
+                let value: Owner = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Customers::update_owner(self, ctx, &value).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.UpdateOwner",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "ListPetTypes" => {
+                let resp = Customers::list_pet_types(self, ctx).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.ListPetTypes",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "AddPet" => {
+                let value: AddPetRequest = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Customers::add_pet(self, ctx, &value).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.AddPet",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "RemovePet" => {
+                let value: u64 = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Customers::remove_pet(self, ctx, &value).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.RemovePet",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "UpdatePet" => {
+                let value: Pet = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Customers::update_pet(self, ctx, &value).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.UpdatePet",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "ListPets" => {
+                let value: u64 = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Customers::list_pets(self, ctx, &value).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.ListPets",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            "FindPet" => {
+                let value: u64 = deserialize(message.arg.as_ref())
+                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let resp = Customers::find_pet(self, ctx, &value).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Customers.FindPet",
+                    arg: Cow::Owned(buf),
                 })
             }
             _ => Err(RpcError::MethodNotHandled(format!(
-                "Vets::{}",
+                "Customers::{}",
                 message.method
             ))),
         }
     }
 }
 
-/// VetsSender sends messages to a Vets service
-/// client for sending Vets messages
+/// CustomersSender sends messages to a Customers service
+/// client for sending Customers messages
 #[derive(Debug)]
-pub struct VetsSender<T: Transport> {
+pub struct CustomersSender<T: Transport> {
     transport: T,
 }
 
-impl<T: Transport> VetsSender<T> {
-    /// Constructs a VetsSender with the specified transport
+impl<T: Transport> CustomersSender<T> {
+    /// Constructs a CustomersSender with the specified transport
     pub fn via(transport: T) -> Self {
         Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
     }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-impl<'send> VetsSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+impl<'send> CustomersSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
     /// Constructs a Sender using an actor's LinkDefinition,
     /// Uses the provider's HostBridge for rpc
     pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
@@ -778,7 +628,7 @@ impl<'send> VetsSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
     }
 }
 #[cfg(target_arch = "wasm32")]
-impl VetsSender<wasmbus_rpc::actor::prelude::WasmHost> {
+impl CustomersSender<wasmbus_rpc::actor::prelude::WasmHost> {
     /// Constructs a client for actor-to-actor messaging
     /// using the recipient actor's public key
     pub fn to_actor(actor_id: &str) -> Self {
@@ -788,23 +638,185 @@ impl VetsSender<wasmbus_rpc::actor::prelude::WasmHost> {
     }
 }
 #[async_trait]
-impl<T: Transport + std::marker::Sync + std::marker::Send> Vets for VetsSender<T> {
+impl<T: Transport + std::marker::Sync + std::marker::Send> Customers for CustomersSender<T> {
     #[allow(unused)]
-    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList> {
-        let arg = *b"";
+    async fn create_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<CreateOwnerReply> {
+        let buf = serialize(arg)?;
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
-                    method: "Vets.ListVets",
-                    arg: Cow::Borrowed(&arg),
+                    method: "Customers.CreateOwner",
+                    arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
             .await?;
         let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListVets", e)))?;
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "CreateOwner", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn find_owner(&self, ctx: &Context, arg: &u64) -> RpcResult<FindOwnerReply> {
+        let buf = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.FindOwner",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "FindOwner", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn list_owners(&self, ctx: &Context) -> RpcResult<OwnersList> {
+        let buf = *b"";
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.ListOwners",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListOwners", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn update_owner(&self, ctx: &Context, arg: &Owner) -> RpcResult<UpdateOwnerReply> {
+        let buf = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.UpdateOwner",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "UpdateOwner", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn list_pet_types(&self, ctx: &Context) -> RpcResult<PetTypeList> {
+        let buf = *b"";
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.ListPetTypes",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListPetTypes", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn add_pet(&self, ctx: &Context, arg: &AddPetRequest) -> RpcResult<bool> {
+        let buf = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.AddPet",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "AddPet", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn remove_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<bool> {
+        let buf = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.RemovePet",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "RemovePet", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn update_pet(&self, ctx: &Context, arg: &Pet) -> RpcResult<bool> {
+        let buf = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.UpdatePet",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "UpdatePet", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn list_pets(&self, ctx: &Context, arg: &u64) -> RpcResult<PetList> {
+        let buf = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.ListPets",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListPets", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn find_pet(&self, ctx: &Context, arg: &u64) -> RpcResult<FindPetReply> {
+        let buf = serialize(arg)?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Customers.FindPet",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "FindPet", e)))?;
         Ok(value)
     }
 }
