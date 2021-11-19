@@ -73,7 +73,7 @@ push: $(DIST_WASM)
 
 # tell host to start an instance of the actor
 start:
-	$(WASH) ctl start actor $(REG_URL) --timeout 3
+	$(WASH) ctl start actor $(REG_URL) --timeout-ms 3000
 
 # NOT WORKING - live actor updates not working yet
 # update it (should update revision before doing this)
@@ -82,18 +82,18 @@ start:
 #	$(WASH) ctl update actor  \
 #        $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id") \
 #	    $(shell make --silent actor_id) \
-#	    $(REG_URL) --timeout 3
+#	    $(REG_URL) --timeout-ms 3000
 
 inventory:
 	$(WASH) ctl get inventory $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id")
 
 ifneq ($(wildcard test-options.json),)
 # if this is a test actor, run its start method
-# project makefile can set RPC_TEST_TIMEOUT to override default
-RPC_TEST_TIMEOUT ?= 2
+# project makefile can set RPC_TEST_TIMEOUT_MS to override default
+RPC_TEST_TIMEOUT_MS ?= 2000
 ACTOR_ID=$(shell make --silent actor_id)
 test::
-	$(WASH) call $(ACTOR_ID) --test --data test-options.json --rpc-timeout $(RPC_TEST_TIMEOUT) Start
+	$(WASH) call $(ACTOR_ID) --test --data test-options.json --rpc-timeout-ms $(RPC_TEST_TIMEOUT_MS) Start
 endif
 
 # generate release build

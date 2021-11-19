@@ -227,8 +227,8 @@ drop_db() {
 start_providers() {
     local _host_id=$(host_id)
 
-  	wash ctl start provider $HTTPSERVER_REF --link-name default --host-id $_host_id --timeout 15
-	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout 15
+  	wash ctl start provider $HTTPSERVER_REF --link-name default --host-id $_host_id --timeout-ms 15000
+	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout-ms 15000
 }
 
 # base-64 encode file into a string
