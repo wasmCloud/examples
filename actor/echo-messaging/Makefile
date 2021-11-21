@@ -18,6 +18,6 @@ MESSAGING_PROVIDER_ID = VADNMSIML2XGO2X4TPIONTIC55R2UUQGPPDZPAVSC2QD7E76CR77SPW7
 
 link:
 	# link to messaging provider
-	wash ctl link --timeout 3 $(shell make actor_id | tail -1) \
+	wash ctl link --timeout-ms 3000 $(shell make actor_id | tail -1) \
 		$(MESSAGING_PROVIDER_ID) wasmcloud:messaging \
 		'URI=nats://localhost:4222' 'SUBSCRIPTION=demo.echo'

@@ -22,9 +22,9 @@ HTTPCLIENT_PROVIDER_ID = VD2K2JRF7MFPGGTBXTIGNOJL354GVHDPSD5LUT65ZQMVMZNPMA2ADTO
 link:
 	# link to httpserver and httpclient
 	# because numbergen is a builtin, it doesn't require a link command
-	wash ctl link --timeout 3 $(ACTOR_ID) \
+	wash ctl link --timeout-ms 3000 $(ACTOR_ID) \
 		$(HTTPSERVER_PROVIDER_ID) wasmcloud:httpserver \
 		'config_json={"address":"127.0.0.1:8080"}'
-	wash ctl link --timeout 3 $(ACTOR_ID) \
+	wash ctl link --timeout-ms 3000 $(ACTOR_ID) \
 		$(HTTPCLIENT_PROVIDER_ID) wasmcloud:httpclient
 
