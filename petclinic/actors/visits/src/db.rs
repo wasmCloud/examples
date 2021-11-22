@@ -7,12 +7,11 @@ use wasmcloud_interface_sqldb::{FetchResult, SqlDb, SqlDbError, minicbor};
 const TABLE_VISITS: &str = "visits";
 
 static REGEX: Lazy<regex::Regex> = Lazy::new(|| {
-    let re = regex::Regex::new(r"^[-a-zA-Z0-9 ,._/]+$").unwrap();
-    re
+    regex::Regex::new(r"^[-a-zA-Z0-9 ,._/]+$").unwrap()
 });
 
 fn check_safety(tag: &str, uncertain_input: &str) -> Result<(), std::io::Error> {
-    if !REGEX.is_match(&uncertain_input) {
+    if !REGEX.is_match(uncertain_input) {
         return Err(std::io::Error::new(
             std::io::ErrorKind::Other,
             format!("{} contains invalid characters", tag),
@@ -84,7 +83,7 @@ pub(crate) async fn record_visit(
 
     let resp = client
         .execute(
-            &ctx,
+            ctx,
             &format!(
                 r#"
             insert into {} (day, month, year, description, petid, vetid, ownerid, hour, minute)
