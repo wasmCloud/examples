@@ -22,7 +22,6 @@
 # KEYDIR    - path to private key folder
 # CARGO     - cargo binary (name or path), defaults to cargo
 # WASH      - wash binary (name or path), defaults to wash
-# RUST_DEPS - rust source files
 # DIST_WASM - the final file after building and signing
 # TARGET_DIR - location of cargo build target folder if not in current dir
 #              (if it's in a workspace, it may be elsewhere)
@@ -32,7 +31,6 @@
 KEYDIR    ?= .keys
 CARGO     ?= cargo
 WASH      ?= wash
-RUST_DEPS ?= Cargo.toml Makefile $(wildcard src/*.rs) .cargo/config.toml
 # location of cargo output files
 TARGET_DIR ?= target
 # location of wasm file after build and signing
@@ -71,10 +69,9 @@ target-path-abs:
 target-file:
 	@echo $(notdir $(DIST_WASM))
 
-# the wasm should be rebuilt if any source files change
-$(UNSIGNED_WASM): $(RUST_DEPS)
+# the wasm should be rebuilt if any source files or dependencies change
+$(UNSIGNED_WASM): .FORCE
 	$(CARGO) build --release
-
 
 # push signed wasm file to registry
 push: $(DIST_WASM)
@@ -138,4 +135,4 @@ lint validate::
 
 endif
 
-.PHONY: actor_id check clean clippy doc release test update
+.PHONY: actor_id check clean clippy doc release test update .FORCE
