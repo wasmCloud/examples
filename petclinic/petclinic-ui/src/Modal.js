@@ -187,6 +187,7 @@ export function PetModal(props) {
     }
     if (e.target.id === 'petType') {
       val = parseInt(e.target.value);
+      pet.petType = val
     }
     setPet({
       ...pet,
@@ -225,7 +226,7 @@ export function PetModal(props) {
           Pet Type
         </label>
         <select
-          value={pet.petType ? pet.petType.id : ''}
+          value={pet.petType ? pet.petType.id ? pet.petType.id : pet.petType : ''}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="petType">
