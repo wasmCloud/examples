@@ -118,7 +118,6 @@ impl From<DbVisit> for petclinic_interface::Visit {
                 year: source.year as _,
             },
             description: source.description,
-            owner_id: source.ownerid,
             pet_id: source.petid,
             time: petclinic_interface::Time {
                 hour: source.hour as _,

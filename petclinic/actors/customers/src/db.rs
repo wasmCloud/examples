@@ -290,8 +290,7 @@ pub(crate) async fn update_pet(
                     name = '{}',
                     bday = {},
                     bmonth = {},
-                    byear = {},
-                    ownerid = {}
+                    byear = {}
             WHERE id = {}
             "#,
                 TABLE_PETS,
@@ -300,7 +299,6 @@ pub(crate) async fn update_pet(
                 pet.bday,
                 pet.bmonth,
                 pet.byear,
-                pet.ownerid,
                 pet.id
             ),
         )
