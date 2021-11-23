@@ -94,6 +94,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install NPM deps
+        run: npm install
+        working-directory: petclinic/petclinic-ui
       - name: Test NPM build
         run: npm run build
         working-directory: petclinic/petclinic-ui

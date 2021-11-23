@@ -155,13 +155,7 @@ async fn delete_pet(ctx: &Context, _owner_id: &str, pet_id: &str) -> RpcResult<H
 async fn create_pet(ctx: &Context, owner_id: &str, pet: Pet) -> RpcResult<HttpResponse> {
     let oid: u64 = owner_id.parse().unwrap_or(0);
     if CustomersSender::to_actor(CUSTOMERS_ACTOR)
-        .add_pet(
-            ctx,
-            &AddPetRequest {
-                owner_id: oid,
-                pet,
-            },
-        )
+        .add_pet(ctx, &AddPetRequest { owner_id: oid, pet })
         .await?
     {
         Ok(HttpResponse::default())
