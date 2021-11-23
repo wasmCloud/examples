@@ -25,7 +25,7 @@ const TABLE_PETS: &str = "pets";
 const TABLE_PETTYPES: &str = "pettypes";
 
 static REGEX: Lazy<regex::Regex> =
-    Lazy::new(|| regex::Regex::new(r"^[-a-zA-Z0-9 ,._/]+$").unwrap());
+    Lazy::new(|| regex::Regex::new(r"^[-a-zA-Z0-9 ,._/@]+$").unwrap());
 
 fn check_safety(tag: &str, uncertain_input: &str) -> Result<(), std::io::Error> {
     if !REGEX.is_match(uncertain_input) {
