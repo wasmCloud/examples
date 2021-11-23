@@ -1,7 +1,7 @@
 use super::Db;
 use serde::{Deserialize, Serialize};
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_sqldb::{FetchResult, SqlDb, SqlDbError, minicbor};
+use wasmcloud_interface_sqldb::{minicbor, FetchResult, SqlDb, SqlDbError};
 
 const TABLE_VETS: &str = "vets";
 

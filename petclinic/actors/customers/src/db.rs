@@ -24,9 +24,8 @@ const TABLE_OWNERS: &str = "owners";
 const TABLE_PETS: &str = "pets";
 const TABLE_PETTYPES: &str = "pettypes";
 
-static REGEX: Lazy<regex::Regex> = Lazy::new(|| {
-    regex::Regex::new(r"^[-a-zA-Z0-9 ,._/]+$").unwrap()
-});
+static REGEX: Lazy<regex::Regex> =
+    Lazy::new(|| regex::Regex::new(r"^[-a-zA-Z0-9 ,._/@]+$").unwrap());
 
 fn check_safety(tag: &str, uncertain_input: &str) -> Result<(), std::io::Error> {
     if !REGEX.is_match(uncertain_input) {
@@ -180,13 +179,16 @@ pub(crate) async fn find_owner(
     client: &Db,
     id: u64,
 ) -> Result<Option<Owner>, SqlDbError> {
-    let resp=client.fetch(
-        ctx,
-        &format!(
-            "select id, address, city, email, firstname, lastname, telephone from {} where id = {}",
-            TABLE_OWNERS, id
+    let resp = client
+        .fetch(
+            ctx,
+            &format!(
+                "select id, address, city, email, firstname, lastname, telephone from {} where id \
+                 = {}",
+                TABLE_OWNERS, id
+            ),
         )
-    ).await?;
+        .await?;
 
     if resp.rows.is_empty() {
         Ok(None)
