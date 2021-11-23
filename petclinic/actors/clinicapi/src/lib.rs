@@ -159,7 +159,7 @@ async fn create_pet(ctx: &Context, owner_id: &str, pet: Pet) -> RpcResult<HttpRe
             ctx,
             &AddPetRequest {
                 owner_id: oid,
-                pet: pet,
+                pet,
             },
         )
         .await?
@@ -254,7 +254,7 @@ fn get_pet_type(pts: &[PetType], id: u64) -> AugmentedPetType {
             name: "Unknown".to_string(),
         },
         |p| AugmentedPetType {
-            id: id,
+            id,
             name: p.name.to_string(),
         },
     )

@@ -40,7 +40,7 @@ impl From<DbVet> for petclinic_interface::Vet {
             last_name: source.lastname,
             specialties: source
                 .specialties
-                .split(",")
+                .split(',')
                 .map(|s| s.to_string())
                 .collect::<Vec<_>>(),
         }
