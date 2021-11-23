@@ -292,7 +292,7 @@ export function VisitsModal(props) {
       minute: 0,
     }
     visit.vetId = 1;
-    const response = await api.createPetVisit(props.owner.id, props.pet.id, visit).catch((err) => { return err })
+    await api.createPetVisit(props.owner.id, props.pet.id, visit).catch((err) => { return err })
     setVisits([visit, ...visits]);
     setVisit({})
   }

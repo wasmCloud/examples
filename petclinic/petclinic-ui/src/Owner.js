@@ -37,7 +37,7 @@ export default class Owner extends Component {
   }
 
   async updateOwner(owner) {
-    const response = await api.updateOwner(this.props.owner.id, owner).catch((err) => { return err })
+    await api.updateOwner(this.props.owner.id, owner).catch((err) => { return err })
     this.setState({
       owner: owner,
       showModal: false
@@ -52,11 +52,10 @@ export default class Owner extends Component {
   }
 
   async addOrEditPet(pet) {
-    let response;
     if (this.state.pet) {
-      response = await api.updatePet(this.props.owner.id, pet.id, pet).catch((err) => { return err })
+      await api.updatePet(this.props.owner.id, pet.id, pet).catch((err) => { return err })
     } else {
-      response = await api.createPet(this.props.owner.id, pet).catch((err) => { return err })
+      await api.createPet(this.props.owner.id, pet).catch((err) => { return err })
     }
     this.setState({
       pets: !this.state.pet ?

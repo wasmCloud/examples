@@ -30,7 +30,7 @@ export default function Owners() {
 
   const addOwner = async (owner) => {
     owner.id = owners.length + 1;
-    const response = await api.createOwner(owner).catch((err) => { return err })
+    await api.createOwner(owner).catch((err) => { return err })
     setOwners([owner, ...owners])
   }
 
