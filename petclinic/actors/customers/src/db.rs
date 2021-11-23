@@ -24,13 +24,11 @@ const TABLE_OWNERS: &str = "owners";
 const TABLE_PETS: &str = "pets";
 const TABLE_PETTYPES: &str = "pettypes";
 
-static REGEX: Lazy<regex::Regex> = Lazy::new(|| {
-    let re = regex::Regex::new(r"^[-a-zA-Z0-9 ,._/@]+$").unwrap();
-    re
-});
+static REGEX: Lazy<regex::Regex> =
+    Lazy::new(|| regex::Regex::new(r"^[-a-zA-Z0-9 ,._/]+$").unwrap());
 
 fn check_safety(tag: &str, uncertain_input: &str) -> Result<(), std::io::Error> {
-    if !REGEX.is_match(&uncertain_input) {
+    if !REGEX.is_match(uncertain_input) {
         return Err(std::io::Error::new(
             std::io::ErrorKind::Other,
             format!("{} contains invalid characters", tag),
@@ -90,7 +88,7 @@ pub(crate) struct PetType {
 pub(crate) async fn delete_pet(ctx: &Context, client: &Db, id: u64) -> Result<(), SqlDbError> {
     let resp = client
         .execute(
-            &ctx,
+            ctx,
             &format!(
                 r#"
             delete from {} where id = {}
@@ -119,7 +117,7 @@ pub(crate) async fn add_pet(
 
     let resp = client
         .execute(
-            &ctx,
+            ctx,
             &format!(
                 r#"
             insert into {} (id, pettype, name, bday, bmonth, byear, ownerid)
@@ -149,10 +147,10 @@ pub(crate) async fn create_owner(
     arg: &petclinic_interface::Owner,
 ) -> Result<(), SqlDbError> {
     let owner = Owner::try_from(arg.clone())
-        .map_err(|_e| SqlDbError::new("parse", "Invalid owner".into()))?;
+        .map_err(|_e| SqlDbError::new("parse", "Invalid new owner".into()))?;
     let resp = client
         .execute(
-            &ctx,
+            ctx,
             &format!(
                 r#"
                 insert into {} (id, address, city, email, firstname, lastname, telephone)
@@ -183,7 +181,7 @@ pub(crate) async fn find_owner(
 ) -> Result<Option<Owner>, SqlDbError> {
     let resp = client
         .fetch(
-            &ctx,
+            ctx,
             &format!(
                 "select id, address, city, email, firstname, lastname, telephone from {} where id \
                  = {}",
@@ -208,7 +206,7 @@ pub(crate) async fn find_pet(
 ) -> Result<Option<Pet>, SqlDbError> {
     let resp = client
         .fetch(
-            &ctx,
+            ctx,
             &format!(
                 "select id, pettype, name, bday, bmonth, byear, ownerid from {} where id = {}",
                 TABLE_PETS, id
@@ -228,7 +226,7 @@ pub(crate) async fn find_pet(
 pub(crate) async fn list_all_owners(ctx: &Context, client: &Db) -> Result<Vec<Owner>, SqlDbError> {
     let resp = client
         .fetch(
-            &ctx,
+            ctx,
             &format!(
                 "select id, address, city, email, firstname, lastname, telephone from {}",
                 TABLE_OWNERS
@@ -246,7 +244,7 @@ pub(crate) async fn list_all_pet_types(
     client: &Db,
 ) -> Result<Vec<PetType>, SqlDbError> {
     let resp = client
-        .fetch(&ctx, &format!("select id, name FROM {}", TABLE_PETTYPES))
+        .fetch(ctx, &format!("select id, name FROM {}", TABLE_PETTYPES))
         .await?;
     let rows: Vec<PetType> = safe_decode(&resp)?;
     Ok(rows)
@@ -260,7 +258,7 @@ pub(crate) async fn list_pets_by_owner(
 ) -> Result<Vec<Pet>, SqlDbError> {
     let resp = client
         .fetch(
-            &ctx,
+            ctx,
             &format!(
                 "select id, pettype, name, bday, bmonth, byear, ownerid from {}
                 where ownerid = {}",
@@ -286,7 +284,7 @@ pub(crate) async fn update_pet(
 
     let resp = client
         .execute(
-            &ctx,
+            ctx,
             &format!(
                 r#"
             update {} 
@@ -326,7 +324,7 @@ pub(crate) async fn update_owner(
 
     let resp = client
         .execute(
-            &ctx,
+            ctx,
             &format!(
                 r#"
                 update {}
@@ -428,10 +426,10 @@ impl TryFrom<petclinic_interface::Owner> for Owner {
     type Error = std::io::Error;
 
     fn try_from(arg: petclinic_interface::Owner) -> Result<Self, Self::Error> {
-        let address = arg.address.unwrap_or("".into());
-        let city = arg.city.unwrap_or("".into());
-        let lastname = arg.last_name.unwrap_or("".into());
-        let telephone = arg.telephone.unwrap_or("".into());
+        let address = arg.address.unwrap_or_else(|| "".into());
+        let city = arg.city.unwrap_or_else(|| "".into());
+        let lastname = arg.last_name.unwrap_or_else(|| "".into());
+        let telephone = arg.telephone.unwrap_or_else(|| "".into());
 
         check_safety("address", &address)?;
         check_safety("city", &city)?;

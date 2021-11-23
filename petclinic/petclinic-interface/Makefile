@@ -1,4 +1,4 @@
 # Makefile for interface petclinic
 
-include ./interface.mk
+include ../../build/makefiles/interface.mk
 
