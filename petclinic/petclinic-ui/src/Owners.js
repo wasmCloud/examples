@@ -67,7 +67,7 @@ export default function Owners() {
             </tr>
           </thead>
           <tbody>
-            {owners.map((owner, idx) => {
+            {owners && owners.length > 0 && owners.map((owner, idx) => {
               return (
                 <tr onClick={() => setOwner(owner)} key={idx} className="border cursor-pointer">
                   <td className="px-8 py-4">{`${owner.firstName} ${owner.lastName}`}</td>

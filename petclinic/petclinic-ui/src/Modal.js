@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import api from './Api';
 
 function parseDateString(day, month, year) {
+  if (isNaN(day) || isNaN(month) || isNaN(year)) {
+    return ""
+  }
   return new Date(Date.parse(`${year}-${month}-${day}`)).toISOString().split('T')[0]
 }
 
