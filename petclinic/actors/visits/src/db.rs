@@ -2,13 +2,12 @@ use super::Db;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_sqldb::{FetchResult, SqlDb, SqlDbError, minicbor};
+use wasmcloud_interface_sqldb::{minicbor, FetchResult, SqlDb, SqlDbError};
 
 const TABLE_VISITS: &str = "visits";
 
-static REGEX: Lazy<regex::Regex> = Lazy::new(|| {
-    regex::Regex::new(r"^[-a-zA-Z0-9 ,._/]+$").unwrap()
-});
+static REGEX: Lazy<regex::Regex> =
+    Lazy::new(|| regex::Regex::new(r"^[-a-zA-Z0-9 ,._/@]+$").unwrap());
 
 fn check_safety(tag: &str, uncertain_input: &str) -> Result<(), std::io::Error> {
     if !REGEX.is_match(uncertain_input) {
@@ -57,9 +56,17 @@ pub(crate) async fn list_visits_by_owner_and_pet(
                 .collect::<Vec::<_>>()
                 .join(",")
         );
-        format!("select day, month, year, description, petid, vetid, ownerid, hour, minute from {} where ownerid = {} AND petid IN {}", TABLE_VISITS, owner_id, petids)
+        format!(
+            "select day, month, year, description, petid, vetid, ownerid, hour, minute from {} \
+             where ownerid = {} AND petid IN {}",
+            TABLE_VISITS, owner_id, petids
+        )
     } else {
-        format!("select day, month, year, description, petid, vetid, ownerid, hour, minute from {} where ownerid = {}", TABLE_VISITS, owner_id)
+        format!(
+            "select day, month, year, description, petid, vetid, ownerid, hour, minute from {} \
+             where ownerid = {}",
+            TABLE_VISITS, owner_id
+        )
     };
 
     let resp = client.fetch(ctx, &sql).await?;
@@ -74,12 +81,8 @@ pub(crate) async fn record_visit(
     owner_id: u64,
     visit: petclinic_interface::Visit,
 ) -> Result<(), SqlDbError> {
-    check_safety("description", &visit.description).map_err(|e| {
-        SqlDbError::new(
-            "invalid",
-            format!("{}", e),
-        )
-    })?;
+    check_safety("description", &visit.description)
+        .map_err(|e| SqlDbError::new("invalid", format!("{}", e)))?;
 
     let resp = client
         .execute(
