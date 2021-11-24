@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import api from './Api';
 
 function parseDateString(day, month, year) {
+  if (isNaN(day) || isNaN(month) || isNaN(year)) {
+    return ""
+  }
   return new Date(Date.parse(`${year}-${month}-${day}`)).toISOString().split('T')[0]
 }
 
@@ -184,6 +187,7 @@ export function PetModal(props) {
     }
     if (e.target.id === 'petType') {
       val = parseInt(e.target.value);
+      pet.petType = val
     }
     setPet({
       ...pet,
@@ -222,7 +226,7 @@ export function PetModal(props) {
           Pet Type
         </label>
         <select
-          value={pet.petType ? pet.petType.id : ''}
+          value={pet.petType ? pet.petType.id ? pet.petType.id : pet.petType : ''}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="petType">
@@ -292,7 +296,7 @@ export function VisitsModal(props) {
       minute: 0,
     }
     visit.vetId = 1;
-    const response = await api.createPetVisit(props.owner.id, props.pet.id, visit).catch((err) => { return err })
+    await api.createPetVisit(props.owner.id, props.pet.id, visit).catch((err) => { return err })
     setVisits([visit, ...visits]);
     setVisit({})
   }

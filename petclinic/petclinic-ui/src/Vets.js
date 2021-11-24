@@ -31,7 +31,7 @@ export default function Vets() {
         </tr>
       </thead>
       <tbody>
-        {vets && vets.map((vet, idx) => {
+        {vets && vets.length > 0 && vets.map((vet, idx) => {
           return (
             <tr onClick={() => console.log(vet)} key={idx} className="border cursor-pointer">
               <td className="px-8 py-4">{`${vet.firstName} ${vet.lastName}`}</td>

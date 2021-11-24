@@ -28,7 +28,7 @@ export default function PetTypes() {
         </tr>
       </thead>
       <tbody>
-        {petTypes.map((petType, idx) => {
+        {petTypes && petTypes.length > 0 && petTypes.map((petType, idx) => {
           return (
             <tr onClick={() => console.log(petType)} key={idx} className="border cursor-pointer">
               <td className="px-8 py-4">{petType.name}</td>
