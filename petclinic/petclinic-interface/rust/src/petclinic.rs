@@ -157,6 +157,94 @@ pub type VisitList = Vec<Visit>;
 
 /// wasmbus.actorReceive
 #[async_trait]
+pub trait Vets {
+    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList>;
+}
+
+/// VetsReceiver receives messages defined in the Vets service trait
+#[doc(hidden)]
+#[async_trait]
+pub trait VetsReceiver: MessageDispatch + Vets {
+    async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
+        match message.method {
+            "ListVets" => {
+                let resp = Vets::list_vets(self, ctx).await?;
+                let buf = serialize(&resp)?;
+                Ok(Message {
+                    method: "Vets.ListVets",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            _ => Err(RpcError::MethodNotHandled(format!(
+                "Vets::{}",
+                message.method
+            ))),
+        }
+    }
+}
+
+/// VetsSender sends messages to a Vets service
+/// client for sending Vets messages
+#[derive(Debug)]
+pub struct VetsSender<T: Transport> {
+    transport: T,
+}
+
+impl<T: Transport> VetsSender<T> {
+    /// Constructs a VetsSender with the specified transport
+    pub fn via(transport: T) -> Self {
+        Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> VetsSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl VetsSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
+#[async_trait]
+impl<T: Transport + std::marker::Sync + std::marker::Send> Vets for VetsSender<T> {
+    #[allow(unused)]
+    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList> {
+        let buf = *b"";
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Vets.ListVets",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        let value = deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListVets", e)))?;
+        Ok(value)
+    }
+}
+
+/// wasmbus.actorReceive
+#[async_trait]
 pub trait Visits {
     /// Retrieve a list of visits for a given owner and an optional
     /// list of pet IDs
@@ -379,94 +467,6 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Petclinic for Petclin
             .await?;
         let value = deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("response to {}: {}", "Convert", e)))?;
-        Ok(value)
-    }
-}
-
-/// wasmbus.actorReceive
-#[async_trait]
-pub trait Vets {
-    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList>;
-}
-
-/// VetsReceiver receives messages defined in the Vets service trait
-#[doc(hidden)]
-#[async_trait]
-pub trait VetsReceiver: MessageDispatch + Vets {
-    async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
-        match message.method {
-            "ListVets" => {
-                let resp = Vets::list_vets(self, ctx).await?;
-                let buf = serialize(&resp)?;
-                Ok(Message {
-                    method: "Vets.ListVets",
-                    arg: Cow::Owned(buf),
-                })
-            }
-            _ => Err(RpcError::MethodNotHandled(format!(
-                "Vets::{}",
-                message.method
-            ))),
-        }
-    }
-}
-
-/// VetsSender sends messages to a Vets service
-/// client for sending Vets messages
-#[derive(Debug)]
-pub struct VetsSender<T: Transport> {
-    transport: T,
-}
-
-impl<T: Transport> VetsSender<T> {
-    /// Constructs a VetsSender with the specified transport
-    pub fn via(transport: T) -> Self {
-        Self { transport }
-    }
-
-    pub fn set_timeout(&self, interval: std::time::Duration) {
-        self.transport.set_timeout(interval);
-    }
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-impl<'send> VetsSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
-    /// Constructs a Sender using an actor's LinkDefinition,
-    /// Uses the provider's HostBridge for rpc
-    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
-        Self {
-            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
-        }
-    }
-}
-#[cfg(target_arch = "wasm32")]
-impl VetsSender<wasmbus_rpc::actor::prelude::WasmHost> {
-    /// Constructs a client for actor-to-actor messaging
-    /// using the recipient actor's public key
-    pub fn to_actor(actor_id: &str) -> Self {
-        let transport =
-            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
-        Self { transport }
-    }
-}
-#[async_trait]
-impl<T: Transport + std::marker::Sync + std::marker::Send> Vets for VetsSender<T> {
-    #[allow(unused)]
-    async fn list_vets(&self, ctx: &Context) -> RpcResult<VetList> {
-        let buf = *b"";
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Vets.ListVets",
-                    arg: Cow::Borrowed(&buf),
-                },
-                None,
-            )
-            .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "ListVets", e)))?;
         Ok(value)
     }
 }

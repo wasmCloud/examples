@@ -295,13 +295,7 @@ pub(crate) async fn update_pet(
                     byear = {}
             WHERE id = {}
             "#,
-                TABLE_PETS,
-                pet.pettype,
-                pet.name,
-                pet.bday,
-                pet.bmonth,
-                pet.byear,
-                pet.id
+                TABLE_PETS, pet.pettype, pet.name, pet.bday, pet.bmonth, pet.byear, pet.id
             ),
         )
         .await?;
