@@ -106,7 +106,6 @@ jobs:
       fail-fast: false
       matrix:
         artifact-name: [clinicapi, customers, vets, visits]
-
     steps:
       - name: Download signed actor
         uses: actions/download-artifact@v2
@@ -122,30 +121,47 @@ jobs:
           prerelease: true
           draft: false
 
-  # artifact_release:
-  #   needs: build_artifact
-  #   if: startswith(github.ref, 'refs/tags/') # Only run on tag push
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Download signed actor
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: wasmcloud-actor
-  #         path: ${{ env.working-directory }}/build
+  artifact_release:
+    needs: actors_build_check 
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        working-directory:
+          - petclinic/actors/clinicapi
+          - petclinic/actors/customers
+          - petclinic/actors/vets
+          - petclinic/actors/visits
+        include:
+          - working-directory: petclinic/actors/clinicapi
+            artifact-name: clinicapi
+          - working-directory: petclinic/actors/customers
+            artifact-name: customers
+          - working-directory: petclinic/actors/vets
+            artifact-name: vets
+          - working-directory: petclinic/actors/visits
+            artifact-name: visits
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download signed actor
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.working-directory}}/build
 
-  #     - name: Determine artifact metadata
-  #       run: |
-  #         echo "oci-repository=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
-  #         echo "oci-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
-  #       working-directory: ${{ env.working-directory }}
+      - name: Determine artifact metadata
+        run: |
+          echo "oci-repository=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
+          echo "oci-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
+        working-directory: ${{ matrix.working-directory }}
 
-  #     - name: Push actor to AzureCR
-  #       uses: wasmcloud/common-actions/oci-artifact-release@main
-  #       with:
-  #         artifact-path: ${{ env.working-directory }}/build/${{ env.oci-repository }}_s.wasm
-  #         oci-url: ${{ secrets.AZURECR_PUSH_URL }}
-  #         oci-repository: ${{ env.oci-repository }}
-  #         oci-version: ${{ env.oci-version }}
-  #         oci-username: ${{ secrets.AZURECR_PUSH_USER }}
-  #         oci-password: ${{ secrets.AZURECR_PUSH_PASSWORD }}
+      - name: Push actor to AzureCR
+        uses: wasmcloud/common-actions/oci-artifact-release@main
+        with:
+          artifact-path: ${{ env.working-directory }}/build/${{ env.oci-repository }}_s.wasm
+          oci-url: ${{ secrets.AZURECR_PUSH_URL }}
+          oci-repository: ${{ env.oci-repository }}
+          oci-version: ${{ env.oci-version }}
+          oci-username: ${{ secrets.AZURECR_PUSH_USER }}
+          oci-password: ${{ secrets.AZURECR_PUSH_PASSWORD }}
