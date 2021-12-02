@@ -1,0 +1,167 @@
+name: Petclinic
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "petclinic/**"
+    tags:
+      - "petclinic-v*"
+  pull_request:
+    branches: [main]
+    paths:
+      - "petclinic/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
+
+jobs:
+  interface_build_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: rust-check-action
+        uses: wasmcloud/common-actions/rust-check@main
+        with:
+          working-directory: petclinic/petclinic-interface/rust
+
+  ui_build_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install NPM deps
+        run: npm install
+        working-directory: petclinic/petclinic-ui
+      - name: Test NPM build
+        run: npm run build
+        working-directory: petclinic/petclinic-ui
+
+  actors_build_check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        working-directory:
+          - petclinic/actors/clinicapi
+          - petclinic/actors/customers
+          - petclinic/actors/vets
+          - petclinic/actors/visits
+        include:
+          - working-directory: petclinic/actors/clinicapi
+            artifact-name: clinicapi
+          - working-directory: petclinic/actors/customers
+            artifact-name: customers
+          - working-directory: petclinic/actors/vets
+            artifact-name: vets
+          - working-directory: petclinic/actors/visits
+            artifact-name: visits
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
+
+      - id: rust-check-action
+        uses: wasmcloud/common-actions/rust-check@main
+        with:
+          working-directory: ${{ matrix.working-directory }}
+          build-options: "--release"
+          clippy-options: "--release"
+          # The `--doc` is required for wasm, as cargo cannot execute wasm tests by default
+          test-options: "--release --doc"
+
+      # Note: This step is only required because secrets cannot be used in the `include` block
+      - name: Set wash subject key (clinicapi)
+        if: ${{ matrix.working-directory == 'petclinic/actors/clinicapi' }}
+        run: echo "WASH_SUBJECT_KEY=${{ secrets.WASMCLOUD_PETCLINIC_CLINICAPI }}" > $GITHUB_ENV
+      - name: Set wash subject key (customers)
+        if: ${{ matrix.working-directory == 'petclinic/actors/customers' }}
+        run: echo "WASH_SUBJECT_KEY=${{ secrets.WASMCLOUD_PETCLINIC_CUSTOMERS }}" > $GITHUB_ENV
+      - name: Set wash subject key (vets)
+        if: ${{ matrix.working-directory == 'petclinic/actors/vets' }}
+        run: echo "WASH_SUBJECT_KEY=${{ secrets.WASMCLOUD_PETCLINIC_VETS }}" > $GITHUB_ENV
+      - name: Set wash subject key (visits)
+        if: ${{ matrix.working-directory == 'petclinic/actors/visits' }}
+        run: echo "WASH_SUBJECT_KEY=${{ secrets.WASMCLOUD_PETCLINIC_VISITS }}" > $GITHUB_ENV
+
+      - name: Build wasmcloud actor
+        if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+        run: make
+        working-directory: ${{ matrix.working-directory }}
+
+      - name: Upload signed actor to GH Actions
+        if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.working-directory }}/build/*.wasm
+
+  github_release:
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    needs: actors_build_check 
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact-name: [clinicapi, customers, vets, visits]
+    steps:
+      - name: Download signed actor
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: build
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/*.wasm
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true
+          draft: false
+
+  artifact_release:
+    needs: actors_build_check 
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        working-directory:
+          - petclinic/actors/clinicapi
+          - petclinic/actors/customers
+          - petclinic/actors/vets
+          - petclinic/actors/visits
+        include:
+          - working-directory: petclinic/actors/clinicapi
+            artifact-name: clinicapi
+          - working-directory: petclinic/actors/customers
+            artifact-name: customers
+          - working-directory: petclinic/actors/vets
+            artifact-name: vets
+          - working-directory: petclinic/actors/visits
+            artifact-name: visits
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download signed actor
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.working-directory}}/build
+
+      - name: Determine artifact metadata
+        run: |
+          echo "oci-repository=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
+          echo "oci-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
+        working-directory: ${{ matrix.working-directory }}
+
+      - name: Push actor to AzureCR
+        uses: wasmcloud/common-actions/oci-artifact-release@main
+        with:
+          artifact-path: ${{ matrix.working-directory }}/build/${{ env.oci-repository }}_s.wasm
+          oci-url: ${{ secrets.AZURECR_PUSH_URL }}
+          oci-repository: ${{ env.oci-repository }}
+          oci-version: ${{ env.oci-version }}
+          oci-username: ${{ secrets.AZURECR_PUSH_USER }}
+          oci-password: ${{ secrets.AZURECR_PUSH_PASSWORD }}

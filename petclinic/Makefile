@@ -10,4 +10,3 @@ inventory:
 	wash ctl get inventory $(shell wash ctl get hosts -o json | jq -r ".hosts[0].id")
 
 .PHONY: all push start test clean
-
