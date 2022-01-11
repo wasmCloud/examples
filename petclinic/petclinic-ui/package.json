@@ -10,7 +10,7 @@
     "@testing-library/user-event": "^12.8.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
+    "react-scripts": "5.0.0",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
@@ -18,12 +18,6 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "proxy": "http://localhost:8080",
   "browserslist": {
@@ -39,9 +33,10 @@
     ]
   },
   "devDependencies": {
-    "autoprefixer": "^9.8.6",
+    "autoprefixer": "^10.4.2",
     "dotenv": "^10.0.0",
-    "postcss": "^7.0.36",
+    "postcss": "^8.4.5",
+    "tailwind": "^4.0.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.14"
   }
 }
