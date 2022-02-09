@@ -25,6 +25,7 @@ use org.wasmcloud.model#F64
 @wasmbus(
     contractId: "wasmcloud:example:union_demo",
     actorReceive: true,
+    providerReceive: true,
     protocol: "2" )
 service UnionDemo {
   version: "0.1",

@@ -333,6 +333,7 @@ pub fn decode_value_map(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<ValueM
 }
 /// The Runner interface has a single Run method
 /// wasmbus.contractId: wasmcloud:example:union_demo
+/// wasmbus.providerReceive
 /// wasmbus.actorReceive
 #[async_trait]
 pub trait UnionDemo {
@@ -411,6 +412,30 @@ impl UnionDemoSender<wasmbus_rpc::actor::prelude::WasmHost> {
         let transport =
             wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
         Self { transport }
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl UnionDemoSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for sending to a UnionDemo provider
+    /// implementing the 'wasmcloud:example:union_demo' capability contract, with the "default" link
+    pub fn new() -> Self {
+        let transport = wasmbus_rpc::actor::prelude::WasmHost::to_provider(
+            "wasmcloud:example:union_demo",
+            "default",
+        )
+        .unwrap();
+        Self { transport }
+    }
+
+    /// Constructs a client for sending to a UnionDemo provider
+    /// implementing the 'wasmcloud:example:union_demo' capability contract, with the specified link name
+    pub fn new_with_link(link_name: &str) -> wasmbus_rpc::RpcResult<Self> {
+        let transport = wasmbus_rpc::actor::prelude::WasmHost::to_provider(
+            "wasmcloud:example:union_demo",
+            link_name,
+        )?;
+        Ok(Self { transport })
     }
 }
 #[async_trait]
