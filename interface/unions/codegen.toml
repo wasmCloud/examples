@@ -1,0 +1,17 @@
+# codegen.toml
+
+[[models]]
+url = "https://cdn.jsdelivr.net/gh/wasmcloud/interfaces/core/wasmcloud-model.smithy"
+[[models]]
+url = "https://cdn.jsdelivr.net/gh/wasmcloud/interfaces@77317ba3c1c6b65c9f3eb7e8ab3d2b44248f6182/core/wasmcloud-model.smithy"
+
+[[models]]
+path = "."
+files = [ "union-demo.smithy" ]
+
+[rust]
+output_dir = "rust"
+
+[[rust.files]]
+path = "src/union_demo.rs"
+namespace = "org.wasmcloud.example.union_demo"
