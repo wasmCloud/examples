@@ -24,3 +24,12 @@ impl HttpServer for EchoActor {
         Ok(resp)
     }
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test_testing() {
+        let x = 1;
+        assert_eq!(1, x);
+    }
+}
