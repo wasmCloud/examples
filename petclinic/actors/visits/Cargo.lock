@@ -1564,7 +1564,7 @@ dependencies = [
 
 [[package]]
 name = "petclinic-interface"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "async-trait",
  "futures 0.3.17",
@@ -2677,7 +2677,7 @@ checksum = "5fecdca9a5291cc2b8dcf7dc02453fee791a280f3743cb0905f8822ae463b3fe"
 
 [[package]]
 name = "visits"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "async-trait",
  "futures 0.3.17",

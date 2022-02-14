@@ -9,6 +9,7 @@ CLAIMS   = wasmcloud:messaging wasmcloud:builtin:logging
 REG_URL  = localhost:5000/v2/$(PROJECT):$(VERSION)
 # command to upload to registry (without last wasm parameter)
 PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
+ACTOR_NAME = "Echo Messaging"
 
 include ../../build/makefiles/actor.mk
 

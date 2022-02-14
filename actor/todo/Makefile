@@ -9,5 +9,6 @@ CLAIMS   = wasmcloud:httpserver wasmcloud:keyvalue wasmcloud:builtin:logging
 REG_URL  = localhost:5000/v2/$(PROJECT):$(REVISION)
 # command to upload to registry (without last wasm parameter)
 PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
+ACTOR_NAME = "Todo"
 
 include ../../build/makefiles/actor.mk
