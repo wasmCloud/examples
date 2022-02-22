@@ -34,11 +34,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     info!("Started SAMPLE config server with {} autostart actor profiles, {} autostart provider profiles, and {} artifact registries",
         AUTOSTART_ACTORS.read().unwrap().len(),
         AUTOSTART_PROVIDERS.read().unwrap().len(),
-        CREDENTIAL_MAP.read().unwrap().len()
-);
+        CREDENTIAL_MAP.read().unwrap().len());
 
     let lattice_id = var("LATTICE_ID").unwrap_or("default".to_string());
-    let lattice = lattice_id.to_string();
 
     // Note: this connection will need to be able to access the control interface
     // topics. Also, you don't want to use an unsecure connection like this in
@@ -60,7 +58,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     });
 
     let put_topic = format!("wasmbus.cfg.{}.put", lattice_id);
-    let ctl_topic = format!("wasmbus.ctl.{}.registries.put", lattice);
+    let ctl_topic = format!("wasmbus.ctl.{}.registries.put", lattice_id);
     conn.subscribe(&put_topic)?.with_handler(move |msg| {
         let m: HashMap<String, Credential> = serde_json::from_slice(&msg.data).unwrap();
         info!("Receiving replacement registry map: {} registries", m.len());
