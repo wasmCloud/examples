@@ -1,4 +1,4 @@
-// This file is generated automatically using wasmcloud/weld-codegen 0.3.2
+// This file is generated automatically using wasmcloud/weld-codegen 0.4.2
 
 #[allow(unused_imports)]
 use async_trait::async_trait;
@@ -353,13 +353,17 @@ pub trait UnionDemo {
 #[doc(hidden)]
 #[async_trait]
 pub trait UnionDemoReceiver: MessageDispatch + UnionDemo {
-    async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
+    async fn dispatch<'disp__, 'ctx__, 'msg__>(
+        &'disp__ self,
+        ctx: &'ctx__ Context,
+        message: &Message<'msg__>,
+    ) -> Result<Message<'msg__>, RpcError> {
         match message.method {
             "Get" => {
                 let value: String = wasmbus_rpc::common::decode(&message.arg, &decode_string)
                     .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
                 let resp = UnionDemo::get(self, ctx, &value).await?;
-                let mut e = wasmbus_rpc::cbor::vec_encoder();
+                let mut e = wasmbus_rpc::cbor::vec_encoder(true);
                 encode_response(&mut e, &resp)?;
                 let buf = e.into_inner();
                 Ok(Message {
@@ -430,7 +434,7 @@ impl UnionDemoSender<wasmbus_rpc::actor::prelude::WasmHost> {
 
     /// Constructs a client for sending to a UnionDemo provider
     /// implementing the 'wasmcloud:example:union_demo' capability contract, with the specified link name
-    pub fn new_with_link(link_name: &str) -> wasmbus_rpc::RpcResult<Self> {
+    pub fn new_with_link(link_name: &str) -> wasmbus_rpc::error::RpcResult<Self> {
         let transport = wasmbus_rpc::actor::prelude::WasmHost::to_provider(
             "wasmcloud:example:union_demo",
             link_name,
@@ -447,7 +451,7 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> UnionDemo for UnionDe
         arg: &TS,
     ) -> RpcResult<Response> {
         let arg = arg.to_string();
-        let mut e = wasmbus_rpc::cbor::vec_encoder();
+        let mut e = wasmbus_rpc::cbor::vec_encoder(true);
         e.str(arg.as_ref())?;
         let buf = e.into_inner();
         let resp = self

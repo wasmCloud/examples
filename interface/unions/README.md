@@ -46,10 +46,10 @@ service UnionDemo {
 Also make sure you have the latest rpc and code generation dependencies: in `Cargo.toml`:
 ```toml
 [dependencies]
-wasmbus-rpc = "0.7.3"
+wasmbus-rpc = "0.8.2"
 
 [dev-dependencies]
-weld-codegen = "0.3.2"
+weld-codegen = "0.4.2"
 
 ```
 
