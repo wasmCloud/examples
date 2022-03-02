@@ -823,7 +823,6 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Payments for Payments
             .map_err(|e| RpcError::Deser(format!("'{}': AuthorizePaymentResponse", e)))?;
         Ok(value)
     }
-
     #[allow(unused)]
     /// Completes a previously authorized payment.
     /// This operation requires the "authorization code" from a successful
@@ -850,7 +849,6 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Payments for Payments
             .map_err(|e| RpcError::Deser(format!("'{}': CompletePaymentResponse", e)))?;
         Ok(value)
     }
-
     #[allow(unused)]
     /// `GetPaymentMethods` - Retrieves an _opaque_ list of payment methods,
     /// which is a list of customer-facing method names and the

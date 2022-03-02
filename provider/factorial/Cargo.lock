@@ -2654,9 +2654,9 @@ checksum = "3d958d035c4438e28c70e4321a2911302f10135ce78a9c7834c0cab4123d06a2"
 
 [[package]]
 name = "wasmbus-macros"
-version = "0.1.8"
+version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c54ca3c8edeea12b57209fc04c96f7c5e175a6e4f42280f0f2bcb67ff19f61ba"
+checksum = "ac4546364f1055f1dd0bcff8f3de216df725e3ad8876a67c4aadbf731d9dfc14"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
