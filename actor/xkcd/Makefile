@@ -17,15 +17,16 @@ include ../../build/makefiles/actor.mk
 # if you're running local builds you get these numbers from
 #    `make inspect` for providers, and `make actor_id` for actors
 ACTOR_ID = $(shell make actor_id)
-HTTPSERVER_PROVIDER_ID = VDCWPLZCQZ366BEFJSGHCNNUUULKSWT25W5TXZ74RXKHGGKLLY3PERPT
-HTTPCLIENT_PROVIDER_ID = VD2K2JRF7MFPGGTBXTIGNOJL354GVHDPSD5LUT65ZQMVMZNPMA2ADTOP
+HTTPSERVER_PROVIDER_ID = VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M
+HTTPCLIENT_PROVIDER_ID = VCCVLH4XWGI3SGARFNYKYT2A32SUYA2KVAIV2U2Q34DQA7WWJPFRKIKM
+
 
 link:
 	# link to httpserver and httpclient
 	# because numbergen is a builtin, it doesn't require a link command
-	wash ctl link --timeout-ms 3000 $(ACTOR_ID) \
+	wash ctl link put --timeout-ms 4000 $(ACTOR_ID) \
 		$(HTTPSERVER_PROVIDER_ID) wasmcloud:httpserver \
 		'config_json={"address":"127.0.0.1:8080"}'
-	wash ctl link --timeout-ms 3000 $(ACTOR_ID) \
+	wash ctl link put --timeout-ms 4000 $(ACTOR_ID) \
 		$(HTTPCLIENT_PROVIDER_ID) wasmcloud:httpclient
 
