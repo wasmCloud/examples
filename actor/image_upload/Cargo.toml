@@ -1,0 +1,31 @@
+[package]
+name = "image_upload"
+version = "0.1.0"
+authors = [ "wasmCloud Team" ]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "image_upload"
+
+[dependencies]
+async-trait = "0.1"
+form_urlencoded = "1.0"
+futures = "0.3"
+image = { version = "0.24.1", default_features = false, features = [ "gif", "jpeg", "ico", "png", "pnm", "tga", "tiff", "webp", "bmp", "hdr", "dxt", "dds", "farbfeld", "jpeg_rayon" ] }
+log = "0.4"
+serde_bytes = "0.11"
+serde_json = "1.0.79"
+serde = { version = "1.0", features = [ "derive" ] }
+sha2 = "0.10"
+wasmbus-rpc = "0.8.2"
+wasmcloud-interface-httpserver = "0.5.0"
+wasmcloud-interface-logging = "0.5.0"
+
+[build-dependencies]
+weld-codegen = "0.4.2"
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
