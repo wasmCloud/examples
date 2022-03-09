@@ -48,7 +48,7 @@ services:
       - 127.0.0.1:9999:80
 
   nats:
-    image: nats:2.3
+    image: nats:2.7.2
     ports:
       - "127.0.0.1:4222:4222"
       - "127.0.0.1:6222:6222"
@@ -64,6 +64,7 @@ services:
     image: wasmcloud/wasmcloud_host:latest
     environment:
       LC_ALL: en_US.UTF-8
+      RUST_LOG: debug
       WASMCLOUD_OCI_ALLOWED_INSECURE: registry:5000
       WASMCLOUD_RPC_HOST: nats
       WASMCLOUD_CTL_HOST: nats
