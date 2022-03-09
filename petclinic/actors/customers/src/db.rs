@@ -18,7 +18,7 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_sqldb::{minicbor, FetchResult, SqlDb, SqlDbError};
+use wasmcloud_interface_sqldb::{minicbor, QueryResult, SqlDb, SqlDbError, Statement};
 
 const TABLE_OWNERS: &str = "owners";
 const TABLE_PETS: &str = "pets";
@@ -89,12 +89,15 @@ pub(crate) async fn delete_pet(ctx: &Context, client: &Db, id: u64) -> Result<()
     let resp = client
         .execute(
             ctx,
-            &format!(
-                r#"
+            &Statement {
+                sql: format!(
+                    r#"
             delete from {} where id = {}
             "#,
-                TABLE_PETS, id
-            ),
+                    TABLE_PETS, id
+                ),
+                ..Default::default()
+            },
         )
         .await?;
     match resp.error {
@@ -118,20 +121,23 @@ pub(crate) async fn add_pet(
     let resp = client
         .execute(
             ctx,
-            &format!(
-                r#"
+            &Statement {
+                sql: format!(
+                    r#"
             insert into {} (id, pettype, name, bday, bmonth, byear, ownerid)
             values({}, {}, '{}', {}, {}, {}, {})
             "#,
-                TABLE_PETS,
-                pet.id,
-                pet.pettype,
-                pet.name,
-                pet.bday,
-                pet.bmonth,
-                pet.byear,
-                pet.ownerid
-            ),
+                    TABLE_PETS,
+                    pet.id,
+                    pet.pettype,
+                    pet.name,
+                    pet.bday,
+                    pet.bmonth,
+                    pet.byear,
+                    pet.ownerid
+                ),
+                ..Default::default()
+            },
         )
         .await?;
     match resp.error {
@@ -151,20 +157,23 @@ pub(crate) async fn create_owner(
     let resp = client
         .execute(
             ctx,
-            &format!(
-                r#"
+            &Statement {
+                sql: format!(
+                    r#"
                 insert into {} (id, address, city, email, firstname, lastname, telephone)
                 values({}, '{}', '{}', '{}', '{}', '{}', '{}')
                 "#,
-                TABLE_OWNERS,
-                arg.id,
-                owner.address,
-                owner.city,
-                owner.email,
-                owner.firstname,
-                owner.lastname,
-                owner.telephone,
-            ),
+                    TABLE_OWNERS,
+                    arg.id,
+                    owner.address,
+                    owner.city,
+                    owner.email,
+                    owner.firstname,
+                    owner.lastname,
+                    owner.telephone,
+                ),
+                ..Default::default()
+            },
         )
         .await?;
     match resp.error {
@@ -180,13 +189,16 @@ pub(crate) async fn find_owner(
     id: u64,
 ) -> Result<Option<Owner>, SqlDbError> {
     let resp = client
-        .fetch(
+        .query(
             ctx,
-            &format!(
-                "select id, address, city, email, firstname, lastname, telephone from {} where id \
-                 = {}",
-                TABLE_OWNERS, id
-            ),
+            &Statement {
+                sql: format!(
+                    "select id, address, city, email, firstname, lastname, telephone from {} \
+                     where id = {}",
+                    TABLE_OWNERS, id
+                ),
+                ..Default::default()
+            },
         )
         .await?;
 
@@ -205,12 +217,15 @@ pub(crate) async fn find_pet(
     id: u64,
 ) -> Result<Option<Pet>, SqlDbError> {
     let resp = client
-        .fetch(
+        .query(
             ctx,
-            &format!(
-                "select id, pettype, name, bday, bmonth, byear, ownerid from {} where id = {}",
-                TABLE_PETS, id
-            ),
+            &Statement {
+                sql: format!(
+                    "select id, pettype, name, bday, bmonth, byear, ownerid from {} where id = {}",
+                    TABLE_PETS, id
+                ),
+                ..Default::default()
+            },
         )
         .await?;
 
@@ -225,12 +240,15 @@ pub(crate) async fn find_pet(
 /// Lists all owners/customers in the database
 pub(crate) async fn list_all_owners(ctx: &Context, client: &Db) -> Result<Vec<Owner>, SqlDbError> {
     let resp = client
-        .fetch(
+        .query(
             ctx,
-            &format!(
-                "select id, address, city, email, firstname, lastname, telephone from {}",
-                TABLE_OWNERS
-            ),
+            &Statement {
+                sql: format!(
+                    "select id, address, city, email, firstname, lastname, telephone from {}",
+                    TABLE_OWNERS
+                ),
+                ..Default::default()
+            },
         )
         .await?;
 
@@ -244,7 +262,13 @@ pub(crate) async fn list_all_pet_types(
     client: &Db,
 ) -> Result<Vec<PetType>, SqlDbError> {
     let resp = client
-        .fetch(ctx, &format!("select id, name FROM {}", TABLE_PETTYPES))
+        .query(
+            ctx,
+            &Statement {
+                sql: format!("select id, name FROM {}", TABLE_PETTYPES),
+                ..Default::default()
+            },
+        )
         .await?;
     let rows: Vec<PetType> = safe_decode(&resp)?;
     Ok(rows)
@@ -257,13 +281,16 @@ pub(crate) async fn list_pets_by_owner(
     owner_id: u64,
 ) -> Result<Vec<Pet>, SqlDbError> {
     let resp = client
-        .fetch(
+        .query(
             ctx,
-            &format!(
-                "select id, pettype, name, bday, bmonth, byear, ownerid from {}
+            &Statement {
+                sql: format!(
+                    "select id, pettype, name, bday, bmonth, byear, ownerid from {}
                 where ownerid = {}",
-                TABLE_PETS, owner_id
-            ),
+                    TABLE_PETS, owner_id
+                ),
+                ..Default::default()
+            },
         )
         .await?;
 
@@ -285,8 +312,9 @@ pub(crate) async fn update_pet(
     let resp = client
         .execute(
             ctx,
-            &format!(
-                r#"
+            &Statement {
+                sql: format!(
+                    r#"
             update {} 
                 SET pettype = {},
                     name = '{}',
@@ -295,8 +323,10 @@ pub(crate) async fn update_pet(
                     byear = {}
             WHERE id = {}
             "#,
-                TABLE_PETS, pet.pettype, pet.name, pet.bday, pet.bmonth, pet.byear, pet.id
-            ),
+                    TABLE_PETS, pet.pettype, pet.name, pet.bday, pet.bmonth, pet.byear, pet.id
+                ),
+                ..Default::default()
+            },
         )
         .await?;
     match resp.error {
@@ -317,22 +347,25 @@ pub(crate) async fn update_owner(
     let resp = client
         .execute(
             ctx,
-            &format!(
-                r#"
+            &Statement {
+                sql: format!(
+                    r#"
                 update {}
                 SET address = '{}', city = '{}', email = '{}',
                 firstname = '{}', lastname = '{}', telephone = '{}'
                 WHERE id = {}                
                 "#,
-                TABLE_OWNERS,
-                owner.address,
-                owner.city,
-                owner.email,
-                owner.firstname,
-                owner.lastname,
-                owner.telephone,
-                owner.id,
-            ),
+                    TABLE_OWNERS,
+                    owner.address,
+                    owner.city,
+                    owner.email,
+                    owner.firstname,
+                    owner.lastname,
+                    owner.telephone,
+                    owner.id,
+                ),
+                ..Default::default()
+            },
         )
         .await?;
 
@@ -445,7 +478,7 @@ impl TryFrom<petclinic_interface::Owner> for Owner {
 
 /// When using this to decode Vecs, will get an empty vec
 /// as a response when no rows are returned
-fn safe_decode<'b, T>(resp: &'b FetchResult) -> Result<T, minicbor::decode::Error>
+fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<T, minicbor::decode::Error>
 where
     T: minicbor::Decode<'b> + Default,
 {

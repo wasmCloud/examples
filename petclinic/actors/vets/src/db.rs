@@ -1,7 +1,7 @@
 use super::Db;
 use serde::{Deserialize, Serialize};
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_sqldb::{minicbor, FetchResult, SqlDb, SqlDbError};
+use wasmcloud_interface_sqldb::{minicbor, QueryResult, SqlDb, SqlDbError, Statement};
 
 const TABLE_VETS: &str = "vets";
 
@@ -20,12 +20,16 @@ pub(crate) struct DbVet {
 
 pub(crate) async fn list_vets(ctx: &Context, client: &Db) -> Result<Vec<DbVet>, SqlDbError> {
     let resp = client
-        .fetch(
+        .query(
             ctx,
-            &format!(
-                "select id, firstname, lastname, specialties from {} order by lastname, firstname",
-                TABLE_VETS
-            ),
+            &Statement {
+                sql: format!(
+                    "select id, firstname, lastname, specialties from {} order by lastname, \
+                     firstname",
+                    TABLE_VETS
+                ),
+                ..Default::default()
+            },
         )
         .await?;
     let rows: Vec<DbVet> = safe_decode(&resp)?;
@@ -49,7 +53,7 @@ impl From<DbVet> for petclinic_interface::Vet {
 
 /// When using this to decode Vecs, will get an empty vec
 /// as a response when no rows are returned
-fn safe_decode<'b, T>(resp: &'b FetchResult) -> Result<T, minicbor::decode::Error>
+fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<T, minicbor::decode::Error>
 where
     T: minicbor::Decode<'b> + Default,
 {

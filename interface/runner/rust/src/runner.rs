@@ -1,19 +1,64 @@
-// This file is generated automatically using wasmcloud/weld-codegen and smithy model definitions
-//
+// This file is generated automatically using wasmcloud/weld-codegen 0.4.2
 
-#![allow(unused_imports, clippy::ptr_arg, clippy::needless_lifetimes)]
+#[allow(unused_imports)]
 use async_trait::async_trait;
+#[allow(unused_imports)]
 use serde::{Deserialize, Serialize};
-use std::{borrow::Cow, io::Write, string::ToString};
+#[allow(unused_imports)]
+use std::{borrow::Borrow, borrow::Cow, io::Write, string::ToString};
+#[allow(unused_imports)]
 use wasmbus_rpc::{
-    deserialize, serialize, Context, Message, MessageDispatch, RpcError, RpcResult, SendOpts,
-    Timestamp, Transport,
+    cbor::*,
+    common::{
+        deserialize, message_format, serialize, Context, Message, MessageDispatch, MessageFormat,
+        SendOpts, Transport,
+    },
+    error::{RpcError, RpcResult},
+    Timestamp,
 };
 
 pub const SMITHY_VERSION: &str = "1.0";
 
 pub type StringList = Vec<String>;
 
+// Encode StringList as CBOR and append to output stream
+#[doc(hidden)]
+pub fn encode_string_list<W: wasmbus_rpc::cbor::Write>(
+    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &StringList,
+) -> RpcResult<()> {
+    e.array(val.len() as u64)?;
+    for item in val.iter() {
+        e.str(item)?;
+    }
+    Ok(())
+}
+
+// Decode StringList from cbor input stream
+#[doc(hidden)]
+pub fn decode_string_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<StringList, RpcError> {
+    let __result = {
+        if let Some(n) = d.array()? {
+            let mut arr: Vec<String> = Vec::with_capacity(n as usize);
+            for _ in 0..(n as usize) {
+                arr.push(d.str()?.to_string())
+            }
+            arr
+        } else {
+            // indefinite array
+            let mut arr: Vec<String> = Vec::new();
+            loop {
+                match d.datatype() {
+                    Err(_) => break,
+                    Ok(wasmbus_rpc::cbor::Type::Break) => break,
+                    Ok(_) => arr.push(d.str()?.to_string()),
+                }
+            }
+            arr
+        }
+    };
+    Ok(__result)
+}
 /// The Runner interface has a single Run method
 /// wasmbus.contractId: wasmcloud:example:runner
 /// wasmbus.actorReceive
@@ -35,13 +80,17 @@ pub trait Runner {
 #[doc(hidden)]
 #[async_trait]
 pub trait RunnerReceiver: MessageDispatch + Runner {
-    async fn dispatch(&self, ctx: &Context, message: &Message<'_>) -> RpcResult<Message<'_>> {
+    async fn dispatch<'disp__, 'ctx__, 'msg__>(
+        &'disp__ self,
+        ctx: &'ctx__ Context,
+        message: &Message<'msg__>,
+    ) -> Result<Message<'msg__>, RpcError> {
         match message.method {
             "Run" => {
-                let value: StringList = deserialize(message.arg.as_ref())
-                    .map_err(|e| RpcError::Deser(format!("message '{}': {}", message.method, e)))?;
+                let value: StringList = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'StringList': {}", e)))?;
                 let resp = Runner::run(self, ctx, &value).await?;
-                let buf = serialize(&resp)?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
                 Ok(Message {
                     method: "Runner.Run",
                     arg: Cow::Owned(buf),
@@ -102,7 +151,7 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Runner for RunnerSend
     /// is dependent on the implementation.
     /// Either input or output arrays may be empty.
     async fn run(&self, ctx: &Context, arg: &StringList) -> RpcResult<StringList> {
-        let buf = serialize(arg)?;
+        let buf = wasmbus_rpc::common::serialize(arg)?;
         let resp = self
             .transport
             .send(
@@ -114,8 +163,9 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Runner for RunnerSend
                 None,
             )
             .await?;
-        let value = deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("response to {}: {}", "Run", e)))?;
+
+        let value: StringList = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': StringList", e)))?;
         Ok(value)
     }
 }

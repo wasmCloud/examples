@@ -2,7 +2,7 @@ use super::Db;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_sqldb::{minicbor, FetchResult, SqlDb, SqlDbError};
+use wasmcloud_interface_sqldb::{minicbor, QueryResult, SqlDb, SqlDbError, Statement};
 
 const TABLE_VISITS: &str = "visits";
 
@@ -69,7 +69,15 @@ pub(crate) async fn list_visits_by_owner_and_pet(
         )
     };
 
-    let resp = client.fetch(ctx, &sql).await?;
+    let resp = client
+        .query(
+            ctx,
+            &Statement {
+                sql,
+                ..Default::default()
+            },
+        )
+        .await?;
 
     let rows: Vec<DbVisit> = safe_decode(&resp)?;
     Ok(rows)
@@ -87,22 +95,25 @@ pub(crate) async fn record_visit(
     let resp = client
         .execute(
             ctx,
-            &format!(
-                r#"
+            &Statement {
+                sql: format!(
+                    r#"
             insert into {} (day, month, year, description, petid, vetid, ownerid, hour, minute)
             values({}, {}, {}, '{}', {}, {}, {}, {}, {})
             "#,
-                TABLE_VISITS,
-                visit.date.day,
-                visit.date.month,
-                visit.date.year,
-                visit.description,
-                visit.pet_id,
-                visit.vet_id,
-                owner_id,
-                visit.time.hour,
-                visit.time.minute
-            ),
+                    TABLE_VISITS,
+                    visit.date.day,
+                    visit.date.month,
+                    visit.date.year,
+                    visit.description,
+                    visit.pet_id,
+                    visit.vet_id,
+                    owner_id,
+                    visit.time.hour,
+                    visit.time.minute
+                ),
+                ..Default::default()
+            },
         )
         .await?;
 
@@ -133,7 +144,7 @@ impl From<DbVisit> for petclinic_interface::Visit {
 
 /// When using this to decode Vecs, will get an empty vec
 /// as a response when no rows are returned
-fn safe_decode<'b, T>(resp: &'b FetchResult) -> Result<T, minicbor::decode::Error>
+fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<T, minicbor::decode::Error>
 where
     T: minicbor::Decode<'b> + Default,
 {
