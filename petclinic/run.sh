@@ -47,6 +47,7 @@ APP_DB_USER=petclinic
 # name of the docker container running database
 APP_DB_HOST=db
 APP_INIT_SQL=db/tables.sql
+APP_FAKE_DATA_SQL=./create_data.sql
 
 # http configuration file. use https_config.json to enable TLS
 HTTP_CONFIG=http_config.json
@@ -208,6 +209,10 @@ init_db() {
     # as app user, create the app tables
     psql -X "postgresql://$APP_DB_USER@$DB_HOST:$DB_PORT/$APP_DB_NAME?passfile=$PSQL_APP" \
         -w $PSQL_VERBOSE -f $APP_INIT_SQL
+
+		# Insert some data for vets and pettypes
+		psql -X "postgresql://$APP_DB_USER@$DB_HOST:$DB_PORT/$APP_DB_NAME?passfile=$PSQL_APP" \
+			-w $PSQL_VERBOSE -f $APP_FAKE_DATA_SQL
 }
 
 # drop the app database and user
@@ -298,11 +303,11 @@ run_all() {
 	# start actors
 	make start REG_SERVER=registry:5000
 
-    # start capability providers: httpserver and sqldb 
-    start_providers
-
     # link providers with actors
     link_providers
+
+    # start capability providers: httpserver and sqldb 
+    start_providers
 }
 
 case $1 in 
