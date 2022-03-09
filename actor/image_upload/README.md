@@ -89,13 +89,15 @@ demonstrated with `curl`. To avoid leaking server details to an
 attacker, most errors return '404 not found', and you'll need to inspect
 the host logs for more detail. These commands generate output in json, so
 you might want to pipe the output to `jq` to make it more readable.
+(using `jq` may require running curl in silent mode (`-s`) to prevent it from
+ending extraneous non-json progress info to stdout)
 
 ### List buckets
 
 List all readable buckets.
 
 ```shell
-curl localhost:8080/containers | jq
+curl -s localhost:8080/containers | jq
 ```
 
 ### List images
@@ -104,7 +106,7 @@ List contents of the image bucket.
 Note that the `/images` part of the url is not the name of the bucket, it is the alias. 
 
 ```shell
-curl localhost:8080/images | jq
+curl -s localhost:8080/images | jq
 ```
 
 ### Upload image
