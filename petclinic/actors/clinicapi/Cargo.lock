@@ -339,7 +339,7 @@ dependencies = [
 
 [[package]]
 name = "clinicapi"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "async-trait",
  "form_urlencoded",

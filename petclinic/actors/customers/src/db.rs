@@ -23,6 +23,7 @@ use wasmcloud_interface_sqldb::{minicbor, QueryResult, SqlDb, SqlDbError, Statem
 const TABLE_OWNERS: &str = "owners";
 const TABLE_PETS: &str = "pets";
 const TABLE_PETTYPES: &str = "pettypes";
+const PETCLINIC_DB: &str = "petclinic";
 
 static REGEX: Lazy<regex::Regex> =
     Lazy::new(|| regex::Regex::new(r"^[-a-zA-Z0-9 ,._/@]+$").unwrap());
@@ -96,6 +97,7 @@ pub(crate) async fn delete_pet(ctx: &Context, client: &Db, id: u64) -> Result<()
             "#,
                     TABLE_PETS, id
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -136,6 +138,7 @@ pub(crate) async fn add_pet(
                     pet.byear,
                     pet.ownerid
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -172,6 +175,7 @@ pub(crate) async fn create_owner(
                     owner.lastname,
                     owner.telephone,
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -197,6 +201,7 @@ pub(crate) async fn find_owner(
                      where id = {}",
                     TABLE_OWNERS, id
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -224,6 +229,7 @@ pub(crate) async fn find_pet(
                     "select id, pettype, name, bday, bmonth, byear, ownerid from {} where id = {}",
                     TABLE_PETS, id
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -247,6 +253,7 @@ pub(crate) async fn list_all_owners(ctx: &Context, client: &Db) -> Result<Vec<Ow
                     "select id, address, city, email, firstname, lastname, telephone from {}",
                     TABLE_OWNERS
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -266,6 +273,7 @@ pub(crate) async fn list_all_pet_types(
             ctx,
             &Statement {
                 sql: format!("select id, name FROM {}", TABLE_PETTYPES),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -289,6 +297,7 @@ pub(crate) async fn list_pets_by_owner(
                 where ownerid = {}",
                     TABLE_PETS, owner_id
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -325,6 +334,7 @@ pub(crate) async fn update_pet(
             "#,
                     TABLE_PETS, pet.pettype, pet.name, pet.bday, pet.bmonth, pet.byear, pet.id
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -364,6 +374,7 @@ pub(crate) async fn update_owner(
                     owner.telephone,
                     owner.id,
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
