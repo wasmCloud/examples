@@ -4,6 +4,7 @@ use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_sqldb::{minicbor, QueryResult, SqlDb, SqlDbError, Statement};
 
 const TABLE_VETS: &str = "vets";
+const PETCLINIC_DB: &str = "petclinic";
 
 #[derive(Serialize, Deserialize, minicbor::Decode, Clone)]
 pub(crate) struct DbVet {
@@ -28,6 +29,7 @@ pub(crate) async fn list_vets(ctx: &Context, client: &Db) -> Result<Vec<DbVet>, 
                      firstname",
                     TABLE_VETS
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )

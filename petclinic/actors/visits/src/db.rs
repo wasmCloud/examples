@@ -5,6 +5,7 @@ use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_sqldb::{minicbor, QueryResult, SqlDb, SqlDbError, Statement};
 
 const TABLE_VISITS: &str = "visits";
+const PETCLINIC_DB: &str = "petclinic";
 
 static REGEX: Lazy<regex::Regex> =
     Lazy::new(|| regex::Regex::new(r"^[-a-zA-Z0-9 ,._/@]+$").unwrap());
@@ -74,6 +75,7 @@ pub(crate) async fn list_visits_by_owner_and_pet(
             ctx,
             &Statement {
                 sql,
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
@@ -112,6 +114,7 @@ pub(crate) async fn record_visit(
                     visit.time.hour,
                     visit.time.minute
                 ),
+                database: Some(PETCLINIC_DB.to_string()),
                 ..Default::default()
             },
         )
