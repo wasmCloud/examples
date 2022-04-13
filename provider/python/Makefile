@@ -16,7 +16,7 @@ include ../../build/makefiles/provider.mk
 
 ifeq ($(shell nc -czt -w1 127.0.0.1 4222 || echo fail),fail)
 test::
-	@killall --quiet python-provider
+	@killall -q python-provider
 	docker run --rm -d --name provider-test -p 127.0.0.1:4222:4222 nats:2.7.2
 	RUST_LOG=info \
 	PYTHON_MAIN=$(PWD)/tests \
@@ -26,7 +26,7 @@ test::
 	docker stop provider-test
 else
 test::
-	@killall --quiet python-provider
+	@killall -q python-provider
 	RUST_LOG=info \
 	PYTHON_MAIN=$(PWD)/tests \
 	PYTHON_DISPATCH=$(PWD)/tests/dispatch.py \
