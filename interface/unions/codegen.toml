@@ -1,13 +1,16 @@
 # codegen.toml
 
 [[models]]
-url = "https://cdn.jsdelivr.net/gh/wasmcloud/interfaces@d6ae2dd196aae3c2486e747eb1b3cd188ea71132/core/wasmcloud-model.smithy"
+url = "https://cdn.jsdelivr.net/gh/wasmcloud/interfaces/core/wasmcloud-core.smithy"
+
 [[models]]
-url = "https://cdn.jsdelivr.net/gh/wasmcloud/interfaces@cb504c8b7cfcee0a8c5ecdedf75757f4718ad4e6/core/wasmcloud-model.smithy"
+# url = "https://cdn.jsdelivr.net/gh/wasmcloud/interfaces@cb504c8b7cfcee0a8c5ecdedf75757f4718ad4e6/core/wasmcloud-model.smithy"
+path = "../../../interfaces/core"
+files = [ "wasmcloud-model.smithy", "wasmcloud-common.smithy"  ]
 
 [[models]]
 path = "."
-files = [ "union-demo.smithy" ]
+files = [ "union-demo.smithy", "smithy-types.smithy" ]
 
 [rust]
 output_dir = "rust"
@@ -15,3 +18,7 @@ output_dir = "rust"
 [[rust.files]]
 path = "src/union_demo.rs"
 namespace = "org.wasmcloud.example.union_demo"
+
+[[rust.files]]
+path = "src/smithy_types.rs"
+namespace = "org.wasmcloud.example.smithy_types"

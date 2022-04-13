@@ -3,6 +3,9 @@
 mod union_demo;
 pub use union_demo::*;
 
+mod smithy_types;
+pub use smithy_types::*;
+
 // If you wish, you can write some helper functions for the union
 // This will probably be code generated in the future
 impl AnyValue {
