@@ -1,4 +1,4 @@
-// This file is generated automatically using wasmcloud/weld-codegen 0.4.2
+// This file is generated automatically using wasmcloud/weld-codegen 0.4.4
 
 #[allow(unused_imports)]
 use async_trait::async_trait;
@@ -17,24 +17,33 @@ use wasmbus_rpc::{
     Timestamp,
 };
 
+#[allow(dead_code)]
 pub const SMITHY_VERSION: &str = "1.0";
 
 /// Union of various data types
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum AnyValue {
+    /// n(0)
     ValU8(u8),
+    /// n(1)
     ValU16(u16),
+    /// n(2)
     ValU32(u32),
+    /// n(3)
     ValU64(u64),
+    /// n(4)
     ValStr(String),
+    /// n(5)
     ValF64(f64),
+    /// n(6)
     ValBin(Vec<u8>),
 }
 
 // Encode AnyValue as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_any_value<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &AnyValue,
 ) -> RpcResult<()> {
     // encoding union AnyValue
@@ -77,9 +86,7 @@ pub fn encode_any_value<W: wasmbus_rpc::cbor::Write>(
 pub fn decode_any_value(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<AnyValue, RpcError> {
     let __result = {
         // decoding union AnyValue
-        let len = d.array()?.ok_or_else(|| {
-            RpcError::Deser("decoding union 'AnyValue': indefinite array not supported".to_string())
-        })?;
+        let len = d.fixed_array()?;
         if len != 2 {
             return Err(RpcError::Deser(
                 "decoding union 'AnyValue': expected 2-array".to_string(),
@@ -132,7 +139,7 @@ pub fn decode_any_value(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<AnyVal
     Ok(__result)
 }
 /// An error response contains an error message and optional stack trace
-#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ErrorResponse {
     #[serde(default)]
     pub message: String,
@@ -142,8 +149,9 @@ pub struct ErrorResponse {
 
 // Encode ErrorResponse as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_error_response<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &ErrorResponse,
 ) -> RpcResult<()> {
     e.array(2)?;
@@ -175,11 +183,7 @@ pub fn decode_error_response(
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct ErrorResponse: indefinite array not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => message = Some(d.str()?.to_string()),
@@ -196,11 +200,7 @@ pub fn decode_error_response(
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct ErrorResponse: indefinite map not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "message" => message = Some(d.str()?.to_string()),
@@ -230,16 +230,19 @@ pub fn decode_error_response(
     Ok(__result)
 }
 /// response contains either a map, for success, or error, for failure
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Response {
+    /// n(0)
     Values(ValueMap),
+    /// n(1)
     Error(ErrorResponse),
 }
 
 // Encode Response as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_response<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &Response,
 ) -> RpcResult<()> {
     // encoding union Response
@@ -262,9 +265,7 @@ pub fn encode_response<W: wasmbus_rpc::cbor::Write>(
 pub fn decode_response(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Response, RpcError> {
     let __result = {
         // decoding union Response
-        let len = d.array()?.ok_or_else(|| {
-            RpcError::Deser("decoding union 'Response': indefinite array not supported".to_string())
-        })?;
+        let len = d.fixed_array()?;
         if len != 2 {
             return Err(RpcError::Deser(
                 "decoding union 'Response': expected 2-array".to_string(),
@@ -272,13 +273,22 @@ pub fn decode_response(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Respons
         }
         match d.u16()? {
             0 => {
-                let val = decode_value_map(d).map_err(|e| format!("decoding 'ValueMap': {}", e))?;
+                let val = decode_value_map(d).map_err(|e| {
+                    format!(
+                        "decoding 'org.wasmcloud.example.union_demo#ValueMap': {}",
+                        e
+                    )
+                })?;
                 Response::Values(val)
             }
 
             1 => {
-                let val = decode_error_response(d)
-                    .map_err(|e| format!("decoding 'ErrorResponse': {}", e))?;
+                let val = decode_error_response(d).map_err(|e| {
+                    format!(
+                        "decoding 'org.wasmcloud.example.union_demo#ErrorResponse': {}",
+                        e
+                    )
+                })?;
                 Response::Error(val)
             }
 
@@ -297,8 +307,9 @@ pub type ValueMap = std::collections::HashMap<String, AnyValue>;
 
 // Encode ValueMap as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_value_map<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &ValueMap,
 ) -> RpcResult<()> {
     e.map(val.len() as u64)?;
@@ -314,17 +325,18 @@ pub fn encode_value_map<W: wasmbus_rpc::cbor::Write>(
 pub fn decode_value_map(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<ValueMap, RpcError> {
     let __result = {
         {
+            let map_len = d.fixed_map()? as usize;
             let mut m: std::collections::HashMap<String, AnyValue> =
-                std::collections::HashMap::default();
-            if let Some(n) = d.map()? {
-                for _ in 0..(n as usize) {
-                    let k = d.str()?.to_string();
-                    let v =
-                        decode_any_value(d).map_err(|e| format!("decoding 'AnyValue': {}", e))?;
-                    m.insert(k, v);
-                }
-            } else {
-                return Err(RpcError::Deser("indefinite maps not supported".to_string()));
+                std::collections::HashMap::with_capacity(map_len);
+            for _ in 0..map_len {
+                let k = d.str()?.to_string();
+                let v = decode_any_value(d).map_err(|e| {
+                    format!(
+                        "decoding 'org.wasmcloud.example.union_demo#AnyValue': {}",
+                        e
+                    )
+                })?;
+                m.insert(k, v);
             }
             m
         }

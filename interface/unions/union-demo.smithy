@@ -7,13 +7,14 @@
 // Tell the code generator how to reference symbols defined in this namespace
 metadata package = [{
     namespace: "org.wasmcloud.example.union_demo",
-    crate: "wasmcloud-example-union-demo",
+    crate: "wasmcloud_example_union_demo",
     py_module: "wasmcloud_example_union_demo",
 }]
 
 namespace org.wasmcloud.example.union_demo
 
 use org.wasmcloud.model#wasmbus
+use org.wasmcloud.model#codegenRust
 use org.wasmcloud.model#n
 use org.wasmcloud.model#U8
 use org.wasmcloud.model#U16
@@ -39,6 +40,7 @@ operation Get {
 
 
 /// response contains either a map, for success, or error, for failure
+@codegenRust(noDeriveEq:true)
 union Response {
 
     @n(0)
@@ -65,6 +67,7 @@ map ValueMap {
 }
 
 /// Union of various data types
+@codegenRust(noDeriveEq:true)
 union AnyValue {
     @n(0)
     valU8: U8,
