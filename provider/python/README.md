@@ -6,6 +6,8 @@ learning models in Python. Because it runs on a native host, it can take
 advantage of C libraries, including the [Intel Optimization for Tensorflow](https://www.intel.com/content/www/us/en/developer/articles/guide/optimization-for-tensorflow-installation-guide.html),
 GPUs, and any other Python libraries and extensions.
 
+> :warning: This example is for illustrative purposes and is not recommended for production due to security and stability concerns. In addition, the requirement for environment variables and preconfigured python installation limit portability.
+
 This differs from other wasmCloud capability providers in a few
 significant ways:
 
@@ -17,10 +19,12 @@ significant ways:
   (GIL), the provider is (mostly) single threaded. Some attempt is made 
   to increase throughput by using threads and async IO for message handling and
   serialization, but the Python functions are invoked one-at-a-time.
+  This has not been tested under load.
 - Running this provider requires a Python 3 environment to be already
   configured on the host machine. Although the wasmCloud host could
   download and run the provider from a remote registry, the host
-  must be configured as described below.
+  must be configured as described below. This requirement limits portability
+  of the provider.
 
 ## Invoking
 
