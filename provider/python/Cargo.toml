@@ -1,0 +1,50 @@
+[package]
+name = "python-provider"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+base64 = "0.13"
+bytes = "1.0"
+env_logger = "0.9"
+futures = "0.3"
+futures-util = "0.3.21"
+http = "0.2.6"
+ini = "1.3.0"
+lazy_static = "1.4.0"
+log = "0.4"
+minicbor-ser = { version = "0.1" }
+pyo3 = "0.16"
+pythonize = "0.16.0"
+rust-ini = { version = "0.18.0", package = "rust-ini" }
+serde_bytes = "0.11"
+serde_json = "1.0"
+serde-value = "0.7.0"
+serde = {version = "1.0", features = ["derive"] }
+thiserror = "1.0"
+tokio-stream = { version = "0.1.8"}
+tokio-util = { version = "0.7.0", features = ["io"] }
+tokio = { version = "1", features = ["full"] }
+toml = "0.5"
+triggered = "0.1.2"
+wasmbus-rpc = "0.8.4"
+
+# test dependencies
+[dev-dependencies]
+wasmcloud-test-util = "0.3.1"
+
+rand = "0.8"
+
+[build-dependencies]
+weld-codegen = "0.4.3"
+
+
+[lib]
+name = "pyprov"
+path = "src/lib.rs"
+
+#[[bin]]
+#name = "python-provider"
+#path = "src/main.rs"
+

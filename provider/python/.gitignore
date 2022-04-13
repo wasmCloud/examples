@@ -1,0 +1,7 @@
+/build
+/target
+secrets.*
+scripts/*
+venv
+__pycache__
+Cargo.lock
