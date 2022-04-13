@@ -55,15 +55,25 @@ def factorial(n):
 
 ## Configuration
 
+### Set up python environment
+
+Create a [virtual environment](https://docs.python.org/3/library/venv.html)
+and install dependencies
+
+```
+python3 -m venv venv
+source venv/bin/activate
+pip3 install neotasker
+```
+
+Install additional dependencies your programs may need.
 
 ### Environment variables
 
 Three variables must be set before running the provider. These must be
 set in the host's environment before starting wasmCloud host.
 
-- `VENV_PATH` path to a Python 3 [virtual environment](https://docs.python.org/3/library/venv.html)
-  In this environment, install any python dependencies
-  that your app requires.
+- `VENV_PATH` path to the virtual environment.
 
 - `PYTHON_MAIN` a path to a python module (folder) that loads and runs
   the `PYTHON_DISPATCH` program. 
