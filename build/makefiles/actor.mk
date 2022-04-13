@@ -5,7 +5,7 @@
 # Required
 # -----------
 # PROJECT      - Short name for the project, must be valid filename chars, no spaces
-# CLAIMS       - Space-separtaed list of capability contracts to use for signing
+# CLAIMS       - Space-separated list of capability contracts to use for signing
 #                These should match the capability providers the actor needs to use.
 #                For example: 
 #                    wasmcloud:httpserver wasmcloud:builtin:logging
