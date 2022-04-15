@@ -1,4 +1,4 @@
-// This file is generated automatically using wasmcloud/weld-codegen 0.4.2
+// This file is generated automatically using wasmcloud/weld-codegen 0.4.3
 
 #[allow(unused_imports)]
 use async_trait::async_trait;
@@ -17,6 +17,7 @@ use wasmbus_rpc::{
     Timestamp,
 };
 
+#[allow(dead_code)]
 pub const SMITHY_VERSION: &str = "1.0";
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -29,8 +30,9 @@ pub struct AddPetRequest {
 
 // Encode AddPetRequest as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_add_pet_request<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &AddPetRequest,
 ) -> RpcResult<()> {
     e.map(2)?;
@@ -60,29 +62,27 @@ pub fn decode_add_pet_request(
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct AddPetRequest: indefinite array not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => owner_id = Some(d.u64()?),
-                    1 => pet = Some(decode_pet(d).map_err(|e| format!("decoding 'Pet': {}", e))?),
+                    1 => {
+                        pet = Some(decode_pet(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Pet': {}", e)
+                        })?)
+                    }
                     _ => d.skip()?,
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct AddPetRequest: indefinite map not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "ownerId" => owner_id = Some(d.u64()?),
                     "pet" => {
-                        pet = Some(decode_pet(d).map_err(|e| format!("decoding 'Pet': {}", e))?)
+                        pet = Some(decode_pet(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Pet': {}", e)
+                        })?)
                     }
                     _ => d.skip()?,
                 }
@@ -118,8 +118,9 @@ pub struct CreateOwnerReply {
 
 // Encode CreateOwnerReply as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_create_owner_reply<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &CreateOwnerReply,
 ) -> RpcResult<()> {
     e.map(2)?;
@@ -149,11 +150,7 @@ pub fn decode_create_owner_reply(
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct CreateOwnerReply: indefinite array not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => id = Some(d.u64()?),
@@ -162,11 +159,7 @@ pub fn decode_create_owner_reply(
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct CreateOwnerReply: indefinite map not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "id" => id = Some(d.u64()?),
@@ -207,8 +200,9 @@ pub struct Date {
 
 // Encode Date as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_date<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &Date,
 ) -> RpcResult<()> {
     e.map(3)?;
@@ -239,9 +233,7 @@ pub fn decode_date(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Date, RpcEr
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Date: indefinite array not supported".to_string())
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => day = Some(d.u8()?),
@@ -251,9 +243,7 @@ pub fn decode_date(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Date, RpcEr
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Date: indefinite map not supported".to_string())
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "day" => day = Some(d.u8()?),
@@ -293,8 +283,9 @@ pub struct FindOwnerReply {
 
 // Encode FindOwnerReply as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_find_owner_reply<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &FindOwnerReply,
 ) -> RpcResult<()> {
     e.map(1)?;
@@ -325,11 +316,7 @@ pub fn decode_find_owner_reply(
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct FindOwnerReply: indefinite array not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => {
@@ -337,9 +324,9 @@ pub fn decode_find_owner_reply(
                             d.skip()?;
                             Some(None)
                         } else {
-                            Some(Some(
-                                decode_owner(d).map_err(|e| format!("decoding 'Owner': {}", e))?,
-                            ))
+                            Some(Some(decode_owner(d).map_err(|e| {
+                                format!("decoding 'org.wasmcloud.examples.petclinic#Owner': {}", e)
+                            })?))
                         }
                     }
 
@@ -347,11 +334,7 @@ pub fn decode_find_owner_reply(
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct FindOwnerReply: indefinite map not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "owner" => {
@@ -359,9 +342,9 @@ pub fn decode_find_owner_reply(
                             d.skip()?;
                             Some(None)
                         } else {
-                            Some(Some(
-                                decode_owner(d).map_err(|e| format!("decoding 'Owner': {}", e))?,
-                            ))
+                            Some(Some(decode_owner(d).map_err(|e| {
+                                format!("decoding 'org.wasmcloud.examples.petclinic#Owner': {}", e)
+                            })?))
                         }
                     }
                     _ => d.skip()?,
@@ -382,8 +365,9 @@ pub struct FindPetReply {
 
 // Encode FindPetReply as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_find_pet_reply<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &FindPetReply,
 ) -> RpcResult<()> {
     e.map(1)?;
@@ -414,11 +398,7 @@ pub fn decode_find_pet_reply(
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct FindPetReply: indefinite array not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => {
@@ -426,9 +406,9 @@ pub fn decode_find_pet_reply(
                             d.skip()?;
                             Some(None)
                         } else {
-                            Some(Some(
-                                decode_pet(d).map_err(|e| format!("decoding 'Pet': {}", e))?,
-                            ))
+                            Some(Some(decode_pet(d).map_err(|e| {
+                                format!("decoding 'org.wasmcloud.examples.petclinic#Pet': {}", e)
+                            })?))
                         }
                     }
 
@@ -436,11 +416,7 @@ pub fn decode_find_pet_reply(
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct FindPetReply: indefinite map not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "pet" => {
@@ -448,9 +424,9 @@ pub fn decode_find_pet_reply(
                             d.skip()?;
                             Some(None)
                         } else {
-                            Some(Some(
-                                decode_pet(d).map_err(|e| format!("decoding 'Pet': {}", e))?,
-                            ))
+                            Some(Some(decode_pet(d).map_err(|e| {
+                                format!("decoding 'org.wasmcloud.examples.petclinic#Pet': {}", e)
+                            })?))
                         }
                     }
                     _ => d.skip()?,
@@ -458,6 +434,117 @@ pub fn decode_find_pet_reply(
             }
         }
         FindPetReply { pet: pet.unwrap() }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct GetAssetResponse {
+    /// The raw asset as bytes
+    #[serde(with = "serde_bytes")]
+    #[serde(default)]
+    pub asset: Vec<u8>,
+    /// Optionally hint to the caller what the content type is. Should be a valid MIME type
+    #[serde(rename = "contentType")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
+    /// True if the asset was found, false if request was successful, but asset was not found
+    #[serde(default)]
+    pub found: bool,
+}
+
+// Encode GetAssetResponse as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_get_asset_response<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &GetAssetResponse,
+) -> RpcResult<()> {
+    e.map(3)?;
+    e.str("asset")?;
+    e.bytes(&val.asset)?;
+    if let Some(val) = val.content_type.as_ref() {
+        e.str("contentType")?;
+        e.str(val)?;
+    } else {
+        e.null()?;
+    }
+    e.str("found")?;
+    e.bool(val.found)?;
+    Ok(())
+}
+
+// Decode GetAssetResponse from cbor input stream
+#[doc(hidden)]
+pub fn decode_get_asset_response(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<GetAssetResponse, RpcError> {
+    let __result = {
+        let mut asset: Option<Vec<u8>> = None;
+        let mut content_type: Option<Option<String>> = Some(None);
+        let mut found: Option<bool> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct GetAssetResponse, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => asset = Some(d.bytes()?.to_vec()),
+                    1 => {
+                        content_type = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    2 => found = Some(d.bool()?),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "asset" => asset = Some(d.bytes()?.to_vec()),
+                    "contentType" => {
+                        content_type = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    "found" => found = Some(d.bool()?),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        GetAssetResponse {
+            asset: if let Some(__x) = asset {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field GetAssetResponse.asset (#0)".to_string(),
+                ));
+            },
+            content_type: content_type.unwrap(),
+
+            found: if let Some(__x) = found {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field GetAssetResponse.found (#2)".to_string(),
+                ));
+            },
+        }
     };
     Ok(__result)
 }
@@ -474,8 +561,9 @@ pub struct ListVisitsRequest {
 
 // Encode ListVisitsRequest as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_list_visits_request<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &ListVisitsRequest,
 ) -> RpcResult<()> {
     e.map(2)?;
@@ -509,11 +597,7 @@ pub fn decode_list_visits_request(
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct ListVisitsRequest: indefinite array not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => owner_id = Some(d.u64()?),
@@ -522,10 +606,12 @@ pub fn decode_list_visits_request(
                             d.skip()?;
                             Some(None)
                         } else {
-                            Some(Some(
-                                decode_pet_id_list(d)
-                                    .map_err(|e| format!("decoding 'PetIdList': {}", e))?,
-                            ))
+                            Some(Some(decode_pet_id_list(d).map_err(|e| {
+                                format!(
+                                    "decoding 'org.wasmcloud.examples.petclinic#PetIdList': {}",
+                                    e
+                                )
+                            })?))
                         }
                     }
 
@@ -533,11 +619,7 @@ pub fn decode_list_visits_request(
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct ListVisitsRequest: indefinite map not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "ownerId" => owner_id = Some(d.u64()?),
@@ -546,10 +628,12 @@ pub fn decode_list_visits_request(
                             d.skip()?;
                             Some(None)
                         } else {
-                            Some(Some(
-                                decode_pet_id_list(d)
-                                    .map_err(|e| format!("decoding 'PetIdList': {}", e))?,
-                            ))
+                            Some(Some(decode_pet_id_list(d).map_err(|e| {
+                                format!(
+                                    "decoding 'org.wasmcloud.examples.petclinic#PetIdList': {}",
+                                    e
+                                )
+                            })?))
                         }
                     }
                     _ => d.skip()?,
@@ -591,8 +675,9 @@ pub struct Owner {
 
 // Encode Owner as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_owner<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &Owner,
 ) -> RpcResult<()> {
     e.map(7)?;
@@ -651,9 +736,7 @@ pub fn decode_owner(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Owner, Rpc
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Owner: indefinite array not supported".to_string())
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => {
@@ -696,9 +779,7 @@ pub fn decode_owner(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Owner, Rpc
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Owner: indefinite map not supported".to_string())
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "address" => {
@@ -775,8 +856,9 @@ pub type OwnersList = Vec<Owner>;
 
 // Encode OwnersList as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_owners_list<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &OwnersList,
 ) -> RpcResult<()> {
     e.array(val.len() as u64)?;
@@ -793,7 +875,9 @@ pub fn decode_owners_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Owne
         if let Some(n) = d.array()? {
             let mut arr: Vec<Owner> = Vec::with_capacity(n as usize);
             for _ in 0..(n as usize) {
-                arr.push(decode_owner(d).map_err(|e| format!("decoding 'Owner': {}", e))?)
+                arr.push(decode_owner(d).map_err(|e| {
+                    format!("decoding 'org.wasmcloud.examples.petclinic#Owner': {}", e)
+                })?)
             }
             arr
         } else {
@@ -803,9 +887,9 @@ pub fn decode_owners_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Owne
                 match d.datatype() {
                     Err(_) => break,
                     Ok(wasmbus_rpc::cbor::Type::Break) => break,
-                    Ok(_) => {
-                        arr.push(decode_owner(d).map_err(|e| format!("decoding 'Owner': {}", e))?)
-                    }
+                    Ok(_) => arr.push(decode_owner(d).map_err(|e| {
+                        format!("decoding 'org.wasmcloud.examples.petclinic#Owner': {}", e)
+                    })?),
                 }
             }
             arr
@@ -827,8 +911,9 @@ pub struct Pet {
 
 // Encode Pet as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_pet<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &Pet,
 ) -> RpcResult<()> {
     e.map(4)?;
@@ -862,14 +947,13 @@ pub fn decode_pet(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Pet, RpcErro
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Pet: indefinite array not supported".to_string())
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => {
-                        birthdate =
-                            Some(decode_date(d).map_err(|e| format!("decoding 'Date': {}", e))?)
+                        birthdate = Some(decode_date(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Date': {}", e)
+                        })?)
                     }
                     1 => id = Some(d.u64()?),
                     2 => name = Some(d.str()?.to_string()),
@@ -878,14 +962,13 @@ pub fn decode_pet(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Pet, RpcErro
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Pet: indefinite map not supported".to_string())
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "birthdate" => {
-                        birthdate =
-                            Some(decode_date(d).map_err(|e| format!("decoding 'Date': {}", e))?)
+                        birthdate = Some(decode_date(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Date': {}", e)
+                        })?)
                     }
                     "id" => id = Some(d.u64()?),
                     "name" => name = Some(d.str()?.to_string()),
@@ -930,8 +1013,9 @@ pub type PetIdList = Vec<u64>;
 
 // Encode PetIdList as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_pet_id_list<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &PetIdList,
 ) -> RpcResult<()> {
     e.array(val.len() as u64)?;
@@ -970,8 +1054,9 @@ pub type PetList = Vec<Pet>;
 
 // Encode PetList as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_pet_list<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &PetList,
 ) -> RpcResult<()> {
     e.array(val.len() as u64)?;
@@ -988,7 +1073,9 @@ pub fn decode_pet_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<PetList
         if let Some(n) = d.array()? {
             let mut arr: Vec<Pet> = Vec::with_capacity(n as usize);
             for _ in 0..(n as usize) {
-                arr.push(decode_pet(d).map_err(|e| format!("decoding 'Pet': {}", e))?)
+                arr.push(decode_pet(d).map_err(|e| {
+                    format!("decoding 'org.wasmcloud.examples.petclinic#Pet': {}", e)
+                })?)
             }
             arr
         } else {
@@ -998,7 +1085,9 @@ pub fn decode_pet_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<PetList
                 match d.datatype() {
                     Err(_) => break,
                     Ok(wasmbus_rpc::cbor::Type::Break) => break,
-                    Ok(_) => arr.push(decode_pet(d).map_err(|e| format!("decoding 'Pet': {}", e))?),
+                    Ok(_) => arr.push(decode_pet(d).map_err(|e| {
+                        format!("decoding 'org.wasmcloud.examples.petclinic#Pet': {}", e)
+                    })?),
                 }
             }
             arr
@@ -1016,8 +1105,9 @@ pub struct PetType {
 
 // Encode PetType as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_pet_type<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &PetType,
 ) -> RpcResult<()> {
     e.map(2)?;
@@ -1045,11 +1135,7 @@ pub fn decode_pet_type(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<PetType
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct PetType: indefinite array not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => id = Some(d.u64()?),
@@ -1058,9 +1144,7 @@ pub fn decode_pet_type(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<PetType
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct PetType: indefinite map not supported".to_string())
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "id" => id = Some(d.u64()?),
@@ -1091,8 +1175,9 @@ pub type PetTypeList = Vec<PetType>;
 
 // Encode PetTypeList as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_pet_type_list<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &PetTypeList,
 ) -> RpcResult<()> {
     e.array(val.len() as u64)?;
@@ -1111,7 +1196,9 @@ pub fn decode_pet_type_list(
         if let Some(n) = d.array()? {
             let mut arr: Vec<PetType> = Vec::with_capacity(n as usize);
             for _ in 0..(n as usize) {
-                arr.push(decode_pet_type(d).map_err(|e| format!("decoding 'PetType': {}", e))?)
+                arr.push(decode_pet_type(d).map_err(|e| {
+                    format!("decoding 'org.wasmcloud.examples.petclinic#PetType': {}", e)
+                })?)
             }
             arr
         } else {
@@ -1121,9 +1208,9 @@ pub fn decode_pet_type_list(
                 match d.datatype() {
                     Err(_) => break,
                     Ok(wasmbus_rpc::cbor::Type::Break) => break,
-                    Ok(_) => arr.push(
-                        decode_pet_type(d).map_err(|e| format!("decoding 'PetType': {}", e))?,
-                    ),
+                    Ok(_) => arr.push(decode_pet_type(d).map_err(|e| {
+                        format!("decoding 'org.wasmcloud.examples.petclinic#PetType': {}", e)
+                    })?),
                 }
             }
             arr
@@ -1142,8 +1229,9 @@ pub struct RecordVisitRequest {
 
 // Encode RecordVisitRequest as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_record_visit_request<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &RecordVisitRequest,
 ) -> RpcResult<()> {
     e.map(2)?;
@@ -1173,34 +1261,27 @@ pub fn decode_record_visit_request(
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct RecordVisitRequest: indefinite array not supported"
-                        .to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => owner_id = Some(d.u64()?),
                     1 => {
-                        visit =
-                            Some(decode_visit(d).map_err(|e| format!("decoding 'Visit': {}", e))?)
+                        visit = Some(decode_visit(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Visit': {}", e)
+                        })?)
                     }
                     _ => d.skip()?,
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct RecordVisitRequest: indefinite map not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "ownerId" => owner_id = Some(d.u64()?),
                     "visit" => {
-                        visit =
-                            Some(decode_visit(d).map_err(|e| format!("decoding 'Visit': {}", e))?)
+                        visit = Some(decode_visit(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Visit': {}", e)
+                        })?)
                     }
                     _ => d.skip()?,
                 }
@@ -1230,8 +1311,9 @@ pub type SpecialtyList = Vec<String>;
 
 // Encode SpecialtyList as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_specialty_list<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &SpecialtyList,
 ) -> RpcResult<()> {
     e.array(val.len() as u64)?;
@@ -1278,8 +1360,9 @@ pub struct Time {
 
 // Encode Time as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_time<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &Time,
 ) -> RpcResult<()> {
     e.map(2)?;
@@ -1307,9 +1390,7 @@ pub fn decode_time(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Time, RpcEr
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Time: indefinite array not supported".to_string())
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => hour = Some(d.u8()?),
@@ -1318,9 +1399,7 @@ pub fn decode_time(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Time, RpcEr
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Time: indefinite map not supported".to_string())
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "hour" => hour = Some(d.u8()?),
@@ -1355,8 +1434,9 @@ pub struct UpdateOwnerReply {
 
 // Encode UpdateOwnerReply as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_update_owner_reply<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &UpdateOwnerReply,
 ) -> RpcResult<()> {
     e.map(1)?;
@@ -1383,11 +1463,7 @@ pub fn decode_update_owner_reply(
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct UpdateOwnerReply: indefinite array not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => success = Some(d.bool()?),
@@ -1395,11 +1471,7 @@ pub fn decode_update_owner_reply(
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser(
-                    "decoding struct UpdateOwnerReply: indefinite map not supported".to_string(),
-                )
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "success" => success = Some(d.bool()?),
@@ -1434,8 +1506,9 @@ pub struct Vet {
 
 // Encode Vet as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_vet<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &Vet,
 ) -> RpcResult<()> {
     e.map(4)?;
@@ -1469,37 +1542,37 @@ pub fn decode_vet(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Vet, RpcErro
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Vet: indefinite array not supported".to_string())
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => first_name = Some(d.str()?.to_string()),
                     1 => id = Some(d.u64()?),
                     2 => last_name = Some(d.str()?.to_string()),
                     3 => {
-                        specialties = Some(
-                            decode_specialty_list(d)
-                                .map_err(|e| format!("decoding 'SpecialtyList': {}", e))?,
-                        )
+                        specialties = Some(decode_specialty_list(d).map_err(|e| {
+                            format!(
+                                "decoding 'org.wasmcloud.examples.petclinic#SpecialtyList': {}",
+                                e
+                            )
+                        })?)
                     }
                     _ => d.skip()?,
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Vet: indefinite map not supported".to_string())
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "firstName" => first_name = Some(d.str()?.to_string()),
                     "id" => id = Some(d.u64()?),
                     "lastName" => last_name = Some(d.str()?.to_string()),
                     "specialties" => {
-                        specialties = Some(
-                            decode_specialty_list(d)
-                                .map_err(|e| format!("decoding 'SpecialtyList': {}", e))?,
-                        )
+                        specialties = Some(decode_specialty_list(d).map_err(|e| {
+                            format!(
+                                "decoding 'org.wasmcloud.examples.petclinic#SpecialtyList': {}",
+                                e
+                            )
+                        })?)
                     }
                     _ => d.skip()?,
                 }
@@ -1543,8 +1616,9 @@ pub type VetList = Vec<Vet>;
 
 // Encode VetList as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_vet_list<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &VetList,
 ) -> RpcResult<()> {
     e.array(val.len() as u64)?;
@@ -1561,7 +1635,9 @@ pub fn decode_vet_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<VetList
         if let Some(n) = d.array()? {
             let mut arr: Vec<Vet> = Vec::with_capacity(n as usize);
             for _ in 0..(n as usize) {
-                arr.push(decode_vet(d).map_err(|e| format!("decoding 'Vet': {}", e))?)
+                arr.push(decode_vet(d).map_err(|e| {
+                    format!("decoding 'org.wasmcloud.examples.petclinic#Vet': {}", e)
+                })?)
             }
             arr
         } else {
@@ -1571,7 +1647,9 @@ pub fn decode_vet_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<VetList
                 match d.datatype() {
                     Err(_) => break,
                     Ok(wasmbus_rpc::cbor::Type::Break) => break,
-                    Ok(_) => arr.push(decode_vet(d).map_err(|e| format!("decoding 'Vet': {}", e))?),
+                    Ok(_) => arr.push(decode_vet(d).map_err(|e| {
+                        format!("decoding 'org.wasmcloud.examples.petclinic#Vet': {}", e)
+                    })?),
                 }
             }
             arr
@@ -1601,8 +1679,9 @@ pub struct Visit {
 
 // Encode Visit as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_visit<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &Visit,
 ) -> RpcResult<()> {
     e.map(5)?;
@@ -1639,36 +1718,40 @@ pub fn decode_visit(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Visit, Rpc
             }
         };
         if is_array {
-            let len = d.array()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Visit: indefinite array not supported".to_string())
-            })?;
+            let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
                     0 => {
-                        date = Some(decode_date(d).map_err(|e| format!("decoding 'Date': {}", e))?)
+                        date = Some(decode_date(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Date': {}", e)
+                        })?)
                     }
                     1 => description = Some(d.str()?.to_string()),
                     2 => pet_id = Some(d.u64()?),
                     3 => {
-                        time = Some(decode_time(d).map_err(|e| format!("decoding 'Time': {}", e))?)
+                        time = Some(decode_time(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Time': {}", e)
+                        })?)
                     }
                     4 => vet_id = Some(d.u64()?),
                     _ => d.skip()?,
                 }
             }
         } else {
-            let len = d.map()?.ok_or_else(|| {
-                RpcError::Deser("decoding struct Visit: indefinite map not supported".to_string())
-            })?;
+            let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "date" => {
-                        date = Some(decode_date(d).map_err(|e| format!("decoding 'Date': {}", e))?)
+                        date = Some(decode_date(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Date': {}", e)
+                        })?)
                     }
                     "description" => description = Some(d.str()?.to_string()),
                     "petId" => pet_id = Some(d.u64()?),
                     "time" => {
-                        time = Some(decode_time(d).map_err(|e| format!("decoding 'Time': {}", e))?)
+                        time = Some(decode_time(d).map_err(|e| {
+                            format!("decoding 'org.wasmcloud.examples.petclinic#Time': {}", e)
+                        })?)
                     }
                     "vetId" => vet_id = Some(d.u64()?),
                     _ => d.skip()?,
@@ -1719,8 +1802,9 @@ pub type VisitList = Vec<Visit>;
 
 // Encode VisitList as CBOR and append to output stream
 #[doc(hidden)]
+#[allow(unused_mut)]
 pub fn encode_visit_list<W: wasmbus_rpc::cbor::Write>(
-    e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
     val: &VisitList,
 ) -> RpcResult<()> {
     e.array(val.len() as u64)?;
@@ -1737,7 +1821,9 @@ pub fn decode_visit_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Visit
         if let Some(n) = d.array()? {
             let mut arr: Vec<Visit> = Vec::with_capacity(n as usize);
             for _ in 0..(n as usize) {
-                arr.push(decode_visit(d).map_err(|e| format!("decoding 'Visit': {}", e))?)
+                arr.push(decode_visit(d).map_err(|e| {
+                    format!("decoding 'org.wasmcloud.examples.petclinic#Visit': {}", e)
+                })?)
             }
             arr
         } else {
@@ -1747,9 +1833,9 @@ pub fn decode_visit_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Visit
                 match d.datatype() {
                     Err(_) => break,
                     Ok(wasmbus_rpc::cbor::Type::Break) => break,
-                    Ok(_) => {
-                        arr.push(decode_visit(d).map_err(|e| format!("decoding 'Visit': {}", e))?)
-                    }
+                    Ok(_) => arr.push(decode_visit(d).map_err(|e| {
+                        format!("decoding 'org.wasmcloud.examples.petclinic#Visit': {}", e)
+                    })?),
                 }
             }
             arr
@@ -2222,6 +2308,113 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Petclinic for Petclin
 
         let value: String = wasmbus_rpc::common::deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("'{}': String", e)))?;
+        Ok(value)
+    }
+}
+
+/// wasmbus.actorReceive
+#[async_trait]
+pub trait Ui {
+    /// Gets the asset with the given path. The input string should be the path part of a URL with the
+    /// leading `/`
+    async fn get_asset<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<GetAssetResponse>;
+}
+
+/// UiReceiver receives messages defined in the Ui service trait
+#[doc(hidden)]
+#[async_trait]
+pub trait UiReceiver: MessageDispatch + Ui {
+    async fn dispatch<'disp__, 'ctx__, 'msg__>(
+        &'disp__ self,
+        ctx: &'ctx__ Context,
+        message: &Message<'msg__>,
+    ) -> Result<Message<'msg__>, RpcError> {
+        match message.method {
+            "GetAsset" => {
+                let value: String = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
+                let resp = Ui::get_asset(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+                Ok(Message {
+                    method: "Ui.GetAsset",
+                    arg: Cow::Owned(buf),
+                })
+            }
+            _ => Err(RpcError::MethodNotHandled(format!(
+                "Ui::{}",
+                message.method
+            ))),
+        }
+    }
+}
+
+/// UiSender sends messages to a Ui service
+/// client for sending Ui messages
+#[derive(Debug)]
+pub struct UiSender<T: Transport> {
+    transport: T,
+}
+
+impl<T: Transport> UiSender<T> {
+    /// Constructs a UiSender with the specified transport
+    pub fn via(transport: T) -> Self {
+        Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> UiSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl UiSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
+#[async_trait]
+impl<T: Transport + std::marker::Sync + std::marker::Send> Ui for UiSender<T> {
+    #[allow(unused)]
+    /// Gets the asset with the given path. The input string should be the path part of a URL with the
+    /// leading `/`
+    async fn get_asset<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<GetAssetResponse> {
+        let buf = wasmbus_rpc::common::serialize(&arg.to_string())?;
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Ui.GetAsset",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: GetAssetResponse = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': GetAssetResponse", e)))?;
         Ok(value)
     }
 }

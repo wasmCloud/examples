@@ -1,15 +1,18 @@
 use petclinic_interface::{
     AddPetRequest, Customers, CustomersSender, Date, ListVisitsRequest, Owner, Pet, PetType,
-    RecordVisitRequest, Vets, VetsSender, Visit, Visits, VisitsSender,
+    RecordVisitRequest, Ui, UiSender, Vets, VetsSender, Visit, Visits, VisitsSender,
 };
 use serde::{Deserialize, Serialize};
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
+use wasmcloud_interface_httpserver::{
+    HeaderMap, HttpRequest, HttpResponse, HttpServer, HttpServerReceiver,
+};
 use wasmcloud_interface_logging::debug;
 
 const VETS_ACTOR: &str = "petclinic/vets";
 const CUSTOMERS_ACTOR: &str = "petclinic/customers";
 const VISITS_ACTOR: &str = "petclinic/visits";
+const UI_ACTOR: &str = "petclinic/ui";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
@@ -55,6 +58,32 @@ impl HttpServer for ClinicapiActor {
             }
             ("POST", ["owners", owner_id, "pets", pet_id, "visits"]) => {
                 record_visit(ctx, owner_id, pet_id, deser(&req.body)?).await
+            }
+            ("GET", _) => {
+                debug!(
+                    "Got unrecognized path {}. Assuming this is an asset request",
+                    req.path
+                );
+                let sender = UiSender::to_actor(UI_ACTOR);
+                let resp = sender.get_asset(ctx, &req.path).await?;
+                if !resp.found {
+                    debug!("Asset {} was not found", req.path);
+                    return Ok(HttpResponse::not_found());
+                }
+                debug!("Got {} bytes for {}", resp.asset.len(), req.path);
+                let mut header = HeaderMap::new();
+                if let Some(content_type) = resp.content_type {
+                    debug!(
+                        "Found content type of {}, setting Content-Type header",
+                        content_type
+                    );
+                    header.insert("Content-Type".to_string(), vec![content_type]);
+                }
+                Ok(HttpResponse {
+                    status_code: 200,
+                    header,
+                    body: resp.asset,
+                })
             }
             (_, _) => Ok(HttpResponse::not_found()),
         }

@@ -7,13 +7,11 @@
 # What's here:
 #   wasmcloud host
 #   local registry
-#   javascript front-end
 #   postgres backend
 #   pgadmin
 #
 # Ports open on localhost:
 #  - 8080,443 httpserver to clinicapi (depending on whether tls is enabled)
-#  - 8081 javascript ui
 #  - 4000 phoenix ui (washboard)
 #  - 4222,6222,8000 nats
 #  - 5000 registry
@@ -48,7 +46,7 @@ services:
       - 127.0.0.1:9999:80
 
   nats:
-    image: nats:2.7.2
+    image: nats:2.7.4
     ports:
       - "127.0.0.1:4222:4222"
       - "127.0.0.1:6222:6222"
@@ -61,7 +59,7 @@ services:
       - "127.0.0.1:5000:5000"
 
   wasmcloud:
-    image: wasmcloud/wasmcloud_host:latest
+    image: wasmcloud/wasmcloud_host:0.54.3
     environment:
       LC_ALL: en_US.UTF-8
       RUST_LOG: debug
@@ -74,14 +72,3 @@ services:
       - "127.0.0.1:4000:4000"  # washboard
       - "127.0.0.1:443:8443"   # httpserver HTTPS port
       - "127.0.0.1:8080:8080"
-
-  ui:
-    build: ./petclinic-ui
-    ports:
-      - "127.0.0.1:8081:3000"
-    # select either the debug or non-debug version below
-    # run debug
-    command: npm run start
-    # run non-debug 
-    #command: serve -l 3000 -b build
-

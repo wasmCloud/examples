@@ -1,4 +1,6 @@
 require('dotenv').config();
+const path = require('path');
+
 // craco.config.js
 module.exports = {
   webpack: {
@@ -9,6 +11,7 @@ module.exports = {
           fullySpecified: false
         }
       })
+      paths.appBuild = webpackConfig.output.path = path.resolve(__dirname, "dist")
       return webpackConfig;
     },
   }

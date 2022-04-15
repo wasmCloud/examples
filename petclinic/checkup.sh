@@ -32,10 +32,10 @@ check_port() {
 
 
 make_version() {
-  if ! $(make -v | grep "GNU Make 4." >/dev/null); then
-      printf "$missing It is strongly recommended: GNU make 4 or greater. Makefiles may not work for you\n"
-      return 1
-  fi
+    if ! $(make -v | grep "GNU Make 4." >/dev/null); then
+        printf "$missing It is strongly recommended: GNU make 4 or greater. Makefiles may not work for you\n"
+    fi
+    return 0
 }
 
 check_ports() {
