@@ -14,7 +14,8 @@ files = [
     "customers.smithy",
     "visits.smithy",
     "vets.smithy",
-    "petclinic.smithy"
+    "petclinic.smithy",
+    "ui.smithy"
 ]
 
 [[models]]

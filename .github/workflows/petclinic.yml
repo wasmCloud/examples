@@ -26,17 +26,6 @@ jobs:
         with:
           working-directory: petclinic/petclinic-interface/rust
 
-  ui_build_check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install NPM deps
-        run: npm install
-        working-directory: petclinic/petclinic-ui
-      - name: Test NPM build
-        run: npm run build
-        working-directory: petclinic/petclinic-ui
-
   actors_build_check:
     runs-on: ubuntu-latest
     strategy:
@@ -47,6 +36,7 @@ jobs:
           - petclinic/actors/customers
           - petclinic/actors/vets
           - petclinic/actors/visits
+          - petclinic/actors/ui
         include:
           - working-directory: petclinic/actors/clinicapi
             artifact-name: clinicapi
@@ -56,6 +46,8 @@ jobs:
             artifact-name: vets
           - working-directory: petclinic/actors/visits
             artifact-name: visits
+          - working-directory: petclinic/actors/ui
+            artifact-name: ui
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
@@ -85,6 +77,9 @@ jobs:
       - name: Set wash subject key (visits)
         if: ${{ matrix.working-directory == 'petclinic/actors/visits' }}
         run: echo "WASH_SUBJECT_KEY=${{ secrets.WASMCLOUD_PETCLINIC_VISITS }}" > $GITHUB_ENV
+      - name: Set wash subject key (ui)
+        if: ${{ matrix.working-directory == 'petclinic/actors/ui' }}
+        run: echo "WASH_SUBJECT_KEY=${{ secrets.WASMCLOUD_PETCLINIC_UI }}" > $GITHUB_ENV
 
       - name: Build wasmcloud actor
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
@@ -100,12 +95,12 @@ jobs:
 
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
-    needs: actors_build_check 
+    needs: actors_build_check
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        artifact-name: [clinicapi, customers, vets, visits]
+        artifact-name: [clinicapi, customers, vets, visits, ui]
     steps:
       - name: Download signed actor
         uses: actions/download-artifact@v2
@@ -122,7 +117,7 @@ jobs:
           draft: false
 
   artifact_release:
-    needs: actors_build_check 
+    needs: actors_build_check
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-latest
     strategy:
@@ -133,6 +128,7 @@ jobs:
           - petclinic/actors/customers
           - petclinic/actors/vets
           - petclinic/actors/visits
+          - petclinic/actors/ui
         include:
           - working-directory: petclinic/actors/clinicapi
             artifact-name: clinicapi
@@ -142,6 +138,8 @@ jobs:
             artifact-name: vets
           - working-directory: petclinic/actors/visits
             artifact-name: visits
+          - working-directory: petclinic/actors/ui
+            artifact-name: ui
     steps:
       - uses: actions/checkout@v2
       - name: Download signed actor
