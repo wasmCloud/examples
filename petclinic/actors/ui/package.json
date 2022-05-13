@@ -1,6 +1,6 @@
 {
   "name": "petclinic-ui",
-  "version": "0.2.3",
+  "version": "0.3.1",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.3.0",

@@ -2,7 +2,7 @@ import * as apiMethods from './ApiMethods';
 
 class Api {
   url;
-  constructor(endpoint = process.env.REACT_APP_API_BASE) {
+  constructor(endpoint = window.location.href.replace(/\/$/, '')) {
     this.url = endpoint || 'http://localhost:8080';
   }
 
