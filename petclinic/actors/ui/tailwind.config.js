@@ -10,4 +10,5 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
   ],
+  purge: ["./public/index.html", "src/**/*.{jsx,js,ts,tsx}"]
 }
