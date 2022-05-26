@@ -179,7 +179,7 @@ async fn delete_todo(ctx: &Context, url: &str) -> Result<()> {
 async fn handle_request(ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
     debug!("incoming req: {:?}", req);
 
-    let trimmed_path = req.path.trim_end_matches('/');
+    let trimmed_path = req.path.trim_end_matches('');
     match (req.method.as_ref(), trimmed_path) {
         ("GET", "/") => Ok(HttpResponse {
             body: "todo server lives at /api".to_string().into_bytes(),
