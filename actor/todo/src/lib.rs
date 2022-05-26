@@ -181,7 +181,7 @@ async fn handle_request(ctx: &Context, req: &HttpRequest) -> RpcResult<HttpRespo
 
     let trimmed_path = req.path.trim_end_matches('/');
     match (req.method.as_ref(), trimmed_path) {
-        ("GET", "/") => Ok(HttpResponse {
+        ("GET", "") => Ok(HttpResponse {
             body: "todo server lives at /api".to_string().into_bytes(),
             ..Default::default()
         }),
