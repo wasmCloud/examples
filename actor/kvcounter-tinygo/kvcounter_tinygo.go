@@ -37,7 +37,7 @@ func (e *KvcounterTinygo) HandleRequest(ctx *actor.Context, req httpserver.HttpR
 	if err != nil {
 		return Success("Couldn't set new value in keyvalue store"), err
 	}
-	return Success(newValue), nil
+	return Success("Count: " + newValue), nil
 }
 
 // Helper function to construct a successful HTTP Response
