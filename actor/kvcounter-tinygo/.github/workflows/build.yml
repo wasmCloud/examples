@@ -1,0 +1,22 @@
+name: Build and test
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "*.go"
+      - "go.*"
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup tinygo
+        run: |
+          wget https://github.com/tinygo-org/tinygo/releases/download/v0.23.0/tinygo_0.23.0_amd64.deb
+          sudo dpkg -i tinygo_0.23.0_amd64.deb
+      - name: Build actor
+        run: tinygo build -target wasm -scheduler none -no-debug .
+      # Once you've written unit tests for your actor, you can uncomment
+      # the two lines below to automatically run tests
+      # - name: Test actor
+      #   run: tinygo test
