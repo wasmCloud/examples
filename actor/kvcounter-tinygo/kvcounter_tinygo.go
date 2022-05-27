@@ -9,8 +9,7 @@ import (
 )
 
 func main() {
-	me := KvcounterTinygo{}
-	actor.RegisterHandlers(httpserver.HttpServerHandler(&me))
+	actor.RegisterHandlers(httpserver.HttpServerHandler(&KvcounterTinygo{}))
 }
 
 type KvcounterTinygo struct{}
