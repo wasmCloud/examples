@@ -1,8 +1,19 @@
 # kvcounter-tinygo
 
-This actor takes an incoming HTTP request and returns a simple HTTP response. 
-This is very similar to the echo example in the [tinygo actor sdk](https://github.com/wasmcloud/actor-tinygo).
-Feel free to experiment with the code to see how you can change the HTTP response easily.
+This actor accepts http GET requests, and 
+increments a counter under the key `tinygo:count`.
+The result is returned in a plaintext payload as follows:
+
+```plain
+Count: 12
+```
+
+This actor makes use of the HTTP server (`wasmcloud:httpserver`) capability 
+and the key-value store capability (`wasmcloud:keyvalue`). 
+
+As usual, it is worth noting that this actor does _not_ know 
+where its HTTP server comes from, nor does it know which 
+key-value implementation the host runtime has provided.
 
 ## Building
 To build this actor and sign the WebAssembly file, run `make`.
@@ -29,7 +40,7 @@ make start
 
 To test it,
 ```
-curl -v localhost:8085/abc
+curl -v localhost:8085
 ```
-It should print the response "hello" on your console.
+It should print the response "Count: 1" on your console.
 
