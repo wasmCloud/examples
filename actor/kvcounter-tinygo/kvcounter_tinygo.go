@@ -22,6 +22,7 @@ func (e *KvcounterTinygo) HandleRequest(ctx *actor.Context, req httpserver.HttpR
 	if err != nil {
 		return Failure("Couldn't query keyvalue store"), nil
 	}
+
 	count, err := strconv.Atoi(prev.Value)
 	if err != nil {
 		count = 0
@@ -34,15 +35,12 @@ func (e *KvcounterTinygo) HandleRequest(ctx *actor.Context, req httpserver.HttpR
 		Expires: 0,
 	})
 	if err != nil {
-		return &httpserver.HttpResponse{
-			StatusCode: 200,
-			Header:     make(httpserver.HeaderMap, 0),
-			Body:       []byte("Couldn't query keyvalue store"),
-		}, err
+		return Success("Couldn't set new value in keyvalue store"), err
 	}
 	return Success(newValue), nil
 }
 
+// Helper function to construct a successful HTTP Response
 func Success(msg string) *httpserver.HttpResponse {
 	return &httpserver.HttpResponse{
 		StatusCode: 200,
@@ -51,6 +49,7 @@ func Success(msg string) *httpserver.HttpResponse {
 	}
 }
 
+// Helper function to construct a failed HTTP Response
 func Failure(msg string) *httpserver.HttpResponse {
 	return &httpserver.HttpResponse{
 		StatusCode: 500,
