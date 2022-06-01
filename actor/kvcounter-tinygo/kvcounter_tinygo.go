@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"strings"
 
 	actor "github.com/wasmcloud/actor-tinygo"
 	httpserver "github.com/wasmcloud/interfaces/httpserver/tinygo"
@@ -14,33 +15,35 @@ func main() {
 
 type KvcounterTinygo struct{}
 
-func (e *KvcounterTinygo) HandleRequest(ctx *actor.Context, req httpserver.HttpRequest) (*httpserver.HttpResponse, error) {
+func (e *KvcounterTinygo) HandleRequest(
+	ctx *actor.Context,
+	req httpserver.HttpRequest) (*httpserver.HttpResponse, error) {
+
+	key := strings.Replace(req.Path, "/", "_", -1)
+
 	kv := keyvalue.NewProviderKeyValue()
 
-	newValue, err := kv.Increment(ctx, keyvalue.IncrementRequest{
-		Key: "tinygo:count", Value: 1,
+	count, err := kv.Increment(ctx, keyvalue.IncrementRequest{
+		Key: key, Value: 1,
 	})
-
 	if err != nil {
-		return Success("Couldn't set increment value in keyvalue store"), err
+		return InternalServerError(err), nil
 	}
-	return Success("Count: " + strconv.FormatInt(int64(newValue), 10)), nil
-}
 
-// Helper function to construct a successful HTTP Response
-func Success(msg string) *httpserver.HttpResponse {
-	return &httpserver.HttpResponse{
+	res := "{\"counter\": " + strconv.Itoa(int(count)) + "}"
+
+	r := httpserver.HttpResponse{
 		StatusCode: 200,
 		Header:     make(httpserver.HeaderMap, 0),
-		Body:       []byte(msg),
+		Body:       []byte(res),
 	}
+	return &r, nil
 }
 
-// Helper function to construct a failed HTTP Response
-func Failure(msg string) *httpserver.HttpResponse {
+func InternalServerError(err error) *httpserver.HttpResponse {
 	return &httpserver.HttpResponse{
 		StatusCode: 500,
 		Header:     make(httpserver.HeaderMap, 0),
-		Body:       []byte(msg),
+		Body:       []byte(err.Error()),
 	}
 }
