@@ -1,0 +1,26 @@
+use * from error-type
+
+type header-map = list<tuple<string, string>>
+
+record http-request {
+    // HTTP method. One of: GET,POST,PUT,DELETE,HEAD,OPTIONS,CONNECT,PATCH,TRACE
+    method: string,
+    // full request path
+    path: string,
+    // query string. May be an empty string if there were no query parameters.
+    query-string: string,
+    // map of request headers (string key, string value)
+    header: header-map,
+    body: list<u8>,
+}
+
+record http-response {
+    // statusCode is a three-digit number, usually in the range 100-599 a value of 200 indicates success.
+    status-code: u16,
+    // Map of headers (string keys, list of values)
+    header: header-map,
+    // Body of response as a byte array. May be an empty array.
+    body: list<u8>,
+}
+
+handle-request: function(req: http-request) -> expected<http-response, rpc-error>

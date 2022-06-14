@@ -1,0 +1,4 @@
+use * from error-type
+use * from wasmbus-common
+
+receive: function(msg: message) -> expected<payload, rpc-error>

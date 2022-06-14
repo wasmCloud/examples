@@ -1,0 +1,36 @@
+variant rpc-error {
+    // The request exceeded its deadline.
+    deadline-exceeded(string),
+
+    // A capability provider was called before its configure_dispatch was called.
+    not-initialized(string),
+
+    method-not-handled(string),
+
+    // Error that can be returned if server has not implemented an optional interface method
+    not-implemented,
+
+    host-error(string),
+
+    deser(string),
+
+    ser(string),
+
+    rpc(string),
+
+    nats(string),
+
+    invalid-parameter(string),
+
+    // Error occurred in actor's rpc handler
+    actor-handler(string),
+
+    // Error occurred during provider initialization or put-link
+    provider-init(string),
+
+    // Timeout occurred
+    timeout(string),
+
+    // Anything else
+    other(string),
+}

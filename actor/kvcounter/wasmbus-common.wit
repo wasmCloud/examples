@@ -1,0 +1,6 @@
+type payload = list<u8>
+
+record message {
+    method: string,
+    arg: payload,
+}

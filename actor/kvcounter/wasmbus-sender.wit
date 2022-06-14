@@ -1,0 +1,4 @@
+use * from error-type
+use * from wasmbus-common
+
+send: function(msg: message, contract-name: string, link-name: option<string>) -> expected<payload, rpc-error>

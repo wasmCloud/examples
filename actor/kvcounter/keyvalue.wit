@@ -1,0 +1,4 @@
+use * from error-type
+
+// Increment the value of the key by the given amount
+increment: function(key: string, value: s32) -> expected<s32, rpc-error>
