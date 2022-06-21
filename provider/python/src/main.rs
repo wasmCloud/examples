@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         *s = service;
         drop(s);
 
-        if let Err(e) = provider_run(PythonProvider::default(), host_data).await {
+        if let Err(e) = provider_run(PythonProvider::default(), host_data, Some("Python Provider".to_string())).await {
             eprintln!("ERROR provider exited with {}", e.to_string());
         }
     });

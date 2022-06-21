@@ -1,24 +1,31 @@
 # codegen.toml
 
 [[models]]
-url = "https://cdn.jsdelivr.net/gh/wasmcloud/interfaces/core/wasmcloud-core.smithy"
-
-[[models]]
-# url = "https://cdn.jsdelivr.net/gh/wasmcloud/interfaces@cb504c8b7cfcee0a8c5ecdedf75757f4718ad4e6/core/wasmcloud-model.smithy"
 path = "../../../interfaces/core"
-files = [ "wasmcloud-model.smithy", "wasmcloud-common.smithy"  ]
+files = [ "wasmcloud-model.smithy", "wasmcloud-core.smithy"  ]
 
 [[models]]
 path = "."
 files = [ "union-demo.smithy", "smithy-types.smithy" ]
 
+
 [rust]
 output_dir = "rust"
+files = [ 
+  { path = "src/union_demo.rs", namespace = "org.wasmcloud.example.union_demo" },
+  { path = "src/smithy_types.rs", namespace = "org.wasmcloud.example.smithy_types" },
+]
 
-[[rust.files]]
-path = "src/union_demo.rs"
-namespace = "org.wasmcloud.example.union_demo"
+[assemblyscript]
+output_dir = "asm"
+files = [ 
+  { path = "src/union_demo.asm", namespace = "org.wasmcloud.example.union_demo" },
+  { path = "src/smithy_types.asm", namespace = "org.wasmcloud.example.smithy_types" },
+]
 
-[[rust.files]]
-path = "src/smithy_types.rs"
-namespace = "org.wasmcloud.example.smithy_types"
+#[tinygo]
+#output_dir = "tinygo"
+#files = [
+#  { path = "src/union_demo.go", namespace = "org.wasmcloud.example.union_demo" },
+#  { path = "src/smithy_types.go", namespace = "org.wasmcloud.example.smithy_types" },
+#]

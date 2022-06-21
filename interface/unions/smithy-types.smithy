@@ -18,8 +18,6 @@ use org.wasmcloud.model#codegenRust
 use org.wasmcloud.model#n
 use org.wasmcloud.model#Unit
 
-use org.wasmcloud.common#DocumentRef
-
 use org.wasmcloud.model#U8
 use org.wasmcloud.model#U16
 use org.wasmcloud.model#U32
@@ -128,13 +126,6 @@ structure Things {
 structure MoreThings {
     @required
     things: Things,
-}
-
-
-@codegenRust(noDeriveEq:true)
-structure DocRef {
-    @required
-    docRef: DocumentRef
 }
 
 union DataType {

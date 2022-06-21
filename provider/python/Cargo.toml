@@ -28,17 +28,16 @@ tokio-util = { version = "0.7.0", features = ["io"] }
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
 triggered = "0.1.2"
-wasmbus-rpc = "0.8.4"
+wasmbus-rpc = { git = "https://github.com/wasmcloud/weld", rev = "6da17f739b0ad0f1a58df2061eedd0d2f92baee0" }
 
 # test dependencies
 [dev-dependencies]
-wasmcloud-test-util = "0.3.1"
+wasmcloud-test-util = { git = "https://github.com/wasmcloud/wasmcloud-test", rev = "73d96b44f142777f3d2d9b1d7a5bbfdac73ea5c3" }
 
 rand = "0.8"
 
 [build-dependencies]
-weld-codegen = "0.4.3"
-
+weld-codegen = { git = "https://github.com/wasmcloud/weld", rev = "38eb105b135d615ab0910a05a9e7d5e821e85176" }
 
 [lib]
 name = "pyprov"

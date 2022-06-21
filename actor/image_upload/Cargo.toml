@@ -18,12 +18,12 @@ serde_bytes = "0.11"
 serde_json = "1.0.79"
 serde = { version = "1.0", features = [ "derive" ] }
 sha2 = "0.10"
-wasmbus-rpc = "0.8.2"
-wasmcloud-interface-httpserver = "0.5.0"
-wasmcloud-interface-logging = "0.5.0"
+wasmbus-rpc = { git = "https://github.com/wasmcloud/weld", rev = "6da17f739b0ad0f1a58df2061eedd0d2f92baee0" }
+wasmcloud-interface-httpserver = { git = "https://github.com/wasmcloud/interfaces", rev = "763d27dcfd6a5bf72a9f82ed406f638fdb429615" }
+wasmcloud-interface-logging = { git = "https://github.com/wasmcloud/interfaces", rev = "763d27dcfd6a5bf72a9f82ed406f638fdb429615" }
 
 [build-dependencies]
-weld-codegen = "0.4.2"
+weld-codegen = { git = "https://github.com/wasmcloud/weld", rev = "38eb105b135d615ab0910a05a9e7d5e821e85176" }
 
 [profile.release]
 # Optimize for small code size
