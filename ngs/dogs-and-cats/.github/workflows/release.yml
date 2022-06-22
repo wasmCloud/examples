@@ -1,0 +1,97 @@
+name: Release to GHCR
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "**"
+      - "src/**"
+      - "Cargo.*"
+    tags:
+      - "v*"
+env:
+  # For the release action, you'll have to set the following variables
+  WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY }}
+  WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
+jobs:
+  build_signed_actor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
+      # Once you've written unit tests for your actor, you can uncomment
+      # the two lines below to automatically run tests
+      # - name: Test actor
+      #   run: cargo test --target x86_64-unknown-linux-gnu -- --nocapture
+      - name: Build and sign wasmCloud actor
+        env:
+          WASH_ISSUER_KEY: ${{ env.WASH_ISSUER_KEY }}
+          WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY }}
+        run: make
+      - name: Upload signed actor to GH Actions
+        uses: actions/upload-artifact@v2
+        with:
+          name: wasmcloud-actor
+          path: build/*.wasm
+
+  github_release:
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    needs: build_signed_actor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+      - name: Download signed actor
+        uses: actions/download-artifact@v2
+        with:
+          name: wasmcloud-actor
+          path: build
+      - name: Create release text
+        run: |
+          export oci_version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')
+          export claims=$(wash claims inspect build/*.wasm)
+          echo "Your actor can be accessed at \`ghcr.io/${{ github.REPOSITORY }}:$oci_version\`" >> release.txt
+          echo "Claims information:" >> release.txt
+          echo "\`\`\`" >> release.txt
+          echo "$claims" >> release.txt
+          echo "\`\`\`" >> release.txt
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/*.wasm
+          token: ${{ env.WASMCLOUD_PAT }}
+          body_path: release.txt
+          prerelease: true
+          draft: false
+
+  artifact_release:
+    needs: build_signed_actor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+      - name: Download signed actor
+        uses: actions/download-artifact@v2
+        with:
+          name: wasmcloud-actor
+          path: build
+      - name: Determine actor name
+        run: |
+          echo "actor-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
+      - name: Determine actor version
+        if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+        run: |
+          echo "actor-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
+      - name: Determine actor version (main)
+        if: ${{ !startswith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "actor-version=latest" >> $GITHUB_ENV
+      - name: Push actor to GHCR
+        env:
+          WASH_REG_USER: ${{ github.repository_owner }}
+          WASH_REG_PASSWORD: ${{ secrets.WASMCLOUD_PAT }}
+        run: |
+          wash reg push ghcr.io/${{ github.REPOSITORY }}:${{ env.actor-version }} build/${{ env.actor-name }}_s.wasm -a org.opencontainers.image.source=https://github.com/${{ github.REPOSITORY }} --allow-latest
