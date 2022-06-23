@@ -53,15 +53,29 @@ impl From<DbVet> for petclinic_interface::Vet {
     }
 }
 
-/// When using this to decode Vecs, will get an empty vec
-/// as a response when no rows are returned
-fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<T, minicbor::decode::Error>
+
+fn safe_decode<'b, X>(resp: &'b QueryResult) -> Result<Vec<X>, minicbor::decode::Error>
 where
-    T: minicbor::Decode<'b> + Default,
+    X: wasmbus_rpc::cbor::Decode<'b> + Default,
 {
     if resp.num_rows == 0 {
-        Ok(T::default())
+        Ok(Vec::new())
     } else {
-        minicbor::decode(&resp.rows)
+        wasmbus_rpc::minicbor::decode(&resp.rows)
     }
 }
+
+
+
+// When using this to decode Vecs, will get an empty vec
+// as a response when no rows are returned
+//fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<T, minicbor::decode::Error>
+//where
+//    T: wasmbus_rpc::cbor::Decode<'b> + Default,
+//{
+//    if resp.num_rows == 0 {
+//        Ok(T::default())
+//    } else {
+//        minicbor::decode(&resp.rows)
+//    }
+//}
