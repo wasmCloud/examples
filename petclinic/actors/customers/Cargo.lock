@@ -2532,7 +2532,7 @@ checksum = "6a89911bd99e5f3659ec4acf9c4d93b0a90fe4a2a11f15328472058edc5261be"
 [[package]]
 name = "wasmbus-macros"
 version = "0.1.9"
-source = "git+https://github.com/wasmcloud/weld?rev=89de35130b2379e144a5d7867a9b7bd9590d6b1f#89de35130b2379e144a5d7867a9b7bd9590d6b1f"
+source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -2543,7 +2543,7 @@ dependencies = [
 [[package]]
 name = "wasmbus-rpc"
 version = "0.9.0-alpha.1.1"
-source = "git+https://github.com/wasmcloud/weld?rev=89de35130b2379e144a5d7867a9b7bd9590d6b1f#89de35130b2379e144a5d7867a9b7bd9590d6b1f"
+source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
 dependencies = [
  "anyhow",
  "async-nats",
@@ -2576,13 +2576,13 @@ dependencies = [
  "uuid",
  "wascap",
  "wasmbus-macros",
- "weld-codegen 0.4.5 (git+https://github.com/wasmcloud/weld?rev=89de35130b2379e144a5d7867a9b7bd9590d6b1f)",
+ "weld-codegen 0.4.5 (git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16)",
 ]
 
 [[package]]
 name = "wasmcloud-interface-logging"
 version = "0.6.0-alpha-1.0"
-source = "git+https://github.com/wasmcloud/interfaces?rev=6fa5eb5f7ef45df9a658f62e234f1efdec4f3700#6fa5eb5f7ef45df9a658f62e234f1efdec4f3700"
+source = "git+https://github.com/wasmcloud/interfaces?rev=d4d6b2af443246f09f2201ba502b87cc1389bb6f#d4d6b2af443246f09f2201ba502b87cc1389bb6f"
 dependencies = [
  "async-trait",
  "cfg-if 1.0.0",
@@ -2597,7 +2597,7 @@ dependencies = [
 [[package]]
 name = "wasmcloud-interface-sqldb"
 version = "0.6.0-alpha-1.0"
-source = "git+https://github.com/wasmcloud/interfaces?rev=6fa5eb5f7ef45df9a658f62e234f1efdec4f3700#6fa5eb5f7ef45df9a658f62e234f1efdec4f3700"
+source = "git+https://github.com/wasmcloud/interfaces?rev=d4d6b2af443246f09f2201ba502b87cc1389bb6f#d4d6b2af443246f09f2201ba502b87cc1389bb6f"
 dependencies = [
  "async-trait",
  "futures 0.3.21",
@@ -2651,7 +2651,7 @@ dependencies = [
 [[package]]
 name = "weld-codegen"
 version = "0.4.5"
-source = "git+https://github.com/wasmcloud/weld?rev=38eb105b135d615ab0910a05a9e7d5e821e85176#38eb105b135d615ab0910a05a9e7d5e821e85176"
+source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
 dependencies = [
  "Inflector",
  "anyhow",
@@ -2680,7 +2680,7 @@ dependencies = [
 [[package]]
 name = "weld-codegen"
 version = "0.4.5"
-source = "git+https://github.com/wasmcloud/weld?rev=89de35130b2379e144a5d7867a9b7bd9590d6b1f#89de35130b2379e144a5d7867a9b7bd9590d6b1f"
+source = "git+https://github.com/wasmcloud/weld?rev=38eb105b135d615ab0910a05a9e7d5e821e85176#38eb105b135d615ab0910a05a9e7d5e821e85176"
 dependencies = [
  "Inflector",
  "anyhow",

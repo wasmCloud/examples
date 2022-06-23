@@ -20,7 +20,7 @@ fn check_safety(tag: &str, uncertain_input: &str) -> Result<(), std::io::Error> 
     Ok(())
 }
 
-#[derive(Serialize, Deserialize, minicbor::Decode, Clone)]
+#[derive(Default, Serialize, Deserialize, minicbor::Decode, Clone)]
 pub(crate) struct DbVisit {
     #[n(0)]
     pub day: u32,
@@ -145,15 +145,16 @@ impl From<DbVisit> for petclinic_interface::Visit {
     }
 }
 
+
 /// When using this to decode Vecs, will get an empty vec
 /// as a response when no rows are returned
-fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<T, minicbor::decode::Error>
+fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<Vec<T>, minicbor::decode::Error>
 where
-    T: minicbor::Decode<'b> + Default,
+    T: Default + minicbor::Decode<'b,()>,
 {
     if resp.num_rows == 0 {
-        Ok(T::default())
+        Ok(Vec::new())
     } else {
-        minicbor::decode(&resp.rows)
+        wasmbus_rpc::minicbor::decode(&resp.rows)
     }
 }

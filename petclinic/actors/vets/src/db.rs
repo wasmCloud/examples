@@ -6,7 +6,7 @@ use wasmcloud_interface_sqldb::{minicbor, QueryResult, SqlDb, SqlDbError, Statem
 const TABLE_VETS: &str = "vets";
 const PETCLINIC_DB: &str = "petclinic";
 
-#[derive(Serialize, Deserialize, minicbor::Decode, Clone)]
+#[derive(Serialize, Default, Deserialize, minicbor::Decode, Clone)]
 pub(crate) struct DbVet {
     #[n(0)]
     pub id: u64,
@@ -53,10 +53,11 @@ impl From<DbVet> for petclinic_interface::Vet {
     }
 }
 
-
-fn safe_decode<'b, X>(resp: &'b QueryResult) -> Result<Vec<X>, minicbor::decode::Error>
+/// When using this to decode Vecs, will get an empty vec
+/// as a response when no rows are returned
+fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<Vec<T>, minicbor::decode::Error>
 where
-    X: wasmbus_rpc::cbor::Decode<'b> + Default,
+    T: Default + minicbor::Decode<'b,()>,
 {
     if resp.num_rows == 0 {
         Ok(Vec::new())
@@ -65,17 +66,3 @@ where
     }
 }
 
-
-
-// When using this to decode Vecs, will get an empty vec
-// as a response when no rows are returned
-//fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<T, minicbor::decode::Error>
-//where
-//    T: wasmbus_rpc::cbor::Decode<'b> + Default,
-//{
-//    if resp.num_rows == 0 {
-//        Ok(T::default())
-//    } else {
-//        minicbor::decode(&resp.rows)
-//    }
-//}
