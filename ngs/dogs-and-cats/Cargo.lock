@@ -525,7 +525,6 @@ dependencies = [
 name = "dogs-and-cats"
 version = "0.1.0"
 dependencies = [
- "form_urlencoded",
  "futures 0.3.21",
  "serde_json",
  "wasmbus-rpc",
