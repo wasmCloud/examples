@@ -4,7 +4,7 @@ PROJECT  = dogs_and_cats
 VERSION  = $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[] .version' | head -1)
 REVISION = 0
 # list of all contract claims for actor signing (space-separated)
-CLAIMS   = wasmcloud:httpserver wasmcloud:httpclient wasmcloud:builtin:numbergen wasmcloud:builtin:logging
+CLAIMS   = wasmcloud:httpserver wasmcloud:httpclient wasmcloud:builtin:numbergen
 # registry url for our actor
 REG_URL  = localhost:5000/v2/$(PROJECT):$(VERSION)
 # command to upload to registry (without last wasm parameter)
