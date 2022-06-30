@@ -94,7 +94,7 @@ jobs:
       - name: Push actor to AzureCR
         uses: wasmcloud/common-actions/oci-artifact-release@main
         with:
-          artifact-path: ${{ env.working-directory }}/build/${{ env.oci-repository }}_s.wasm
+          artifact-path: ${{ env.working-directory }}/build/dogs_and_cats_s.wasm
           oci-url: ${{ secrets.AZURECR_PUSH_URL }}
           oci-repository: ${{ env.oci-repository }}
           oci-version: ${{ env.oci-version }}
