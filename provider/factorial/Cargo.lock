@@ -2997,19 +2997,9 @@ checksum = "6a89911bd99e5f3659ec4acf9c4d93b0a90fe4a2a11f15328472058edc5261be"
 
 [[package]]
 name = "wasmbus-macros"
-version = "0.1.9"
-source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "wasmbus-macros"
-version = "0.1.9"
-source = "git+https://github.com/wasmcloud/weld?rev=d9c4dd571925c66462c196134a66f799a2e4c7fc#d9c4dd571925c66462c196134a66f799a2e4c7fc"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "302b6c170bb936b14fdcc8dd8efd3023258865e093293c4edbb110bd94cdb276"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -3019,47 +3009,9 @@ dependencies = [
 
 [[package]]
 name = "wasmbus-rpc"
-version = "0.9.0-alpha.1.1"
-source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
-dependencies = [
- "anyhow",
- "async-nats",
- "async-trait",
- "atty",
- "base64",
- "bytes",
- "cfg-if 1.0.0",
- "data-encoding",
- "futures 0.3.21",
- "lazy_static",
- "minicbor 0.17.1",
- "minicbor-ser",
- "nats",
- "nkeys",
- "once_cell",
- "rmp-serde 1.1.0",
- "serde",
- "serde_bytes",
- "serde_json",
- "sha2 0.10.2",
- "thiserror",
- "time 0.3.11",
- "tokio",
- "tokio-timer",
- "toml",
- "tracing",
- "tracing-futures",
- "tracing-subscriber",
- "uuid",
- "wascap",
- "wasmbus-macros 0.1.9 (git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16)",
- "weld-codegen 0.4.5 (git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16)",
-]
-
-[[package]]
-name = "wasmbus-rpc"
-version = "0.9.0-alpha-1.0"
-source = "git+https://github.com/wasmcloud/weld?rev=d9c4dd571925c66462c196134a66f799a2e4c7fc#d9c4dd571925c66462c196134a66f799a2e4c7fc"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2df664ef8e11410284657147b78e8172d119839b23b27c71a4eca6b0be083d21"
 dependencies = [
  "anyhow",
  "async-nats",
@@ -3094,8 +3046,8 @@ dependencies = [
  "tracing-subscriber",
  "uuid",
  "wascap",
- "wasmbus-macros 0.1.9 (git+https://github.com/wasmcloud/weld?rev=d9c4dd571925c66462c196134a66f799a2e4c7fc)",
- "weld-codegen 0.4.5 (git+https://github.com/wasmcloud/weld?rev=d9c4dd571925c66462c196134a66f799a2e4c7fc)",
+ "wasmbus-macros",
+ "weld-codegen",
 ]
 
 [[package]]
@@ -3118,29 +3070,31 @@ dependencies = [
  "thiserror",
  "tokio",
  "toml",
- "wasmbus-rpc 0.9.0-alpha.1.1",
+ "wasmbus-rpc",
  "wasmcloud-interface-factorial",
  "wasmcloud-test-util",
 ]
 
 [[package]]
 name = "wasmcloud-interface-factorial"
-version = "0.5.0-alpha.1.0"
-source = "git+https://github.com/wasmcloud/interfaces?rev=d4d6b2af443246f09f2201ba502b87cc1389bb6f#d4d6b2af443246f09f2201ba502b87cc1389bb6f"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a74cb7e9891cbd01b77b47fad6c2caf4b79a5b576759ed25b729d240f6ad6a12"
 dependencies = [
  "async-trait",
  "futures 0.3.21",
  "serde",
  "serde_bytes",
  "serde_json",
- "wasmbus-rpc 0.9.0-alpha.1.1",
- "weld-codegen 0.4.5 (git+https://github.com/wasmcloud/weld?rev=38eb105b135d615ab0910a05a9e7d5e821e85176)",
+ "wasmbus-rpc",
+ "weld-codegen",
 ]
 
 [[package]]
 name = "wasmcloud-interface-testing"
-version = "0.5.0-alpha-1.0"
-source = "git+https://github.com/wasmcloud/interfaces?rev=8c39d40ea70fef6985a5d67510cc33319c15b8f8#8c39d40ea70fef6985a5d67510cc33319c15b8f8"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "099f02466c92a4609100d0ba55eb55b100d5eeca157a80b75c8bab26660546cc"
 dependencies = [
  "async-trait",
  "regex",
@@ -3148,14 +3102,15 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_json",
- "wasmbus-rpc 0.9.0-alpha-1.0",
- "weld-codegen 0.4.5 (git+https://github.com/wasmcloud/weld?rev=38eb105b135d615ab0910a05a9e7d5e821e85176)",
+ "wasmbus-rpc",
+ "weld-codegen",
 ]
 
 [[package]]
 name = "wasmcloud-test-util"
-version = "0.4.0-alpha-1.0"
-source = "git+https://github.com/wasmcloud/wasmcloud-test?rev=a5eadfe4712cab12813823c8f489d7edf3abc134#a5eadfe4712cab12813823c8f489d7edf3abc134"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e36bde37f146a2902def5b47c19c633c2ffbf6d078b7f0143815a45e581f3aeb"
 dependencies = [
  "anyhow",
  "async-nats",
@@ -3169,7 +3124,7 @@ dependencies = [
  "termcolor",
  "tokio",
  "toml",
- "wasmbus-rpc 0.9.0-alpha-1.0",
+ "wasmbus-rpc",
  "wasmcloud-interface-testing",
 ]
 
@@ -3214,66 +3169,9 @@ dependencies = [
 
 [[package]]
 name = "weld-codegen"
-version = "0.4.5"
-source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
-dependencies = [
- "Inflector",
- "anyhow",
- "atelier_assembler",
- "atelier_core",
- "atelier_json",
- "atelier_smithy",
- "bytes",
- "cfg-if 1.0.0",
- "clap",
- "directories",
- "downloader",
- "handlebars",
- "lazy_static",
- "lexical-sort",
- "reqwest",
- "rustc-hash",
- "semver",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
- "toml",
-]
-
-[[package]]
-name = "weld-codegen"
-version = "0.4.5"
-source = "git+https://github.com/wasmcloud/weld?rev=38eb105b135d615ab0910a05a9e7d5e821e85176#38eb105b135d615ab0910a05a9e7d5e821e85176"
-dependencies = [
- "Inflector",
- "anyhow",
- "atelier_assembler",
- "atelier_core",
- "atelier_json",
- "atelier_smithy",
- "bytes",
- "cfg-if 1.0.0",
- "clap",
- "directories",
- "downloader",
- "handlebars",
- "lazy_static",
- "lexical-sort",
- "reqwest",
- "rustc-hash",
- "semver",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
- "toml",
-]
-
-[[package]]
-name = "weld-codegen"
-version = "0.4.5"
-source = "git+https://github.com/wasmcloud/weld?rev=d9c4dd571925c66462c196134a66f799a2e4c7fc#d9c4dd571925c66462c196134a66f799a2e4c7fc"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e60907625a6f1a53c2b4b26b4bf381d2335ea1ae5bd2e82263034bdaddfe4638"
 dependencies = [
  "Inflector",
  "anyhow",
