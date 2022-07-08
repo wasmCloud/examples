@@ -12,8 +12,8 @@ async-trait = "0.1"
 futures = "0.3"
 serde_bytes = "0.11"
 serde = {version = "1.0", features = ["derive"]}
-wasmbus-rpc = { git = "https://github.com/wasmcloud/weld", rev = "249102567eb50fddaf3a35c2546afbdb321e8b16" }
-wasmcloud-interface-numbergen = { git = "https://github.com/wasmcloud/interfaces", rev = "d4d6b2af443246f09f2201ba502b87cc1389bb6f" }
+wasmbus-rpc = "0.9"
+wasmcloud-interface-numbergen = "0.6.0"
 wasmcloud-example-runner = { path = "../../interface/runner/rust" }
 
 [profile.release]

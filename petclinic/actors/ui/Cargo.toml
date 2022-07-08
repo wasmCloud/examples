@@ -13,8 +13,8 @@ path = "lib.rs"
 async-trait = "0.1"
 futures = "0.3"
 form_urlencoded = "1.0"
-wasmbus-rpc = { git = "https://github.com/wasmcloud/weld", rev = "249102567eb50fddaf3a35c2546afbdb321e8b16" }
-wasmcloud-interface-logging = { git = "https://github.com/wasmcloud/interfaces", rev = "d4d6b2af443246f09f2201ba502b87cc1389bb6f" }
+wasmbus-rpc = "0.9"
+wasmcloud-interface-logging = "0.6.0"
 petclinic-interface = { path = "../../petclinic-interface/rust"}
 rust-embed = "6.3.0"
 mime_guess = "2"

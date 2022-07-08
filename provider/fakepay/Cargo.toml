@@ -21,7 +21,7 @@ thiserror = "1.0"
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
 wasmcloud-examples-payments = { version = "0.3.0", path="../../interface/payments/rust" }
-wasmbus-rpc = { git = "https://github.com/wasmcloud/weld", rev = "249102567eb50fddaf3a35c2546afbdb321e8b16" }
+wasmbus-rpc = { version = "0.9", features = ["otel"] }
 
 [[bin]]
 name = "fakepay"
