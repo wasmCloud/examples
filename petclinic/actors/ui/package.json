@@ -3,9 +3,9 @@
   "version": "0.3.1",
   "private": true,
   "dependencies": {
-    "@craco/craco": "^6.3.0",
-    "@tailwindcss/forms": "^0.3.3",
-    "@testing-library/jest-dom": "^5.16.3",
+    "@craco/craco": "^6.4.3",
+    "@tailwindcss/forms": "^0.3.4",
+    "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "react": "^17.0.2",
@@ -33,9 +33,9 @@
     ]
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.2",
+    "autoprefixer": "^10.4.7",
     "dotenv": "^10.0.0",
-    "postcss": "^8.4.5",
+    "postcss": "^8.4.14",
     "tailwind": "^4.0.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.14"
   }

@@ -1,6 +1,6 @@
 [package]
 name = "dogs-and-cats"
-version = "0.1.0"
+version = "0.2.1"
 authors = [ "wasmCloud Team" ]
 edition = "2021"
 
@@ -11,11 +11,11 @@ name = "dogs_and_cats"
 [dependencies]
 futures = "0.3"
 serde_json = "1.0.81"
-wasmbus-rpc = "0.8.2"
-wasmcloud-interface-numbergen = "0.5"
-wasmcloud-interface-logging = "0.5"
-wasmcloud-interface-httpserver = "0.5"
-wasmcloud-interface-httpclient = "0.5"
+wasmbus-rpc = "0.9"
+wasmcloud-interface-numbergen = "0.6"
+wasmcloud-interface-logging = "0.6"
+wasmcloud-interface-httpserver = "0.6"
+wasmcloud-interface-httpclient = "0.6"
 
 [profile.release]
 # Optimize for small code size

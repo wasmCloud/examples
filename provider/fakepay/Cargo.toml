@@ -1,6 +1,6 @@
 [package]
 name = "wasmcloud-example-provider-fakepay"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2018"
 resolver = "2"
 
@@ -21,7 +21,7 @@ thiserror = "1.0"
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
 wasmcloud-examples-payments = { version = "0.3.0", path="../../interface/payments/rust" }
-wasmbus-rpc = "0.8.2"
+wasmbus-rpc = { version = "0.9", features = ["otel"] }
 
 [[bin]]
 name = "fakepay"

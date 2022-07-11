@@ -39,7 +39,7 @@ fn check_safety(tag: &str, uncertain_input: &str) -> Result<(), std::io::Error> 
 }
 
 /// Represents a row in the owners table
-#[derive(Serialize, Deserialize, minicbor::Decode, Clone)]
+#[derive(Default, Serialize, Deserialize, minicbor::Decode, Clone)]
 pub(crate) struct Owner {
     #[n(0)]
     pub id: u64,
@@ -58,7 +58,7 @@ pub(crate) struct Owner {
 }
 
 /// Represents a row in the pets table
-#[derive(Serialize, Deserialize, minicbor::Decode, Clone)]
+#[derive(Default, Serialize, Deserialize, minicbor::Decode, Clone)]
 pub(crate) struct Pet {
     #[n(0)]
     pub id: u64,
@@ -77,7 +77,7 @@ pub(crate) struct Pet {
 }
 
 /// Represents a row in the pettypes table
-#[derive(Serialize, Deserialize, minicbor::Decode, Clone)]
+#[derive(Default, Serialize, Deserialize, minicbor::Decode, Clone)]
 pub(crate) struct PetType {
     #[n(0)]
     pub id: u64,
@@ -489,13 +489,13 @@ impl TryFrom<petclinic_interface::Owner> for Owner {
 
 /// When using this to decode Vecs, will get an empty vec
 /// as a response when no rows are returned
-fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<T, minicbor::decode::Error>
+fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<Vec<T>, minicbor::decode::Error>
 where
-    T: minicbor::Decode<'b> + Default,
+    T: Default + minicbor::Decode<'b, ()>,
 {
     if resp.num_rows == 0 {
-        Ok(T::default())
+        Ok(Vec::new())
     } else {
-        minicbor::decode(&resp.rows)
+        wasmbus_rpc::minicbor::decode(&resp.rows)
     }
 }

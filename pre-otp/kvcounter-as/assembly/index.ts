@@ -1,7 +1,6 @@
 import { Request, Response, ResponseBuilder, Handlers as HTTPHandlers } from "@wasmcloud/actor-http-server";
 import { Host as KV } from "@wasmcloud/actor-keyvalue";
 import { HealthCheckResponse, HealthCheckRequest, Handlers as CoreHandlers, HealthCheckResponseBuilder } from "@wasmcloud/actor-core";
-import { JSONEncoder } from "assemblyscript-json";
 
 export function wapc_init(): void {
   CoreHandlers.registerHealthRequest(HealthCheck);
@@ -17,15 +16,8 @@ function HandleRequest(request: Request): Response {
   const key = request.path.replace("/", ":");
   const result = kv.Add(key, 1);
 
-  let encoder = new JSONEncoder();
-
-  // Construct output JSON
-  encoder.pushObject("");
-  encoder.setInteger("count", result.value);
-  encoder.popObject();
-
   // Get serialized data
-  let json: Uint8Array = encoder.serialize();
+  let json = Uint8Array.wrap(String.UTF8.encode('{"greeting":"hello"}'));
 
   return new ResponseBuilder()
     .withStatusCode(200)
