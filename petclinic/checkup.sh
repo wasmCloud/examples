@@ -65,7 +65,6 @@ check_requirements() {
     check_command uuidgen "Please install uuidgen." || _ok=1
     make_version || _ok=1
     check_command docker  "Please install docker" || _ok=1
-    check_command docker-compose  "Please install docker-compose" || _ok=1
     check_command psql    "Please install psql" || _ok=1
 
     if ! $(has nc); then

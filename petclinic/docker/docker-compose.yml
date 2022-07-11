@@ -33,6 +33,8 @@ services:
     restart: always
 
   pgadmin:
+    profiles:
+      - localdev
     image: dpage/pgadmin4:5
     depends_on:
       - "db"
@@ -46,7 +48,7 @@ services:
       - 127.0.0.1:9999:80
 
   nats:
-    image: nats:2.7.4
+    image: nats:2.8.4-alpine
     ports:
       - "127.0.0.1:4222:4222"
       - "127.0.0.1:6222:6222"
@@ -54,20 +56,45 @@ services:
     command: [ "-js" ]
 
   registry:
+    profiles:
+      - localdev
     image: registry:2.7
     ports:
       - "127.0.0.1:5000:5000"
 
+  grafana:
+    image: grafana/grafana:8.1.2
+    ports:
+      - 5050:3000
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    depends_on:
+      - tempo  
+  tempo:
+    image: grafana/tempo:1.1.0
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+    ports:
+      - 8000:8000 # tempo
+      - 55681:55681 # otlp http  
+
   wasmcloud:
-    image: wasmcloud/wasmcloud_host:0.54.3
+    image: wasmcloud/wasmcloud_host:latest
     environment:
       LC_ALL: en_US.UTF-8
-      RUST_LOG: debug
+      RUST_LOG: debug,hyper=info
       WASMCLOUD_OCI_ALLOWED_INSECURE: registry:5000
       WASMCLOUD_RPC_HOST: nats
       WASMCLOUD_CTL_HOST: nats
       WASMCLOUD_PROV_RPC_HOST: nats
       WASMCLOUD_CLUSTER_SEED: ${WASMCLOUD_CLUSTER_SEED}
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:55681
     ports:
       - "127.0.0.1:4000:4000"  # washboard
       - "127.0.0.1:443:8443"   # httpserver HTTPS port

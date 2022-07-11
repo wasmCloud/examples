@@ -3,10 +3,11 @@ set -e
 
 show_help() {
 cat <<_SHOW_HELP
-  This program runs the petclinic api. Useful commands:
+  This program runs the petclinic example. Useful commands:
 
   Basics:
-   $0 all                          - run everything
+   $0 all                          - Run Postgres and wasmCloud in Docker, start PetClinicapplication
+   $0 dev                          - Run Postgres and wasmCloud in Docker, start locally built petclinic resources
    $0 wipe                         - stop everything and erase all secrets
 
   Database management
@@ -26,21 +27,35 @@ _SHOW_HELP
 ## ---------------------------------------------------------------
 ## CONFIGURATION
 ##
-HTTPSERVER_REF=wasmcloud.azurecr.io/httpserver:0.15.0
-SQLDB_REF=wasmcloud.azurecr.io/sqldb-postgres:0.2.0
+# Providers
+HTTPSERVER_REF=wasmcloud.azurecr.io/httpserver:0.16.0
+SQLDB_REF=wasmcloud.azurecr.io/sqldb-postgres:0.3.0
 HTTPSERVER_ID=VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M
 SQLDB_POSTGRES_ID=VDJQVOMF5FI3S5P4KJLCK2N25525U4IQIPH6NLHWZVTRZXTU6AOX4OPN
+# Actors TODO: bump patch for otel release
+UI_REF=wasmcloud.azurecr.io/ui:0.3.1
+UI_ID=MA2BF3WNKPR6LFEHOAEGVRWHPR7TS25AF5QTGSDKTDKHY4JV7DUEUSVG
+CLINICAPI_REF=wasmcloud.azurecr.io/clinicapi:0.3.0
+CLINICAPI_ID=MA5DZLFF733IR7TIDMBNOUMDS7I32NFUJIZ7LBSS5ED3V6GPFTDZJXZ3
+VETS_REF=wasmcloud.azurecr.io/vets:0.3.0
+VETS_ID=MBZ3XLCME3RZBF7GQJ2LNIFZXHOGEJ2I7GVRHSIOPERWQXGMAH5NCI4F
+VISITS_REF=wasmcloud.azurecr.io/visits:0.3.0
+VISITS_ID=MAGZWZ4POOV6VKPJEIYP477KAHBPX5TULKVDHLJQT5QYOARP6CNHFNKJ
+CUSTOMERS_REF=wasmcloud.azurecr.io/customers:0.3.0
+CUSTOMERS_ID=MATDCJMSWC4R3Q4CKWLZ6SSF67CPST5TIHP6773OCDJL4B52NS3CPTGU
 # the registry using container name
 REG_SERVER=registry:5000
 
-# actor to link to httpsrever. there can be only one since there's one listen port
+# actor to link to httpserver. there can be only one since there's one listen port
 HTTP_ACTOR=actors/clinicapi
 # actors to link to sqldb-postgres
 SQLDB_ACTORS="actors/customers actors/vets actors/visits"
+WASMCLOUD_LATTICE_PREFIX=default
 
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_ROOT_USER=postgres
+LOG_FILE=docker/logs.txt
 
 APP_DB_NAME=petclinic
 APP_DB_USER=petclinic
@@ -63,6 +78,7 @@ BASE64_ENC=base64
 # uncomment this line to echo all database commands to terminal
 PSQL_VERBOSE=-e
 
+COMPOSE_FILE=./docker/docker-compose.yml
 # where passwords are stored after being generated
 SECRETS=.secrets
 PSQL_ROOT=.psql_root
@@ -86,11 +102,10 @@ POSTGRES_PASSWORD=
 WASMCLOUD_CLUSTER_SEED=
 __WIPE
 
-    docker-compose --env-file $SECRETS stop
-    docker-compose --env-file $SECRETS rm -f
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE down
     wash drain all
 
-    rm -f $ALL_SECRET_FILES .pgadmin_init.json 
+    rm -f $ALL_SECRET_FILES .pgadmin_init.json $LOG_FILE
 }
 
 create_seed() {
@@ -183,18 +198,37 @@ wait_for_postgres() {
     done
 }
 
+##
+# Petclinic scripts (local dev)
+##
+
+##
+# Petclinic scripts (published resources)
+##
+
 # start docker services
 # idempotent
 start_services() {
-
     # ensure we have secrets
     if [ ! -f $SECRETS ]; then
         create_secrets
     fi
-    docker-compose --env-file $SECRETS up -d db
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
     wait_for_postgres
 
-    docker-compose --env-file $SECRETS up -d
+    docker-compose --env-file $SECRETS -f $COMPOSE_FILE up > $LOG_FILE &
+    # give things time to start
+    sleep 5
+}
+start_services_dev() {
+    # ensure we have secrets
+    if [ ! -f $SECRETS ]; then
+        create_secrets
+    fi
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
+    wait_for_postgres
+
+    docker-compose --env-file $SECRETS -f $COMPOSE_FILE --profiles localdev up -d
     # give things time to start
     sleep 5
 }
@@ -241,9 +275,25 @@ b64_encode_file() {
     cat "$1" | $BASE64_ENC | tr -d ' \r\n'
 }
 
+link_providers() {
+    local _actor_id
+    local _a
+
+    # link gateway actor to http server
+    wash ctl link put "$CLINICAPI_ID" $HTTPSERVER_ID -x $WASMCLOUD_LATTICE_PREFIX    \
+        wasmcloud:httpserver config_b64="$(b64_encode_file $HTTP_CONFIG )"
+
+    # link actors to sqldb-postgres
+    SQLDB_ACTORS="$CUSTOMERS_ID $VISITS_ID $VETS_ID"
+    for _a in $SQLDB_ACTORS; do
+	    wash ctl link put "$_a" $SQLDB_POSTGRES_ID  -x $WASMCLOUD_LATTICE_PREFIX \
+            wasmcloud:sqldb config_b64="$(b64_encode_file $SQL_CONFIG )"
+    done
+}
+
 # link actors with providers
 # idempotent
-link_providers() {
+link_providers_dev() {
     local _host_id=$(host_id)
     local _actor_id
     local _a
@@ -281,7 +331,6 @@ check_files() {
 }
 
 run_all() {
-
     # make sure we have all prerequisites installed
     ./checkup.sh
 
@@ -294,17 +343,46 @@ run_all() {
     start_services
     init_db
 
+    # start actors
+    wash ctl start actor $UI_REF
+    wash ctl start actor $CLINICAPI_REF
+    wash ctl start actor $CUSTOMERS_REF
+    wash ctl start actor $VETS_REF
+    wash ctl start actor $VISITS_REF
+
+    # link providers with actors
+    link_providers
+
+    # start capability providers: httpserver and sqldb 
+    start_providers
+
+    echo "PetClinic started successfully and is available at http://localhost:8080"
+}
+
+run_dev() {
+    # make sure we have all prerequisites installed
+    ./checkup.sh
+
+    if [ ! -f $SECRETS ]; then
+        create_secrets
+    fi
+    check_files
+
+    # start all the containers and initialize database
+    start_services_dev
+    init_db
+
     # build all actors
     make
 
     # push actors to registry
     make push
 
-	# start actors
-	make start REG_SERVER=registry:5000
+    # start actors
+    make start REG_SERVER=registry:5000
 
     # link providers with actors
-    link_providers
+    link_providers_dev
 
     # start capability providers: httpserver and sqldb 
     start_providers
@@ -321,6 +399,7 @@ case $1 in
     start-providers ) start_providers ;;
     link-providers ) link_providers ;;
     run-all | all ) run_all ;;
+    run-dev | dev ) run_dev ;;
     psql ) shift; psql_cli $@ ;;
     psql-root ) shift; psql_cli_root $@ ;;
 
