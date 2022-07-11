@@ -1,6 +1,6 @@
 [package]
 name = "image_upload"
-version = "0.1.0"
+version = "0.1.1"
 authors = [ "wasmCloud Team" ]
 edition = "2021"
 
@@ -18,12 +18,12 @@ serde_bytes = "0.11"
 serde_json = "1.0.79"
 serde = { version = "1.0", features = [ "derive" ] }
 sha2 = "0.10"
-wasmbus-rpc = "0.8.2"
-wasmcloud-interface-httpserver = "0.5.0"
-wasmcloud-interface-logging = "0.5.0"
+wasmbus-rpc = "0.9"
+wasmcloud-interface-httpserver = "0.6.0"
+wasmcloud-interface-logging = "0.6.0"
 
 [build-dependencies]
-weld-codegen = "0.4.2"
+weld-codegen = "0.4.6"
 
 [profile.release]
 # Optimize for small code size
