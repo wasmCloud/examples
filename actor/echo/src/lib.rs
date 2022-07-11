@@ -2,12 +2,6 @@ use serde_json::json;
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
 
-#[no_mangle]
-fn _start() {
-    println!("hello from prinln");
-    console_log("hello from console_log");
-}
-
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
 struct EchoActor {}
