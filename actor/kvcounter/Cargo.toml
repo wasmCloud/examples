@@ -1,6 +1,6 @@
 [package]
 name = "kvcounter"
-version = "0.3.100"
+version = "0.3.4"
 authors = [ "wasmcloud Team" ]
 edition = "2021"
 

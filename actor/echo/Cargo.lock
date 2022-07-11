@@ -573,7 +573,7 @@ dependencies = [
 
 [[package]]
 name = "echo"
-version = "0.3.6"
+version = "0.3.5"
 dependencies = [
  "async-trait",
  "futures 0.3.21",

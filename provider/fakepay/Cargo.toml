@@ -1,6 +1,6 @@
 [package]
 name = "wasmcloud-example-provider-fakepay"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2018"
 resolver = "2"
 

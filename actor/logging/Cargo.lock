@@ -638,7 +638,7 @@ checksum = "77f3309417938f28bf8228fcff79a4a37103981e3e186d2ccd19c74b38f4eb71"
 
 [[package]]
 name = "example-logging"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "async-trait",
  "futures 0.3.21",
@@ -2547,7 +2547,7 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-example-runner"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "async-trait",
  "log",

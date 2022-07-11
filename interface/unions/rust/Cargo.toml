@@ -1,6 +1,6 @@
 [package]
 name = "wasmcloud-example-union-demo"
-version = "0.2.0"
+version = "0.2.1"
 description = "demonstration interface for smithy union types"
 repository = "https://github.com/wasmcloud/examples"
 homepage = "https://github.com/wasmcloud/wasmcloud"

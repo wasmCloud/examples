@@ -1,6 +1,6 @@
 [package]
 name = "petclinic-interface"
-version = "0.3.0"
+version = "0.4.0"
 description = "Pet Clinic Actor Interface"
 authors = [ "wasmcCloud Team" ]
 edition = "2018"
