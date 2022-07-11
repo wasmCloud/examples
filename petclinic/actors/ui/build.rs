@@ -11,8 +11,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-changed=./tailwind.config.js");
 
     handle_output(
-        Command::new("npm").args(["install"]).output()?,
-        "npm install",
+        Command::new("npm").args(["ci", "--force"]).output()?,
+        "npm ci --force",
     )?;
 
     handle_output(

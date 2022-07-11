@@ -145,12 +145,11 @@ impl From<DbVisit> for petclinic_interface::Visit {
     }
 }
 
-
 /// When using this to decode Vecs, will get an empty vec
 /// as a response when no rows are returned
 fn safe_decode<'b, T>(resp: &'b QueryResult) -> Result<Vec<T>, minicbor::decode::Error>
 where
-    T: Default + minicbor::Decode<'b,()>,
+    T: Default + minicbor::Decode<'b, ()>,
 {
     if resp.num_rows == 0 {
         Ok(Vec::new())
