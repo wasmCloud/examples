@@ -2482,17 +2482,6 @@ checksum = "6a89911bd99e5f3659ec4acf9c4d93b0a90fe4a2a11f15328472058edc5261be"
 
 [[package]]
 name = "wasmbus-macros"
-version = "0.1.9"
-source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "wasmbus-macros"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "302b6c170bb936b14fdcc8dd8efd3023258865e093293c4edbb110bd94cdb276"
@@ -2501,45 +2490,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "wasmbus-rpc"
-version = "0.9.0-alpha.1.1"
-source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
-dependencies = [
- "anyhow",
- "async-nats",
- "async-trait",
- "atty",
- "base64",
- "bytes",
- "cfg-if 1.0.0",
- "data-encoding",
- "futures 0.3.21",
- "lazy_static",
- "minicbor 0.17.1",
- "minicbor-ser",
- "nats",
- "nkeys",
- "once_cell",
- "rmp-serde",
- "serde",
- "serde_bytes",
- "serde_json",
- "sha2 0.10.2",
- "thiserror",
- "time",
- "tokio",
- "tokio-timer",
- "toml",
- "tracing",
- "tracing-futures",
- "tracing-subscriber",
- "uuid",
- "wascap",
- "wasmbus-macros 0.1.9",
- "weld-codegen 0.4.5 (git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16)",
 ]
 
 [[package]]
@@ -2578,22 +2528,23 @@ dependencies = [
  "tracing-subscriber",
  "uuid",
  "wascap",
- "wasmbus-macros 0.1.10",
- "weld-codegen 0.4.6",
+ "wasmbus-macros",
+ "weld-codegen",
 ]
 
 [[package]]
 name = "wasmcloud-interface-httpclient"
-version = "0.6.0-alpha.1"
-source = "git+https://github.com/wasmcloud/interfaces?rev=d4d6b2af443246f09f2201ba502b87cc1389bb6f#d4d6b2af443246f09f2201ba502b87cc1389bb6f"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0acf5093b89b2c87b32573e43ce2e5375eb349e079d0d4da84ba73bf1fbf4fe"
 dependencies = [
  "async-trait",
  "futures 0.3.21",
  "serde",
  "serde_bytes",
  "serde_json",
- "wasmbus-rpc 0.9.0-alpha.1.1",
- "weld-codegen 0.4.5 (git+https://github.com/wasmcloud/weld?rev=38eb105b135d615ab0910a05a9e7d5e821e85176)",
+ "wasmbus-rpc",
+ "weld-codegen",
 ]
 
 [[package]]
@@ -2606,8 +2557,8 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_json",
- "wasmbus-rpc 0.9.0",
- "weld-codegen 0.4.6",
+ "wasmbus-rpc",
+ "weld-codegen",
 ]
 
 [[package]]
@@ -2621,8 +2572,8 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_json",
- "wasmbus-rpc 0.9.0",
- "weld-codegen 0.4.6",
+ "wasmbus-rpc",
+ "weld-codegen",
 ]
 
 [[package]]
@@ -2662,64 +2613,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "44d8de8415c823c8abd270ad483c6feeac771fad964890779f9a8cb24fbbc1bf"
 dependencies = [
  "webpki 0.22.0",
-]
-
-[[package]]
-name = "weld-codegen"
-version = "0.4.5"
-source = "git+https://github.com/wasmcloud/weld?rev=249102567eb50fddaf3a35c2546afbdb321e8b16#249102567eb50fddaf3a35c2546afbdb321e8b16"
-dependencies = [
- "Inflector",
- "anyhow",
- "atelier_assembler",
- "atelier_core",
- "atelier_json",
- "atelier_smithy",
- "bytes",
- "cfg-if 1.0.0",
- "clap",
- "directories",
- "downloader",
- "handlebars",
- "lazy_static",
- "lexical-sort",
- "reqwest",
- "rustc-hash",
- "semver",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
- "toml",
-]
-
-[[package]]
-name = "weld-codegen"
-version = "0.4.5"
-source = "git+https://github.com/wasmcloud/weld?rev=38eb105b135d615ab0910a05a9e7d5e821e85176#38eb105b135d615ab0910a05a9e7d5e821e85176"
-dependencies = [
- "Inflector",
- "anyhow",
- "atelier_assembler",
- "atelier_core",
- "atelier_json",
- "atelier_smithy",
- "bytes",
- "cfg-if 1.0.0",
- "clap",
- "directories",
- "downloader",
- "handlebars",
- "lazy_static",
- "lexical-sort",
- "reqwest",
- "rustc-hash",
- "semver",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
- "toml",
 ]
 
 [[package]]
@@ -2844,7 +2737,7 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_json",
- "wasmbus-rpc 0.9.0",
+ "wasmbus-rpc",
  "wasmcloud-interface-httpclient",
  "wasmcloud-interface-httpserver",
  "wasmcloud-interface-numbergen",

@@ -8,7 +8,6 @@ fn _start() {
     console_log("hello from console_log");
 }
 
-
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
 struct EchoActor {}
