@@ -228,7 +228,7 @@ start_services_dev() {
     docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
     wait_for_postgres
 
-    docker-compose --env-file $SECRETS -f $COMPOSE_FILE --profiles localdev up -d
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE --profile localdev up -d
     # give things time to start
     sleep 5
 }
