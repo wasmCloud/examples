@@ -1,6 +1,5 @@
 # wasmCloud Pet Clinic
-The wasmCloud Pet Clinic example application is a WebAssembly and wasmCloud-based reimagining of the
-classic [Spring Boot microservices Pet
+The wasmCloud Pet Clinic example application is a WebAssembly and wasmCloud-based reimagining of the classic [Spring Boot microservices Pet
 Clinic](https://github.com/spring-petclinic/spring-petclinic-microservices) example.
 
 ## Application Architecture
@@ -22,7 +21,7 @@ and then push link definitions between the Customers, Vets, and Visits actors an
 database. Lastly, ensure that both the HTTP Server and relational database capability providers are
 started.
 
-## Running the petclinic
+## Running the Petclinic
 
 If you'd like a quick out of the box example of the petclinic, you can use the included `run.sh`
 script to automatically spin up a running wasmcloud host, database, and all the actors. This does
@@ -39,4 +38,4 @@ To cleanup everything when you are done:
 $ ./run.sh wipe
 ```
 
-Once it is running, you should be able to access the api on `localhost:8080`
+Once it is running, you should be able to access the PetClinic application on `localhost:8080`
