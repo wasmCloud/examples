@@ -3,10 +3,11 @@ set -e
 
 show_help() {
 cat <<_SHOW_HELP
-  This program runs the petclinic api. Useful commands:
+  This program runs the petclinic example. Useful commands:
 
   Basics:
-   $0 all                          - run everything
+   $0 all                          - Run Postgres and wasmCloud in Docker, start PetClinicapplication
+   $0 dev                          - Run Postgres and wasmCloud in Docker, start locally built petclinic resources
    $0 wipe                         - stop everything and erase all secrets
 
   Database management
@@ -26,21 +27,36 @@ _SHOW_HELP
 ## ---------------------------------------------------------------
 ## CONFIGURATION
 ##
-HTTPSERVER_REF=wasmcloud.azurecr.io/httpserver:0.15.0
-SQLDB_REF=wasmcloud.azurecr.io/sqldb-postgres:0.2.0
+# Providers
+HTTPSERVER_REF=wasmcloud.azurecr.io/httpserver:0.16.1
+SQLDB_REF=wasmcloud.azurecr.io/sqldb-postgres:0.3.1
 HTTPSERVER_ID=VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M
 SQLDB_POSTGRES_ID=VDJQVOMF5FI3S5P4KJLCK2N25525U4IQIPH6NLHWZVTRZXTU6AOX4OPN
+# Actors
+UI_REF=wasmcloud.azurecr.io/ui:0.3.2
+UI_ID=MA2BF3WNKPR6LFEHOAEGVRWHPR7TS25AF5QTGSDKTDKHY4JV7DUEUSVG
+CLINICAPI_REF=wasmcloud.azurecr.io/clinicapi:0.3.1
+CLINICAPI_ID=MA5DZLFF733IR7TIDMBNOUMDS7I32NFUJIZ7LBSS5ED3V6GPFTDZJXZ3
+VETS_REF=wasmcloud.azurecr.io/vets:0.3.1
+VETS_ID=MBZ3XLCME3RZBF7GQJ2LNIFZXHOGEJ2I7GVRHSIOPERWQXGMAH5NCI4F
+VISITS_REF=wasmcloud.azurecr.io/visits:0.3.1
+VISITS_ID=MAGZWZ4POOV6VKPJEIYP477KAHBPX5TULKVDHLJQT5QYOARP6CNHFNKJ
+CUSTOMERS_REF=wasmcloud.azurecr.io/customers:0.3.1
+CUSTOMERS_ID=MATDCJMSWC4R3Q4CKWLZ6SSF67CPST5TIHP6773OCDJL4B52NS3CPTGU
 # the registry using container name
 REG_SERVER=registry:5000
 
-# actor to link to httpsrever. there can be only one since there's one listen port
+# actor to link to httpserver. there can be only one since there's one listen port
 HTTP_ACTOR=actors/clinicapi
 # actors to link to sqldb-postgres
 SQLDB_ACTORS="actors/customers actors/vets actors/visits"
+WASMCLOUD_LATTICE_PREFIX=default
 
 DB_HOST=127.0.0.1
 DB_PORT=5432
+WASMCLOUD_PORT=4000
 DB_ROOT_USER=postgres
+LOG_FILE=docker/logs.txt
 
 APP_DB_NAME=petclinic
 APP_DB_USER=petclinic
@@ -63,6 +79,7 @@ BASE64_ENC=base64
 # uncomment this line to echo all database commands to terminal
 PSQL_VERBOSE=-e
 
+COMPOSE_FILE=./docker/docker-compose.yml
 # where passwords are stored after being generated
 SECRETS=.secrets
 PSQL_ROOT=.psql_root
@@ -86,11 +103,10 @@ POSTGRES_PASSWORD=
 WASMCLOUD_CLUSTER_SEED=
 __WIPE
 
-    docker-compose --env-file $SECRETS stop
-    docker-compose --env-file $SECRETS rm -f
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE down
     wash drain all
 
-    rm -f $ALL_SECRET_FILES .pgadmin_init.json 
+    rm -f $ALL_SECRET_FILES .pgadmin_init.json $LOG_FILE
 }
 
 create_seed() {
@@ -183,21 +199,15 @@ wait_for_postgres() {
     done
 }
 
-# start docker services
-# idempotent
-start_services() {
-
-    # ensure we have secrets
-    if [ ! -f $SECRETS ]; then
-        create_secrets
-    fi
-    docker-compose --env-file $SECRETS up -d db
-    wait_for_postgres
-
-    docker-compose --env-file $SECRETS up -d
-    # give things time to start
-    sleep 5
+wait_for_wasmcloud() {
+    # This might be overkill and could be replaced with a sleep
+    # otherwise 'nc' would have to be on the required dependencies list
+    until nc localhost $WASMCLOUD_PORT -w1 -z ; do
+        echo Waiting for wasmCloud to start ...
+        sleep 1
+    done
 }
+
 
 # not idempotent, because 'create database' isn't.
 # if you need to reinitialize the db use "run.sh drop-db; run.sh init-db"
@@ -232,33 +242,13 @@ drop_db() {
 start_providers() {
     local _host_id=$(host_id)
 
-  	wash ctl start provider $HTTPSERVER_REF --link-name default --host-id $_host_id --timeout-ms 15000
-	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout-ms 15000
+  	wash ctl start provider $HTTPSERVER_REF --link-name default --host-id $_host_id --timeout-ms 60000
+	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout-ms 60000
 }
 
 # base-64 encode file into a string
 b64_encode_file() {
     cat "$1" | $BASE64_ENC | tr -d ' \r\n'
-}
-
-# link actors with providers
-# idempotent
-link_providers() {
-    local _host_id=$(host_id)
-    local _actor_id
-    local _a
-
-    # link gateway actor to http server
-    _actor_id=$(make -C $HTTP_ACTOR --silent actor_id)
-    wash ctl link put $_actor_id $HTTPSERVER_ID     \
-        wasmcloud:httpserver config_b64=$(b64_encode_file $HTTP_CONFIG )
-
-    # link actors to sqldb-postgres
-    for _a in $SQLDB_ACTORS; do
-        _actor_id=$(make -C $_a --silent actor_id)
-	    wash ctl link put $_actor_id $SQLDB_POSTGRES_ID \
-            wasmcloud:sqldb config_b64=$(b64_encode_file $SQL_CONFIG )
-    done
 }
 
 show_inventory() {
@@ -280,8 +270,113 @@ check_files() {
 	jq < $SQL_CONFIG >/dev/null
 }
 
-run_all() {
+##
+# Petclinic scripts (local dev)
+##
+start_services_dev() {
+    # ensure we have secrets
+    if [ ! -f $SECRETS ]; then
+        create_secrets
+    fi
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
+    wait_for_postgres
 
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE --profile localdev up
+    wait_for_wasmcloud
+    # give things time to start
+    sleep 5
+}
+
+# link actors with providers
+# idempotent
+link_providers_dev() {
+    local _host_id=$(host_id)
+    local _actor_id
+    local _a
+
+    # link gateway actor to http server
+    _actor_id=$(make -C $HTTP_ACTOR --silent actor_id)
+    wash ctl link put $_actor_id $HTTPSERVER_ID     \
+        wasmcloud:httpserver config_b64=$(b64_encode_file $HTTP_CONFIG )
+
+    # link actors to sqldb-postgres
+    for _a in $SQLDB_ACTORS; do
+        _actor_id=$(make -C $_a --silent actor_id)
+	    wash ctl link put $_actor_id $SQLDB_POSTGRES_ID \
+            wasmcloud:sqldb config_b64=$(b64_encode_file $SQL_CONFIG )
+    done
+}
+
+run_dev() {
+    # make sure we have all prerequisites installed
+    ./checkup.sh
+
+    if [ ! -f $SECRETS ]; then
+        create_secrets
+    fi
+    check_files
+
+    # start all the containers and initialize database
+    start_services_dev
+    init_db
+
+    # build all actors
+    make
+
+    # push actors to registry
+    make push
+
+    # start actors
+    make start REG_SERVER=registry:5000
+
+    # link providers with actors
+    link_providers_dev
+
+		# Short sleep to let links settle in
+		sleep 1
+
+    # start capability providers: httpserver and sqldb 
+    start_providers
+}
+
+##
+# Petclinic scripts (published resources)
+##
+
+# start docker services
+# idempotent
+start_services() {
+    # ensure we have secrets
+    if [ ! -f $SECRETS ]; then
+        create_secrets
+    fi
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
+    wait_for_postgres
+
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE up > $LOG_FILE &
+    wait_for_wasmcloud
+    # give things time to start
+    sleep 5
+}
+
+# idempotent
+link_providers() {
+    local _actor_id
+    local _a
+
+    # link gateway actor to http server
+    wash ctl link put "$CLINICAPI_ID" $HTTPSERVER_ID -x $WASMCLOUD_LATTICE_PREFIX    \
+        wasmcloud:httpserver config_b64="$(b64_encode_file $HTTP_CONFIG )"
+
+    # link actors to sqldb-postgres
+    SQLDB_ACTORS="$CUSTOMERS_ID $VISITS_ID $VETS_ID"
+    for _a in $SQLDB_ACTORS; do
+	    wash ctl link put "$_a" $SQLDB_POSTGRES_ID  -x $WASMCLOUD_LATTICE_PREFIX \
+            wasmcloud:sqldb config_b64="$(b64_encode_file $SQL_CONFIG )"
+    done
+}
+
+run_all() {
     # make sure we have all prerequisites installed
     ./checkup.sh
 
@@ -294,20 +389,23 @@ run_all() {
     start_services
     init_db
 
-    # build all actors
-    make
-
-    # push actors to registry
-    make push
-
-	# start actors
-	make start REG_SERVER=registry:5000
+    # start actors
+    wash ctl start actor $UI_REF --skip-wait
+    wash ctl start actor $CLINICAPI_REF --skip-wait
+    wash ctl start actor $CUSTOMERS_REF --skip-wait
+    wash ctl start actor $VETS_REF --skip-wait
+    wash ctl start actor $VISITS_REF --skip-wait
 
     # link providers with actors
     link_providers
 
+		# Short sleep to let links settle in
+		sleep 1
+
     # start capability providers: httpserver and sqldb 
     start_providers
+
+    echo "PetClinic started successfully and is available at http://localhost:8080"
 }
 
 case $1 in 
@@ -321,6 +419,7 @@ case $1 in
     start-providers ) start_providers ;;
     link-providers ) link_providers ;;
     run-all | all ) run_all ;;
+    run-dev | dev ) run_dev ;;
     psql ) shift; psql_cli $@ ;;
     psql-root ) shift; psql_cli_root $@ ;;
 
