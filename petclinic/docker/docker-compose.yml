@@ -84,7 +84,7 @@ services:
       - 55681:55681 # otlp http  
 
   wasmcloud:
-    image: wasmcloud/wasmcloud_host:latest
+    image: wasmcloud/wasmcloud_host:0.55.1
     environment:
       LC_ALL: en_US.UTF-8
       RUST_LOG: debug,hyper=info
