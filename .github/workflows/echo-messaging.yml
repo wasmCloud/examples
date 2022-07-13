@@ -76,6 +76,8 @@ jobs:
   artifact_release:
     needs: build_artifact
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    env:
+      oci-repository: echo_messaging
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -87,7 +89,6 @@ jobs:
 
       - name: Determine artifact metadata
         run: |
-          echo "oci-repository=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
           echo "oci-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
         working-directory: ${{ env.working-directory }}
 
