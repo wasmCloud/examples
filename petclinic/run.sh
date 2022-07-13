@@ -281,7 +281,7 @@ start_services_dev() {
     docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
     wait_for_postgres
 
-    docker compose --env-file $SECRETS -f $COMPOSE_FILE --profile localdev up > $LOG_FILE
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE --profile localdev up
     wait_for_wasmcloud
     # give things time to start
     sleep 5
@@ -353,7 +353,8 @@ start_services() {
     docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
     wait_for_postgres
 
-    docker-compose --env-file $SECRETS -f $COMPOSE_FILE up -d
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE up > $LOG_FILE &
+    wait_for_wasmcloud
     # give things time to start
     sleep 5
 }
