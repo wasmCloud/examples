@@ -85,6 +85,8 @@ services:
 
   wasmcloud:
     image: wasmcloud/wasmcloud_host:0.55.1
+    depends_on: 
+      - nats
     environment:
       LC_ALL: en_US.UTF-8
       RUST_LOG: debug,hyper=info

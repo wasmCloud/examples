@@ -54,6 +54,7 @@ WASMCLOUD_LATTICE_PREFIX=default
 
 DB_HOST=127.0.0.1
 DB_PORT=5432
+WASMCLOUD_PORT=4000
 DB_ROOT_USER=postgres
 LOG_FILE=docker/logs.txt
 
@@ -198,6 +199,16 @@ wait_for_postgres() {
     done
 }
 
+wait_for_wasmcloud() {
+    # This might be overkill and could be replaced with a sleep
+    # otherwise 'nc' would have to be on the required dependencies list
+    until nc localhost $WASMCLOUD_PORT -w1 -z ; do
+        echo Waiting for wasmCloud to start ...
+        sleep 1
+    done
+}
+
+
 # not idempotent, because 'create database' isn't.
 # if you need to reinitialize the db use "run.sh drop-db; run.sh init-db"
 init_db() {
@@ -231,8 +242,8 @@ drop_db() {
 start_providers() {
     local _host_id=$(host_id)
 
-  	wash ctl start provider $HTTPSERVER_REF --link-name default --host-id $_host_id --timeout-ms 15000 --skip-wait
-	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout-ms 15000 --skip-wait
+  	wash ctl start provider $HTTPSERVER_REF --link-name default --host-id $_host_id --timeout-ms 60000
+	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout-ms 60000
 }
 
 # base-64 encode file into a string
@@ -270,7 +281,8 @@ start_services_dev() {
     docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
     wait_for_postgres
 
-    docker compose --env-file $SECRETS -f $COMPOSE_FILE --profile localdev up -d
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE --profile localdev up > $LOG_FILE
+    wait_for_wasmcloud
     # give things time to start
     sleep 5
 }
@@ -341,7 +353,7 @@ start_services() {
     docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
     wait_for_postgres
 
-    docker-compose --env-file $SECRETS -f $COMPOSE_FILE up > $LOG_FILE &
+    docker-compose --env-file $SECRETS -f $COMPOSE_FILE up -d
     # give things time to start
     sleep 5
 }
