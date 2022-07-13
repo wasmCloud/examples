@@ -320,6 +320,9 @@ run_dev() {
     # link providers with actors
     link_providers_dev
 
+		# Short sleep to let links settle in
+		sleep 1
+
     # start capability providers: httpserver and sqldb 
     start_providers
 }
@@ -382,6 +385,9 @@ run_all() {
 
     # link providers with actors
     link_providers
+
+		# Short sleep to let links settle in
+		sleep 1
 
     # start capability providers: httpserver and sqldb 
     start_providers
