@@ -198,41 +198,6 @@ wait_for_postgres() {
     done
 }
 
-##
-# Petclinic scripts (local dev)
-##
-
-##
-# Petclinic scripts (published resources)
-##
-
-# start docker services
-# idempotent
-start_services() {
-    # ensure we have secrets
-    if [ ! -f $SECRETS ]; then
-        create_secrets
-    fi
-    docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
-    wait_for_postgres
-
-    docker-compose --env-file $SECRETS -f $COMPOSE_FILE up > $LOG_FILE &
-    # give things time to start
-    sleep 5
-}
-start_services_dev() {
-    # ensure we have secrets
-    if [ ! -f $SECRETS ]; then
-        create_secrets
-    fi
-    docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
-    wait_for_postgres
-
-    docker compose --env-file $SECRETS -f $COMPOSE_FILE --profile localdev up -d
-    # give things time to start
-    sleep 5
-}
-
 # not idempotent, because 'create database' isn't.
 # if you need to reinitialize the db use "run.sh drop-db; run.sh init-db"
 init_db() {
@@ -275,20 +240,39 @@ b64_encode_file() {
     cat "$1" | $BASE64_ENC | tr -d ' \r\n'
 }
 
-link_providers() {
-    local _actor_id
-    local _a
+show_inventory() {
+    wash ctl get inventory $(host_id)
+}
 
-    # link gateway actor to http server
-    wash ctl link put "$CLINICAPI_ID" $HTTPSERVER_ID -x $WASMCLOUD_LATTICE_PREFIX    \
-        wasmcloud:httpserver config_b64="$(b64_encode_file $HTTP_CONFIG )"
+# check config files
+check_files() {
 
-    # link actors to sqldb-postgres
-    SQLDB_ACTORS="$CUSTOMERS_ID $VISITS_ID $VETS_ID"
-    for _a in $SQLDB_ACTORS; do
-	    wash ctl link put "$_a" $SQLDB_POSTGRES_ID  -x $WASMCLOUD_LATTICE_PREFIX \
-            wasmcloud:sqldb config_b64="$(b64_encode_file $SQL_CONFIG )"
+    for f in $APP_INIT_SQL $HTTP_CONFIG $SQL_CONFIG; do
+        if [ ! -f $f ]; then
+            echo "missing file:$f"
+            exit 1
+        fi
     done
+
+	# check syntax of json files
+	jq < $HTTP_CONFIG >/dev/null
+	jq < $SQL_CONFIG >/dev/null
+}
+
+##
+# Petclinic scripts (local dev)
+##
+start_services_dev() {
+    # ensure we have secrets
+    if [ ! -f $SECRETS ]; then
+        create_secrets
+    fi
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
+    wait_for_postgres
+
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE --profile localdev up -d
+    # give things time to start
+    sleep 5
 }
 
 # link actors with providers
@@ -309,54 +293,6 @@ link_providers_dev() {
 	    wash ctl link put $_actor_id $SQLDB_POSTGRES_ID \
             wasmcloud:sqldb config_b64=$(b64_encode_file $SQL_CONFIG )
     done
-}
-
-show_inventory() {
-    wash ctl get inventory $(host_id)
-}
-
-# check config files
-check_files() {
-
-    for f in $APP_INIT_SQL $HTTP_CONFIG $SQL_CONFIG; do
-        if [ ! -f $f ]; then
-            echo "missing file:$f"
-            exit 1
-        fi
-    done
-
-	# check syntax of json files
-	jq < $HTTP_CONFIG >/dev/null
-	jq < $SQL_CONFIG >/dev/null
-}
-
-run_all() {
-    # make sure we have all prerequisites installed
-    ./checkup.sh
-
-    if [ ! -f $SECRETS ]; then
-        create_secrets
-    fi
-    check_files
-
-    # start all the containers and initialize database
-    start_services
-    init_db
-
-    # start actors
-    wash ctl start actor $UI_REF
-    wash ctl start actor $CLINICAPI_REF
-    wash ctl start actor $CUSTOMERS_REF
-    wash ctl start actor $VETS_REF
-    wash ctl start actor $VISITS_REF
-
-    # link providers with actors
-    link_providers
-
-    # start capability providers: httpserver and sqldb 
-    start_providers
-
-    echo "PetClinic started successfully and is available at http://localhost:8080"
 }
 
 run_dev() {
@@ -386,6 +322,71 @@ run_dev() {
 
     # start capability providers: httpserver and sqldb 
     start_providers
+}
+
+##
+# Petclinic scripts (published resources)
+##
+
+# start docker services
+# idempotent
+start_services() {
+    # ensure we have secrets
+    if [ ! -f $SECRETS ]; then
+        create_secrets
+    fi
+    docker compose --env-file $SECRETS -f $COMPOSE_FILE up -d db
+    wait_for_postgres
+
+    docker-compose --env-file $SECRETS -f $COMPOSE_FILE up > $LOG_FILE &
+    # give things time to start
+    sleep 5
+}
+
+# idempotent
+link_providers() {
+    local _actor_id
+    local _a
+
+    # link gateway actor to http server
+    wash ctl link put "$CLINICAPI_ID" $HTTPSERVER_ID -x $WASMCLOUD_LATTICE_PREFIX    \
+        wasmcloud:httpserver config_b64="$(b64_encode_file $HTTP_CONFIG )"
+
+    # link actors to sqldb-postgres
+    SQLDB_ACTORS="$CUSTOMERS_ID $VISITS_ID $VETS_ID"
+    for _a in $SQLDB_ACTORS; do
+	    wash ctl link put "$_a" $SQLDB_POSTGRES_ID  -x $WASMCLOUD_LATTICE_PREFIX \
+            wasmcloud:sqldb config_b64="$(b64_encode_file $SQL_CONFIG )"
+    done
+}
+
+run_all() {
+    # make sure we have all prerequisites installed
+    ./checkup.sh
+
+    if [ ! -f $SECRETS ]; then
+        create_secrets
+    fi
+    check_files
+
+    # start all the containers and initialize database
+    start_services
+    init_db
+
+    # start actors
+    wash ctl start actor $UI_REF
+    wash ctl start actor $CLINICAPI_REF
+    wash ctl start actor $CUSTOMERS_REF
+    wash ctl start actor $VETS_REF
+    wash ctl start actor $VISITS_REF
+
+    # link providers with actors
+    link_providers
+
+    # start capability providers: httpserver and sqldb 
+    start_providers
+
+    echo "PetClinic started successfully and is available at http://localhost:8080"
 }
 
 case $1 in 
