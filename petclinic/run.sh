@@ -231,8 +231,8 @@ drop_db() {
 start_providers() {
     local _host_id=$(host_id)
 
-  	wash ctl start provider $HTTPSERVER_REF --link-name default --host-id $_host_id --timeout-ms 15000
-	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout-ms 15000
+  	wash ctl start provider $HTTPSERVER_REF --link-name default --host-id $_host_id --timeout-ms 15000 --skip-wait
+	wash ctl start provider $SQLDB_REF      --link-name default --host-id $_host_id --timeout-ms 15000 --skip-wait
 }
 
 # base-64 encode file into a string
@@ -377,11 +377,11 @@ run_all() {
     init_db
 
     # start actors
-    wash ctl start actor $UI_REF
-    wash ctl start actor $CLINICAPI_REF
-    wash ctl start actor $CUSTOMERS_REF
-    wash ctl start actor $VETS_REF
-    wash ctl start actor $VISITS_REF
+    wash ctl start actor $UI_REF --skip-wait
+    wash ctl start actor $CLINICAPI_REF --skip-wait
+    wash ctl start actor $CUSTOMERS_REF --skip-wait
+    wash ctl start actor $VETS_REF --skip-wait
+    wash ctl start actor $VISITS_REF --skip-wait
 
     # link providers with actors
     link_providers
