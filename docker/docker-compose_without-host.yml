@@ -41,3 +41,11 @@ services:
     ports:
       - 8000:8000 # tempo
       - 55681:55681 # otlp http  
+  wadm:
+    depends_on:
+      - "nats"
+      - "redis"
+    image: wasmcloud.azurecr.io/wadm:0.1.0
+    environment:
+      - WADM_NATS_HOST=nats
+      - WADM_REDIS_HOST=redis
