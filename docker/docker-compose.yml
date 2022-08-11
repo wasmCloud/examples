@@ -55,3 +55,12 @@ services:
     ports:
       - "4000:4000"
       - "8080-8089:8080-8089" # Allows exposing examples on ports 8080-8089
+
+  wadm:
+    depends_on:
+      - "nats"
+      - "redis"
+    image: wasmcloud.azurecr.io/wadm:0.1.0
+    environment:
+      - WADM_NATS_HOST=nats
+      - WADM_REDIS_HOST=redis

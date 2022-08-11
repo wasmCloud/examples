@@ -97,7 +97,22 @@ services:
       WASMCLOUD_CLUSTER_SEED: ${WASMCLOUD_CLUSTER_SEED}
       OTEL_TRACES_EXPORTER: otlp
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:55681
+      HOST_app: petclinic
     ports:
       - "127.0.0.1:4000:4000"  # washboard
       - "127.0.0.1:443:8443"   # httpserver HTTPS port
       - "127.0.0.1:8080:8080"
+
+  # Services for wadm
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
+  wadm:
+    depends_on:
+      - "nats"
+      - "redis"
+    image: wasmcloud.azurecr.io/wadm:0.1.0
+    environment:
+      - WADM_NATS_HOST=nats
+      - WADM_REDIS_HOST=redis
