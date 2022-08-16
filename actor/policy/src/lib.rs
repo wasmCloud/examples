@@ -21,7 +21,7 @@ impl MessageSubscriber for PolicyActor {
             (Some(subject), Ok(Value::Object(policy_request))) => {
                 // Here we're manually retrieving keys from the policy struct to avoid writing a full policy request struct
                 let policy_result = match (
-                    policy_request["request_id"].clone(),
+                    policy_request["requestId"].clone(),
                     policy_request["action"].clone(),
                 ) {
                     (Value::String(request_id), Value::String(action)) => {
