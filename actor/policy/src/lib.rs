@@ -83,6 +83,7 @@ fn evaluate_issuer(issuer: &str, request_id: &str) -> PolicyResult {
 struct PolicyResult {
     permitted: bool,
     message: Option<String>,
+    #[serde(rename = "requestId")]
     request_id: String,
 }
 
