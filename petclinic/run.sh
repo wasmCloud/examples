@@ -86,6 +86,7 @@ PSQL_ROOT=.psql_root
 PSQL_APP=.psql_app
 CREATE_APP_SQL=.create_app.sql
 CLUSTER_SEED=.cluster.nk
+WADM_FILE=populated_wadm.yaml
 
 ALL_SECRET_FILES="$SECRETS $PSQL_ROOT $PSQL_APP $SQL_CONFIG $CREATE_APP_SQL $CLUSTER_SEED"
 
@@ -107,6 +108,7 @@ __WIPE
     wash drain all
 
     rm -f $ALL_SECRET_FILES .pgadmin_init.json $LOG_FILE
+    rm -f $WADM_FILE
 }
 
 create_seed() {
@@ -359,6 +361,11 @@ start_services() {
     sleep 5
 }
 
+create_wadm_manifest() {
+    password="$(cat $PSQL_APP | awk -F ':' '{ print $5}')"
+    sed "s/user:pass@your.db.host.com/$APP_DB_USER:$password@db:$DB_PORT/g" wadm.yaml > $WADM_FILE
+}
+
 # idempotent
 link_providers() {
     local _actor_id
@@ -408,6 +415,33 @@ run_all() {
     echo "PetClinic started successfully and is available at http://localhost:8080"
 }
 
+# NOTE(thomastaylor312): This mostly works, but we run into the race condition from
+# https://github.com/wasmCloud/wasmcloud-otp/issues/361. So for now we are not exposing it. Once
+# that bug fix is in, we can uncomment this
+
+# run_wadm() {
+#     ./checkup.sh
+
+#     if [ ! -f $SECRETS ]; then
+#         create_secrets
+#     fi
+#     check_files
+
+#     # start all the containers and initialize database
+#     start_services
+#     init_db
+
+#     create_wadm_manifest
+#     wash app get petclinic 0.0.1 2>&1 > /dev/null || wash app put $WADM_FILE
+#     wash app deploy petclinic 0.0.1
+
+#     # Give a chance for providers to download and start
+#     echo "Waiting for everything to start"
+#     sleep 10
+
+#     echo "PetClinic started successfully and is available at http://localhost:8080"
+# }
+
 case $1 in 
 
     secrets ) create_secrets ;;
@@ -420,6 +454,7 @@ case $1 in
     link-providers ) link_providers ;;
     run-all | all ) run_all ;;
     run-dev | dev ) run_dev ;;
+    # wadm ) run_wadm ;;
     psql ) shift; psql_cli $@ ;;
     psql-root ) shift; psql_cli_root $@ ;;
 
