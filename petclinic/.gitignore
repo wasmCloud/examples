@@ -6,3 +6,4 @@
 .psql_root
 .secrets
 sql_config.json
+populated_wadm.yaml

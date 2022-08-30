@@ -84,7 +84,7 @@ services:
       - 55681:55681 # otlp http  
 
   wasmcloud:
-    image: wasmcloud/wasmcloud_host:0.55.1
+    image: wasmcloud/wasmcloud_host:0.56.0
     depends_on: 
       - nats
     environment:
@@ -112,7 +112,7 @@ services:
     depends_on:
       - "nats"
       - "redis"
-    image: wasmcloud.azurecr.io/wadm:0.1.0
+    image: wasmcloud.azurecr.io/wadm:0.3.0
     environment:
       - WADM_NATS_HOST=nats
       - WADM_REDIS_HOST=redis
