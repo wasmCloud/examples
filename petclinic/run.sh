@@ -16,6 +16,8 @@ cat <<_SHOW_HELP
 
   Host/actor controls:
    $0 inventory                    - show host inventory
+   $0 start-actors                 - start all actors
+   $0 link-providers               - link providers to actors
 
   Utility:
    $0 psql [ args ... ]            - start a psql cli as the app user
@@ -383,6 +385,15 @@ link_providers() {
     done
 }
 
+start_actors() {
+    # start actors
+    wash ctl start actor $UI_REF --skip-wait
+    wash ctl start actor $CLINICAPI_REF --skip-wait
+    wash ctl start actor $CUSTOMERS_REF --skip-wait
+    wash ctl start actor $VETS_REF --skip-wait
+    wash ctl start actor $VISITS_REF --skip-wait
+}
+
 run_all() {
     # make sure we have all prerequisites installed
     ./checkup.sh
@@ -397,11 +408,7 @@ run_all() {
     init_db
 
     # start actors
-    wash ctl start actor $UI_REF --skip-wait
-    wash ctl start actor $CLINICAPI_REF --skip-wait
-    wash ctl start actor $CUSTOMERS_REF --skip-wait
-    wash ctl start actor $VETS_REF --skip-wait
-    wash ctl start actor $VISITS_REF --skip-wait
+    start_actors
 
     # link providers with actors
     link_providers
@@ -452,6 +459,7 @@ case $1 in
     inventory ) show_inventory ;;
     start-providers ) start_providers ;;
     link-providers ) link_providers ;;
+    start-actors ) start_actors ;;
     run-all | all ) run_all ;;
     run-dev | dev ) run_dev ;;
     # wadm ) run_wadm ;;
