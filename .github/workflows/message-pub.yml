@@ -16,7 +16,7 @@ env:
   CARGO_TERM_COLOR: always
   working-directory: ./actor/message-pub
   WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_DOGS_AND_CATS }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_MESSAGE_PUB }}
 
 jobs:
   rust_check:
