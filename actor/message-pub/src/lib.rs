@@ -6,10 +6,10 @@ const MESSAGE_PREFIX: &str = "wasmcloud.http";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
-struct NatsPubActor {}
+struct MessagePubActor {}
 
 #[async_trait]
-impl HttpServer for NatsPubActor {
+impl HttpServer for MessagePubActor {
     async fn handle_request(
         &self,
         ctx: &Context,
@@ -17,7 +17,7 @@ impl HttpServer for NatsPubActor {
     ) -> std::result::Result<HttpResponse, RpcError> {
         // Format the path as a dot separated subject instead
         let subject = format!("{}{}", MESSAGE_PREFIX, req.path.replace('/', "."));
-        // Publish the body of the HTTP request in a NATS message
+        // Publish the body of the HTTP request in a Message
         if let Err(e) = MessagingSender::new()
             .publish(
                 ctx,
