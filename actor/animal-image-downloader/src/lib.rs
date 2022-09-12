@@ -7,7 +7,6 @@ use wasmcloud_interface_messaging::{
     SubMessage,
 };
 
-// Backup image to download if the animal type is unknown
 const REQUEST_PREFIX: &str = "wasmcloud.animal.";
 const CAT_URL: &str = "https://api.thecatapi.com/v1/images/search";
 const DOG_URL: &str = "https://dog.ceo/api/breeds/image/random";
@@ -83,11 +82,7 @@ impl MessageSubscriber for AnimalImageDownloaderActor {
 
 /// Helper function to transform incoming message topic to a URL to request
 fn animal_req_url(topic: &str) -> String {
-    match topic
-        .replace(REQUEST_PREFIX, "")
-        .to_ascii_lowercase()
-        .as_str()
-    {
+    match topic.trim_start_matches(REQUEST_PREFIX) {
         "cat" => CAT_URL,
         "dog" => DOG_URL,
         _ => UNKNOWN_IMAGE_URL,
