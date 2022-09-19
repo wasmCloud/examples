@@ -13,6 +13,7 @@ The following actors run as WebAssembly on wasmCloud hosts.
 | [hello](https://github.com/wasmcloud/examples/tree/main/actor/hello) | Canonical "hello world" actor that listens on an HTTP port and replies with a greeting |  `wasmcloud.azurecr.io/hello` |
 | [kvcounter](https://github.com/wasmcloud/examples/tree/main/actor/kvcounter) | An actor that uses the key-value store to increment a counter and return a value for every HTTP request it receives | `wasmcloud.azurecr.io/kvcounter` |
 | [logging](https://github.com/wasmcloud/examples/tree/main/actor/logging) | An actor that demonstrates the builtin logging capability provider | `wasmcloud.azurecr.io/logging` |
+| [message-pub](https://github.com/wasmcloud/examples/tree/main/actor/message-pub) | An actor that demonstrates receiving HTTP requests and publishing the request body as a message | `wasmcloud.azurecr.io/message-pub` |
 | [random](https://github.com/wasmcloud/examples/tree/main/actor/random) | An actor that demonstrates the builtin random number generation capability provider | `wasmcloud.azurecr.io/random` |
 | [todo-sql](https://github.com/wasmcloud/examples/tree/main/actor/todo-sql) | An todo-application using sql database, https server (with TLS), logging, and numbergen | (unpublished) |
 | [todo](https://github.com/wasmcloud/examples/tree/main/actor/todo) | An todo-application using keyvalue store, http server, and logging | (unpublished) |
