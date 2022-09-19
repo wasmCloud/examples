@@ -16,7 +16,7 @@ impl HttpServer for MessagePubActor {
         req: &HttpRequest,
     ) -> std::result::Result<HttpResponse, RpcError> {
         // Format the path as a dot separated subject instead
-        let subject = format!("{}{}", MESSAGE_PREFIX, req.path.replace('/', "."));
+        let subject = format!("{}{}", MESSAGE_PREFIX, req.path.replace('.', "_").replace('/', "."));
         // Publish the body of the HTTP request in a Message
         if let Err(e) = MessagingSender::new()
             .publish(
