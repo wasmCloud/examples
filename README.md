@@ -8,6 +8,7 @@ The following actors run as WebAssembly on wasmCloud hosts.
 
 | Example | Description | OCI Reference <br/> (refer to example for latest version) |
 |---|---|---|
+| [animal-image-downloader](https://github.com/wasmcloud/examples/tree/main/actor/animal-image-downloader) | An actor that receives messages and makes HTTP requests, downloading a picture of an animal to a blobstore |  `wasmcloud.azurecr.io/animal-image-downloader` |
 | [echo](https://github.com/wasmcloud/examples/tree/main/actor/echo) | An actor that listens on an HTTP port and returns a JSON payload describing the incoming request |  `wasmcloud.azurecr.io/echo` |
 | [echo-messaging](https://github.com/wasmcloud/examples/tree/main/actor/echo-messaging) | An actor that listens on a message broker topic and replies |  `wasmcloud.azurecr.io/echo-messaging` |
 | [hello](https://github.com/wasmcloud/examples/tree/main/actor/hello) | Canonical "hello world" actor that listens on an HTTP port and replies with a greeting |  `wasmcloud.azurecr.io/hello` |
