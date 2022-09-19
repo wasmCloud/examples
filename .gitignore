@@ -4,3 +4,5 @@ pre-otp/
 
 .vscode
 *logs.txt
+
+host_config.json

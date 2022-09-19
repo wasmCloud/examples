@@ -1,0 +1,102 @@
+name: ANIMAL IMAGE DOWNLOADER
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "actor/animal-image-downloader/**"
+    tags:
+      - "animal-image-downloader-v*"
+  pull_request:
+    branches: [main]
+    paths:
+      - "actor/animal-image-downloader/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  working-directory: ./actor/animal-image-downloader
+  WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_ANIMAL_IMAGE_DOWNLOADER }}
+
+jobs:
+  rust_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # If your integration tests require nats or redis, run them here
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
+      - id: rust-check-action
+        uses: wasmcloud/common-actions/rust-check@main
+        with:
+          working-directory: ${{ env.working-directory }}
+          # The `--doc` is required for wasm, as cargo cannot execute wasm tests by default
+          test-options: "--verbose --doc"
+
+  build_artifact:
+    needs: rust_check
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Build wasmcloud actor
+        run: make
+        working-directory: ${{ env.working-directory }}
+
+      - name: Upload signed actor to GH Actions
+        uses: actions/upload-artifact@v2
+        with:
+          name: wasmcloud-actor
+          path: ${{ env.working-directory }}/build/*.wasm
+
+  github_release:
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    needs: build_artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download signed actor
+        uses: actions/download-artifact@v2
+        with:
+          name: wasmcloud-actor
+          path: ${{ env.working-directory }}/build
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.working-directory }}/build/*.wasm
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true
+          draft: false
+
+  artifact_release:
+    needs: build_artifact
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download signed actor
+        uses: actions/download-artifact@v2
+        with:
+          name: wasmcloud-actor
+          path: ${{ env.working-directory }}/build
+
+      - name: Determine artifact metadata
+        run: |
+          echo "oci-repository=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
+          echo "oci-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
+        working-directory: ${{ env.working-directory }}
+
+      - name: Push actor to AzureCR
+        uses: wasmcloud/common-actions/oci-artifact-release@main
+        with:
+          artifact-path: ${{ env.working-directory }}/build/animal_image_downloader_s.wasm
+          oci-url: ${{ secrets.AZURECR_PUSH_URL }}
+          oci-repository: ${{ env.oci-repository }}
+          oci-version: ${{ env.oci-version }}
+          oci-username: ${{ secrets.AZURECR_PUSH_USER }}
+          oci-password: ${{ secrets.AZURECR_PUSH_PASSWORD }}
