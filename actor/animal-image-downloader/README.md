@@ -13,7 +13,7 @@ This example requires capability providers that fulfill the above contracts. The
 Once you've installed **wash** and ran wasmCloud after following the [installation guide](https://wasmcloud.dev/overview/installation/), you can run this example actor and the wasmCloud providers with the following commands:
 ```
 wash ctl start actor wasmcloud.azurecr.io/animal-image-downloader:0.1.0
-# If you use a locally build actor, replace the actor ID below with your own
+# If you use a locally built actor, replace the actor ID below with your own
 wash ctl link put MDBIB35BEIFT552CBSJXY3TOQYGIDAWZMMX4TKD5AGMRSJUDYSDCDWDF VBBQNNCGUKIXEWLL5HL5XJE57BS3GU5DMDOKZS6ROEWPQFHEDP6NGVZM wasmcloud:blobstore "ROOT=/tmp"
 wash ctl link put MDBIB35BEIFT552CBSJXY3TOQYGIDAWZMMX4TKD5AGMRSJUDYSDCDWDF VCCVLH4XWGI3SGARFNYKYT2A32SUYA2KVAIV2U2Q34DQA7WWJPFRKIKM wasmcloud:httpclient
 wash ctl link put MDBIB35BEIFT552CBSJXY3TOQYGIDAWZMMX4TKD5AGMRSJUDYSDCDWDF VADNMSIML2XGO2X4TPIONTIC55R2UUQGPPDZPAVSC2QD7E76CR77SPW7 wasmcloud:messaging "SUBSCRIPTION=wasmcloud.animal.*"
