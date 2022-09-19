@@ -8,7 +8,7 @@ This actor accepts requests over a message broker to download a random image of 
 1. `wasmcloud:blobstore` to save the image to a blob
 
 ## Running this example
-This example requires capability providers that fulfill the above contracts. The wasmCloud [HTTP Client](), [NATS Messaging](), and [Filesystem]() capability providers implement this functionality but you're welcome to use any implementation.
+This example requires capability providers that fulfill the above contracts. The wasmCloud [HTTP Client](https://github.com/wasmCloud/capability-providers/tree/main/httpclient), [NATS Messaging](https://github.com/wasmCloud/capability-providers/tree/main/nats), and [Filesystem](https://github.com/wasmCloud/capability-providers/tree/main/blobstore-fs) capability providers implement this functionality but you're welcome to use any implementation.
 
 Once you've installed **wash** and ran wasmCloud after following the [installation guide](https://wasmcloud.dev/overview/installation/), you can run this example actor and the wasmCloud providers with the following commands:
 ```
