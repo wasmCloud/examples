@@ -21,5 +21,5 @@ wash ctl start provider wasmcloud.azurecr.io/nats_messaging:0.14.5 --skip-wait
 
 And you can subscribe for messages with:
 ```
-nats sub "wasmcloud.http.*"
+nats sub "wasmcloud.http.>"
 ```
