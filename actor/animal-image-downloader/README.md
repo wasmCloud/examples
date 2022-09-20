@@ -28,3 +28,8 @@ nats req wasmcloud.animal.dog '{}'
 nats req wasmcloud.animal.cat '{}'
 nats req wasmcloud.animal.idk '{}'
 ```
+
+If you don't want to install the NATS CLI, you can use `wash call` to accomplish the same thing by directly invoking the actor's message handler. You won't get a response from `call`, but your image will be stored under `/tmp/MDBIB35BEIFT552CBSJXY3TOQYGIDAWZMMX4TKD5AGMRSJUDYSDCDWDF/animalpics/animal.png`.
+```
+wash call MDBIB35BEIFT552CBSJXY3TOQYGIDAWZMMX4TKD5AGMRSJUDYSDCDWDF MessageSubscriber.HandleMessage '{"subject": "wasmcloud.animal.dog", "body": []}'
+```
