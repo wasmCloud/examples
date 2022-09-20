@@ -2942,7 +2942,7 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-example-provider-fakepay"
-version = "0.1.2"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "base64",
@@ -2965,7 +2965,7 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-examples-payments"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "async-trait",
  "futures 0.3.21",
