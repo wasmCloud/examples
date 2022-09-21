@@ -1,7 +1,7 @@
 # example/provider/fakepay/Makefile
 
 PROJECT = fakepay
-CAPABILITY_ID = wasmcloud:example:fakepay
+CAPABILITY_ID = wasmcloud:examples:payments
 NAME = "FakePay"
 VENDOR = "wasmcloud"
 VERSION  = $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[] .version' | head -1)

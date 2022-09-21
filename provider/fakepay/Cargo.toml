@@ -20,7 +20,7 @@ serde = {version = "1.0", features = ["derive"] }
 thiserror = "1.0"
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
-wasmcloud-examples-payments = { version = "0.3.0", path="../../interface/payments/rust" }
+wasmcloud-examples-payments = { version = "0.4.0", path="../../interface/payments/rust" }
 wasmbus-rpc = { version = "0.9", features = ["otel"] }
 
 [[bin]]
