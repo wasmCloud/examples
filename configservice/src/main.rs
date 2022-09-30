@@ -151,6 +151,8 @@ struct Credential {
     pub token: Option<String>,
     pub username: Option<String>,
     pub password: Option<String>,
+    #[serde(rename = "registryType")]
+    pub registry_type: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
