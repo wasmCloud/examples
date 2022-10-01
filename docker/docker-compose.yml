@@ -5,7 +5,7 @@
 #   grafana + tempo for tracing
 #   wasmcloud_host
 
-version: "4"
+version: "3.8"
 services:
   nats:
     image: nats:2.8.4-alpine
