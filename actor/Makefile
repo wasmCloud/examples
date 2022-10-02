@@ -1,6 +1,6 @@
 # Makefile for examples/actor
 
-subdirs = echo echo-messaging hello kvcounter logging random xkcd
+subdirs = $(wildcard */)
 
 include ../build/makefiles/common.mk
 

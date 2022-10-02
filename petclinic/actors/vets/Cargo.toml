@@ -1,6 +1,6 @@
 [package]
 name = "vets"
-version = "0.3.1"
+version = "0.3.2"
 authors = [ "wasmCloud Team" ]
 edition = "2021"
 
@@ -15,9 +15,8 @@ serde_bytes = "0.11"
 serde = {version = "1.0", features = ["derive"]}
 petclinic-interface = { path = "../../petclinic-interface/rust"}
 
-wasmbus-rpc = "0.9"
-wasmcloud-interface-sqldb = "0.6.0"
-wasmcloud-interface-logging = "0.6.0"
+wasmbus-rpc = "0.10.1"
+wasmcloud-interface-sqldb = "0.7.0"
 
 [profile.release]
 # Optimize for small code size
