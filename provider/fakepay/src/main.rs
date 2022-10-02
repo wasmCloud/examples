@@ -5,7 +5,10 @@ use wasmcloud_examples_payments::*;
 
 // Start the provider and run until stopped by the host
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    provider_main(FakePayProvider::default(), Some("FakePay Provider".to_string()))?;
+    provider_main(
+        FakePayProvider::default(),
+        Some("FakePay Provider".to_string()),
+    )?;
     eprintln!("FakePay provider exiting");
     Ok(())
 }

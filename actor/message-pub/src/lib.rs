@@ -33,7 +33,7 @@ impl HttpServer for MessagePubActor {
             )
             .await
         {
-            Err(format!("Could not publish message {}", e.to_string()).into())
+            Err(format!("Could not publish message {}", e).into())
         } else {
             Ok(HttpResponse {
                 body: format!("Published on subject {}", subject).into_bytes(),

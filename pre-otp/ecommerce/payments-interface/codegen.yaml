@@ -1,5 +1,0 @@
-schema: payments.widl
-generates:
-  src/generated.rs:
-    module: '@wapc/widl-codegen/rust'
-    visitorClass: ModuleVisitor  
