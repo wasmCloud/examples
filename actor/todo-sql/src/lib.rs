@@ -141,7 +141,7 @@ async fn create_table(ctx: &Context, client: &Db) -> Result<(), SqlDbError> {
         );"#,
         TABLE_NAME
     );
-    let _resp = client.execute(ctx, &sql).await?;
+    let _resp = client.execute(ctx, &sql.into()).await?;
     Ok(())
 }
 
@@ -161,7 +161,8 @@ async fn create_todo(ctx: &Context, client: &Db, input: InputTodo) -> Result<Tod
         insert into {} (id, url, title, priority) values ('{}','{}', '{}', {})
         "#,
                 TABLE_NAME, id, &db_todo.url, &db_todo.title, db_todo.priority
-            ),
+            )
+            .into(),
         )
         .await?;
 
@@ -187,7 +188,8 @@ async fn update_todo(
         update {} set title='{}', priority={}, completed={} where url='{}';
         "#,
                 TABLE_NAME, &db_todo.title, db_todo.priority, db_todo.completed, &db_todo.url
-            ),
+            )
+            .into(),
         )
         .await?;
     Ok(db_todo.into())
@@ -196,9 +198,9 @@ async fn update_todo(
 async fn get_all_todos(ctx: &Context, client: &Db) -> Result<Vec<Todo>, SqlDbError> {
     info!("Getting all todos...");
     let resp = client
-        .fetch(
+        .query(
             ctx,
-            &format!("select url, title, completed, priority from {}", TABLE_NAME),
+            &format!("select url, title, completed, priority from {}", TABLE_NAME).into(),
         )
         .await?;
     info!(
@@ -222,12 +224,13 @@ async fn get_db_todo(ctx: &Context, client: &Db, url: &str) -> Result<DbTodo, Sq
     info!("Getting a todo...");
     check_safety("url", url)?;
     let resp = client
-        .fetch(
+        .query(
             ctx,
             &format!(
                 "select url, title, completed, priority from {} where url='{}'",
                 TABLE_NAME, url
-            ),
+            )
+            .into(),
         )
         .await?;
     if resp.num_rows == 0 {
@@ -241,7 +244,7 @@ async fn get_db_todo(ctx: &Context, client: &Db, url: &str) -> Result<DbTodo, Sq
 async fn delete_all_todos(ctx: &Context, client: &Db) -> Result<(), SqlDbError> {
     info!("Deleting all todos...");
     let _resp = client
-        .execute(ctx, &format!("delete from {}", TABLE_NAME))
+        .execute(ctx, &format!("delete from {}", TABLE_NAME).into())
         .await?;
     Ok(())
 }
@@ -253,7 +256,7 @@ async fn delete_todo(ctx: &Context, client: &Db, url: &str) -> Result<(), SqlDbE
     let _resp = client
         .execute(
             ctx,
-            &format!("delete from {} where url='{}'", TABLE_NAME, url),
+            &format!("delete from {} where url='{}'", TABLE_NAME, url).into(),
         )
         .await?;
 
