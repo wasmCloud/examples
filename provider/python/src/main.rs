@@ -3,7 +3,7 @@
 use lazy_static::lazy_static;
 use log::info;
 use pyprov::Service;
-use std::{borrow::Cow, convert::Infallible};
+use std::convert::Infallible;
 use tokio::sync::RwLock;
 use wasmbus_rpc::provider::prelude::*;
 
@@ -31,7 +31,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         *s = service;
         drop(s);
 
-        if let Err(e) = provider_run(PythonProvider::default(), host_data, Some("Python Provider".to_string())).await {
+        if let Err(e) = provider_run(
+            PythonProvider::default(),
+            host_data,
+            Some("Python Provider".to_string()),
+        )
+        .await
+        {
             eprintln!("ERROR provider exited with {}", e.to_string());
         }
     });
@@ -62,11 +68,7 @@ impl ProviderHandler for PythonProvider {
 
 #[async_trait]
 impl MessageDispatch for PythonProvider {
-    async fn dispatch<'disp, 'ctx, 'msg>(
-        &'disp self,
-        _ctx: &'ctx Context,
-        message: Message<'msg>,
-    ) -> Result<Message<'msg>, RpcError> {
+    async fn dispatch(&self, _ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
         use wasmbus_rpc::common::MessageFormat;
 
         let method = message.method;
@@ -88,9 +90,6 @@ impl MessageDispatch for PythonProvider {
         // call into python and return result
         let service = SINGLE_SERVICE.read().await;
         let result = service.check_invoke(method, buf).await?;
-        Ok(Message {
-            method,
-            arg: Cow::Owned(result),
-        })
+        Ok(result)
     }
 }

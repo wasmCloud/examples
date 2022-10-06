@@ -151,13 +151,12 @@
 //!
 //! <https://github.com/alttch/pime/tree/main/examples/>
 //!
-#![allow(dead_code)]
 
+use ini::Ini;
 use lazy_static::lazy_static;
 use log::{debug, error};
 use pyo3::prelude::*;
 use pythonize::{depythonize, pythonize};
-use rust_ini::Ini;
 use serde_value::Value;
 use std::{
     collections::{btree_map, BTreeMap},
@@ -618,6 +617,7 @@ impl<'p> PySyncEngine<'p> {
     /// # Errors
     ///
     /// Will return Err if the Python neotasker module failed to enable debugging
+    #[allow(dead_code)]
     pub fn enable_debug(&self) -> Result<(), Error> {
         self.neo.call_method0("set_debug")?;
         Ok(())

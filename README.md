@@ -47,8 +47,3 @@ Providers of capabilities for wasmCloud actors
 | --- | --- | 
 | [petclinic](https://github.com/wasmcloud/examples/tree/main/petclinic) |  A WebAssembly and wasmCloud-based reimagining of the classic [Spring Boot microservices Pet Clinic](https://github.com/spring-petclinic/spring-petclinic-microservices). The wasmCloud Pet Clinic consists of multiple actors, and uses a relational database capability provider and an http server capability provider. |
 
-
-## ⚠️ Pre-OTP examples have moved ⚠️
-
-Examples compatible with the 0.18 wasmcloud host have been moved to the
-pre-otp folder.

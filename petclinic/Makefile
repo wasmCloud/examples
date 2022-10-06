@@ -1,4 +1,4 @@
-subdirs = actors/clinicapi actors/customers actors/vets actors/visits actors/ui
+subdirs = actors/clinicapi actors/customers actors/vets actors/visits actors/ui petclinic-interface
 top_targets = all push start test clean
 
 include ../build/makefiles/common.mk
