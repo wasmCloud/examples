@@ -44,6 +44,11 @@ services:
       - 55681:55681 # otlp http  
 
   wasmcloud:
+    depends_on:
+      - "nats"
+      - "redis"
+      - "grafana"
+      - "tempo"
     image: wasmcloud/wasmcloud_host:latest
     environment:
       RUST_LOG: debug,hyper=info
