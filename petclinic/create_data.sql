@@ -22,5 +22,6 @@ insert into pets (id, pettype, name, bday, bmonth, byear, ownerid) values (6, 2,
 insert into pets (id, pettype, name, bday, bmonth, byear, ownerid) values (7, 1, 'Harley Quinn', 12, 12, 2012, 6);
 insert into pets (id, pettype, name, bday, bmonth, byear, ownerid) values (8, 1, 'Loki Odin', 12, 12, 2012, 6);
 insert into pets (id, pettype, name, bday, bmonth, byear, ownerid) values (9, 1, 'Nelson', 12, 12, 2012, 7);
+insert into pets (id, pettype, name, bday, bmonth, byear, ownerid) values (10, 1, 'Douglas', 5, 3, 2019, 4);
 insert into visits (day, month, year, description, petid, vetid, ownerid, hour, minute) values (2, 2, 2022, 'Annual Checkup, diagnosis: very good boy', 1, 1, 4, 12, 12);
 insert into visits (day, month, year, description, petid, vetid, ownerid, hour, minute) values (9, 6, 2022, 'Her growl sounds like Donald Duck', 5, 1, 1, 16, 10);
