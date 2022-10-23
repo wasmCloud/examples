@@ -6,7 +6,7 @@ use std::{
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-changed=./src");
     println!("cargo:rerun-if-changed=./public");
-    println!("cargo:rerun-if-changed=./craco.config.js");
+    // println!("cargo:rerun-if-changed=./craco.config.js");
     println!("cargo:rerun-if-changed=./package.json");
     println!("cargo:rerun-if-changed=./tailwind.config.js");
 
