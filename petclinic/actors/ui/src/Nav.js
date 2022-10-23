@@ -11,22 +11,41 @@ export default function Nav(props) {
 
   const isActive = (link) => {
     return active === link ?
-      'py-4 px-2 text-blue-500 border-b-4 border-blue-500 font-semibold cursor-pointer'
+      'py-4 px-2 text-[#00bc8e] border-b-4 border-[#00bc8e] font-semibold cursor-pointer'
       :
-      'py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300 cursor-pointer'
+      'py-4 px-2 text-wasmcloudGray font-semibold hover:text-[#00bc8e] transition duration-300 cursor-pointer'
 
   }
 
   return (
     <nav className="bg-white shadow-lg">
       <div className="container mx-auto">
-        <div className="flex justify-between">
-          <div className="flex space-x-7">
-            <div className="hidden md:flex items-center space-x-1">
-              <h1 className="font-semibold text-gray-500 pr-4">Pet Clinic</h1>
-              <div onClick={() => changePage('owners')} className={isActive('owners')}>Owners</div>
-              <div onClick={() => changePage('vets')} className={isActive('vets')}>Vets</div>
-              <div onClick={() => changePage('petTypes')} className={isActive('petTypes')}>PetTypes</div>
+        <div className="flex">
+          <img src="/images/wasmcloud_logo.svg" className="p-1" height="40%" width="15%" />
+          <h1 className="font-semibold text-gray-500 text-2xl my-auto pl-4">Pet Clinic</h1>
+          <div className="flex space-x-6 ml-[15%]">
+            <div
+              onClick={() => changePage('owners')}
+              className={`${isActive('owners')} flex`}
+            >
+              <i className="fa fa-user text-wasmcloudGreen-light my-auto mr-2" />
+              Owners
+            </div>
+
+            <div
+              onClick={() => changePage('vets')}
+              className={`${isActive('vets')} flex`}
+            >
+              <i className="fa fa-notes-medical text-wasmcloudGreen-light my-auto mr-2" />
+              Vets
+            </div>
+
+            <div
+              onClick={() => changePage('petTypes')}
+              className={`${isActive('petTypes')} flex`}
+            >
+              <i className="fa fa-paw text-wasmcloudGreen-light my-auto mr-2" />
+              Pet Types
             </div>
           </div>
         </div>

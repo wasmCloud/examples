@@ -21,7 +21,7 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="text-white px-6 py-4 border-0 rounded relative mb-4 bg-red-500">
+        <div className="text-white px-6 py-4 border-0 rounded-md relative mb-4 bg-red-500">
           <span className="inline-block align-middle mr-8">
             <b className="capitalize">Error&nbsp;</b>{this.state.hasError.message}
           </span>

@@ -25,8 +25,10 @@ function App() {
   return (
     <div>
       <Nav changePage={(page) => setPage(page)} />
-      <div className="container mx-auto pt-8">
+      <div className="container mx-auto pt-8 relative">
         <ErrorBoundary>
+          <img src="/images/cat.png" className="absolute top-0 -left-[40%] opacity-75 -z-10" />
+          <img src="/images/dog.png" className="absolute top-1/2 -right-[38%] opacity-75 -z-10" />
           {renderPage()}
         </ErrorBoundary>
       </div>

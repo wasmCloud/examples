@@ -1,25 +1,8 @@
 import React, { Component } from 'react';
 import { Modal, OwnerModal, PetModal, VisitsModal } from './Modal';
 import api from './Api';
-/*
-{
-  id: 1,
-  name: '',
-  petType: {
-    id: 1,
-    name: ''
-  },
-  birthdate: '',
-}
+import { fakePets } from './fake';
 
-{
-  id: 1,
-  description: '',
-  petId: 1,
-  vetId: 1
-}
-
-*/
 
 export default class Owner extends Component {
   constructor(props) {
@@ -72,10 +55,14 @@ export default class Owner extends Component {
     const { owner } = this.state;
     return (
       <div className="w-1/3 pr-2">
-        <div className="p-8 bg-white shadow-md">
+        <h1 className="text-2xl pl-1 font-bold text-wasmcloudGray">Owner</h1>
+        <div className="p-8 rounded-md bg-white bg-opacity-50 shadow-md">
           <h2 className="text-2xl font-bold text-gray-800">{`${owner.firstName} ${owner.lastName}`}</h2>
           {/* <p className="text-gray-600">{`${owner.address}, ${owner.city}`}</p> */}
-          <p className="text-gray-600">{owner.email}</p>
+          <div className="flex space-x-2">
+            <i className="fa fa-at my-auto text-wasmcloudGreen-light" />
+            <p className="text-gray-600 italic">{owner.email}</p>
+          </div>
           {/* <p className="text-gray-600">{owner.telephone}</p> */}
           <div className="mt-2">
             <button
@@ -84,7 +71,7 @@ export default class Owner extends Component {
                   showModal: 'owner'
                 })
               }}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-2 mr-2">
+              className="bg-wasmcloudGreen-light rounded-md hover:bg-wasmcloudGreen-dark text-white font-bold py-2 px-4 mb-2 mr-2">
               Edit Owner
             </button>
             <button
@@ -93,7 +80,7 @@ export default class Owner extends Component {
                   showModal: 'addOrEditPet'
                 })
               }}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mb-2">
+              className="bg-blue-500 rounded-md hover:bg-blue-700 text-white font-bold py-2 px-4 mb-2">
               Add Pet
             </button>
           </div>
@@ -106,13 +93,22 @@ export default class Owner extends Component {
     const { pets } = this.state;
     return (
       <div className="w-2/3">
+        <h1 className="text-2xl pl-1 font-bold text-wasmcloudGray">Pets</h1>
         {pets.map((pet, idx) => {
           return (
             <div key={idx} className="pr-2 pb-2">
-              <div className="p-8 bg-white shadow-md">
-                <h2 className="text-2xl font-bold text-gray-800">{pet.name}</h2>
-                <p className="text-gray-600 italic">{pet.petType.name}</p>
-                <p className="text-gray-600">{pet.birthdate.month}/{pet.birthdate.day}/{pet.birthdate.year}</p>
+              <div className="p-8 rounded-md bg-white bg-opacity-50 shadow-md">
+                <div className="flex space-x-2">
+                  <i className="fa fa-paw my-auto text-wasmcloudGreen-light" />
+                  <h2 className="text-2xl font-bold text-gray-800">{pet.name}</h2>
+                </div>
+                <p className="text-gray-600 italic">{pet.petType}</p>
+                {/* <p className="text-gray-600 italic">{pet.petType.name}</p> */}
+                <div className="flex space-x-2">
+                  <i className="fa fa-cake-candles my-auto" />
+                  <p className="text-gray-600">{pet.birthdate.month}/{pet.birthdate.day}/{pet.birthdate.year}</p>
+                  {/* <p className="text-gray-600">{pet.birthdate}</p> */}
+                </div>
                 <div className="mt-2">
                   <button
                     onClick={() => {
@@ -121,7 +117,7 @@ export default class Owner extends Component {
                         pet: pet,
                       })
                     }}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-2 mr-2">
+                    className="bg-wasmcloudGreen-light rounded-md text-white font-bold py-2 px-4 mb-2 mr-2">
                     Edit Pet
                   </button>
                   <button
@@ -131,7 +127,7 @@ export default class Owner extends Component {
                         pet: pet
                       })
                     }}
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mb-2">
+                    className="bg-blue-500 rounded-md hover:bg-blue-700 text-white font-bold py-2 px-4 mb-2">
                     Visits
                   </button>
                 </div>
@@ -198,9 +194,9 @@ export default class Owner extends Component {
 
   render() {
     return (
-      <div>
+      <div className="relative">
         {this.state.showModal ? this.renderModal() : null}
-        <button onClick={() => this.props.goBack()} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-2">
+        <button onClick={() => this.props.goBack()} className="bg-wasmcloudGreen-light hover:bg-wasmcloudGreen-dark rounded-md text-white font-bold py-2 px-4 mb-2">
           Back
         </button>
         <div className="flex">
