@@ -64,7 +64,14 @@ export function Modal(props) {
 }
 
 export function OwnerModal(props) {
-  const [owner, setOwner] = useState(props.owner || {})
+  const [owner, setOwner] = useState(Object.assign({
+    firstName: "",
+    lastName: "",
+    email: "",
+    address: "",
+    city: "",
+    telephone: "",
+  }, props.owner))
 
   const onChange = (e) => {
     setOwner({
@@ -80,7 +87,7 @@ export function OwnerModal(props) {
           FirstName
         </label>
         <input
-          value={owner.firstName || ''}
+          value={owner.firstName}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="firstName"
@@ -92,7 +99,7 @@ export function OwnerModal(props) {
           LastName
         </label>
         <input
-          value={owner.lastName || ''}
+          value={owner.lastName}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="lastName"
@@ -104,7 +111,7 @@ export function OwnerModal(props) {
           Email
         </label>
         <input
-          value={owner.email || ''}
+          value={owner.email}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="email"
@@ -116,7 +123,7 @@ export function OwnerModal(props) {
           Address
         </label>
         <input
-          value={owner.address || ''}
+          value={owner.address}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="address"
@@ -128,7 +135,7 @@ export function OwnerModal(props) {
           City
         </label>
         <input
-          value={owner.city || ''}
+          value={owner.city}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="city"
@@ -140,7 +147,7 @@ export function OwnerModal(props) {
           Telephone
         </label>
         <input
-          value={owner.telephone || ''}
+          value={owner.telephone}
           onChange={(e) => onChange(e)}
           className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="telephone"
