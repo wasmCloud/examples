@@ -357,10 +357,10 @@ export function VisitsModal(props) {
       </form>
       <div>
         <div className="bg-white-lg shadow">
-          <ul className="divide-y-2 divide-gray-100">
+          <ul className="space-y-2">
             {visits.map((v, idx) => {
               return (
-                <li key={idx} className="p-3">
+                <li key={idx} className="p-3 border-wasmcloudGreen-light border rounded-md">
                   <div className="flex space-x-2">
                     <i className="fa fa-calendar my-auto text-wasmcloudGreen-light" />
                     <span className="italic">{v.date.month}/{v.date.day}/{v.date.year}</span>
