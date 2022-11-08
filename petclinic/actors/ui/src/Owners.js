@@ -40,6 +40,8 @@ export default function Owners() {
       null;
   }
 
+  console.log("OWNER", owner)
+
   const renderTable = () => {
     return (
       <div className="">
@@ -58,35 +60,33 @@ export default function Owners() {
               </tr>
             </thead>
             <tbody className="rounded-b-md">
-              {owners && owners.length > 0 && owners.map((owner, idx) => {
+              {owners && owners.length > 0 && owners.map((own, idx) => {
                 return (
                   <tr key={idx} className="border">
                     <td className="px-8 py-4 flex flex-col space-y-2">
-                      <span className="font-bold">{`${owner.firstName} ${owner.lastName}`}</span>
+                      <span className="font-bold">{`${own.firstName} ${own.lastName}`}</span>
                       <div className="flex space-x-2">
                         <i className="fa fa-at my-auto text-wasmcloudGreen-light" />
-                        <span className="italic">{owner.email}</span>
+                        <span className="italic">{own.email}</span>
                       </div>
                     </td>
                     <td className="px-8 py-4">
                       <div className="flex flex-col space-y-2">
                         <div className="flex space-x-2">
                           <i className="fa fa-house my-auto text-wasmcloudGreen-light" />
-                          <span>{owner.address}, {owner.city}</span>
+                          <span>{own.address}, {own.city}</span>
                         </div>
                         <div className="flex space-x-2">
                           <i className="fa fa-phone my-auto text-wasmcloudGreen-light" />
-                          <span className="italic">{owner.telephone}</span>
+                          <span className="italic">{own.telephone}</span>
                         </div>
                       </div>
                     </td>
                     <td className="text-right pr-8">
-                      <button onClick={() => setOwner(owner)} className="bg-wasmcloudGreen-light rounded-md hover:bg-wasmcloudGreen-dark text-white font-bold py-2 px-4 mb-2">
+                      <button onClick={() => setOwner(own)} className="bg-wasmcloudGreen-light rounded-md hover:bg-wasmcloudGreen-dark text-white font-bold py-2 px-4 mb-2">
                         Manage
                       </button>
                     </td>
-                    {/* <td className="px-8 py-4">{`${owner.address}, ${owner.city}`}</td>
-                  <td className="px-8 py-4">{owner.telephone}</td> */}
                   </tr>
                 )
               })}

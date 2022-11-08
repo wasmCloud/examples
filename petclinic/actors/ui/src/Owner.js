@@ -102,7 +102,7 @@ export default class Owner extends Component {
                   <i className="fa fa-paw my-auto text-wasmcloudGreen-light" />
                   <h2 className="text-2xl font-bold text-gray-800">{pet.name}</h2>
                 </div>
-                <p className="text-gray-600 italic">{pet.petType}</p>
+                <p className="text-gray-600 italic">{pet.petType.name}</p>
                 {/* <p className="text-gray-600 italic">{pet.petType.name}</p> */}
                 <div className="flex space-x-2">
                   <i className="fa fa-cake-candles my-auto" />
