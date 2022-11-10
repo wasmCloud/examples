@@ -18,7 +18,7 @@ export default function Nav(props) {
   }
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-white shadow-lg sticky top-0 z-20">
       <div className="container mx-auto">
         <div className="flex">
           <img src="/images/wasmcloud_logo.svg" className="p-1" height="40%" width="15%" />
