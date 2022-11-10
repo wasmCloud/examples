@@ -34,7 +34,7 @@ export function Modal(props) {
     return (
       <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200">
         <button
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mb-2"
+          className="bg-red-500 rounded-md hover:bg-red-700 text-white font-bold py-2 px-4 mb-2"
           type="button"
           onClick={() => props.setShowModal(false)}
         >
@@ -47,11 +47,11 @@ export function Modal(props) {
   return (
     <>
       <div
-        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+        className="justify-center items-center bg-white bg-opacity-50  flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
       >
-        <div className="relative w-1/3 my-6 mx-auto ">
+        <div className="relative w-2/5 bg-white  my-6 mx-auto ">
           {/*content*/}
-          <div className="border-0 shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+          <div className="border-0 shadow-lg bg-goldenCream relative flex flex-col w-full bg-white outline-none focus:outline-none">
             {renderModalHeader()}
             {renderModalContent()}
             {renderModalFooter()}
@@ -89,7 +89,7 @@ export function OwnerModal(props) {
         <input
           value={owner.firstName}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="firstName"
           type="text"
           placeholder="First Name" />
@@ -101,7 +101,7 @@ export function OwnerModal(props) {
         <input
           value={owner.lastName}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="lastName"
           type="text"
           placeholder="Last Name" />
@@ -113,7 +113,7 @@ export function OwnerModal(props) {
         <input
           value={owner.email}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="email"
           type="text"
           placeholder="Email" />
@@ -125,7 +125,7 @@ export function OwnerModal(props) {
         <input
           value={owner.address}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="address"
           type="text"
           placeholder="Address" />
@@ -137,7 +137,7 @@ export function OwnerModal(props) {
         <input
           value={owner.city}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="city"
           type="text"
           placeholder="City" />
@@ -149,14 +149,14 @@ export function OwnerModal(props) {
         <input
           value={owner.telephone}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="telephone"
           type="text"
           placeholder="Telephone" />
       </div>
       <div className="mb-4">
         <button
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
+          className="w-full bg-wasmcloudGreen-light hover:bg-wasmcloudGreen-dark rounded-md text-white font-bold py-2 px-4"
           type="button"
           onClick={() => {
             props.ownerCallback(owner);
@@ -211,7 +211,7 @@ export function PetModal(props) {
         <input
           value={pet.name || ''}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="name"
           type="text"
           placeholder="Name" />
@@ -223,7 +223,7 @@ export function PetModal(props) {
         <input
           value={pet.birthdate ? parseDateString(pet.birthdate.day, pet.birthdate.month, pet.birthdate.year) : ''}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="birthdate"
           type="date"
           placeholder="Birthdate" />
@@ -235,7 +235,7 @@ export function PetModal(props) {
         <select
           value={pet.petType ? pet.petType.id ? pet.petType.id : pet.petType : ''}
           onChange={(e) => onChange(e)}
-          className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="petType">
           <option value=''>Choose pet type...</option>
           {petTypes.map((petType, idx) => {
@@ -247,7 +247,7 @@ export function PetModal(props) {
       </div>
       <div className="mb-4">
         <button
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
+          className="w-full bg-wasmcloudGreen-light hover:bg-wasmcloudGreen-dark rounded-md text-white font-bold py-2 px-4"
           type="button"
           onClick={() => {
             props.petCallback(pet);
@@ -318,7 +318,7 @@ export function VisitsModal(props) {
           <input
             value={visit.description || ''}
             onChange={(e) => onChange(e)}
-            className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="description"
             type="text"
             placeholder="Description" />
@@ -330,7 +330,7 @@ export function VisitsModal(props) {
           <input
             value={visit.date ? parseDateString(visit.date.day, visit.date.month, visit.date.year) : ''}
             onChange={(e) => onChange(e)}
-            className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="date"
             type="date"
             placeholder="Date" />
@@ -342,7 +342,7 @@ export function VisitsModal(props) {
           <select
             value={visit.vetId || ''}
             onChange={(e) => onChange(e)}
-            className="shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="vetId">
             <option value=''>Choose vet...</option>
             {vets.map((vet, idx) => {
@@ -354,7 +354,7 @@ export function VisitsModal(props) {
         </div>
         <div className="mb-4">
           <button
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
+            className="w-full bg-wasmcloudGreen-light hover:bg-wasmcloudGreen-dark rounded-md text-white font-bold py-2 px-4"
             type="button"
             onClick={() => addVisit(visit)}
           >
@@ -364,18 +364,24 @@ export function VisitsModal(props) {
       </form>
       <div>
         <div className="bg-white-lg shadow">
-          <ul className="divide-y-2 divide-gray-100">
+          <ul className="space-y-2">
             {visits.map((v, idx) => {
               return (
-                <li key={idx} className="p-3">
-                  <span className="italic">{v.date.month}/{v.date.day}/{v.date.year}</span>
-                  <p className="font-bold">{v.description}</p>
+                <li key={idx} className="p-3 border-wasmcloudGreen-light border rounded-md">
+                  <div className="flex space-x-2">
+                    <i className="fa fa-calendar my-auto text-wasmcloudGreen-light" />
+                    <span className="italic">{v.date.month}/{v.date.day}/{v.date.year}</span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <i className="fa fa-clipboard my-auto text-wasmcloudGreen-light" />
+                    <p className="font-bold">{v.description}</p>
+                  </div>
                 </li>
               )
             })}
           </ul>
         </div>
       </div>
-    </div >
+    </div>
   );
 }

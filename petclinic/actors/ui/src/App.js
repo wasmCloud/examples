@@ -23,10 +23,12 @@ function App() {
   }
 
   return (
-    <div>
+    <div className="overflow-x-hidden h-screen overflow-y-scroll">
       <Nav changePage={(page) => setPage(page)} />
-      <div className="container mx-auto pt-8">
+      <div className="container mx-auto px-8 pt-8 relative">
         <ErrorBoundary>
+          <img src="/images/cat.png" className="absolute top-0 sm:-left-[30%] -left-[38%] opacity-75 -z-10" />
+          <img src="/images/dog.png" className="absolute top-1/2 sm:-right-[30%] -right-[35%] opacity-75 -z-10" />
           {renderPage()}
         </ErrorBoundary>
       </div>
