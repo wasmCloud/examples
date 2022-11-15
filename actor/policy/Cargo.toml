@@ -1,6 +1,6 @@
 [package]
 name = "example-policy"
-version = "0.1.1"
+version = "0.2.0"
 authors = [ "A policy enforcer that restricts actors and providers to only wasmCloud official artifacts" ]
 edition = "2021"
 

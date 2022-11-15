@@ -1,6 +1,6 @@
 [package]
 name = "xkcd"
-version = "0.1.5"
+version = "0.2.0"
 authors = [ "wasmcloud Team" ]
 edition = "2021"
 

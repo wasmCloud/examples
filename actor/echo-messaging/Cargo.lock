@@ -490,7 +490,7 @@ dependencies = [
 
 [[package]]
 name = "echo-messaging"
-version = "0.1.5"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "futures",
