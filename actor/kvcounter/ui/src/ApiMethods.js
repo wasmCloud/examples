@@ -1,6 +1,4 @@
-// KV - [/]
-export function incrementKV(num = 1) {
-    return this.modifyRequest('/', 'POST', {
-        num
-    });
+// KV - [/${bucket}]
+export function getKV(key) {
+    return this.getRequest(key === '' || key === undefined ? '/' : `/${key}`);
 }

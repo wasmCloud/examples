@@ -47,6 +47,6 @@ class Api {
 
 Object.assign(Api.prototype, apiMethods);
 
-const api = new Api();
+const api = new Api('');
 
 export default api;
