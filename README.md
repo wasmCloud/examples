@@ -6,19 +6,20 @@ Example actors, capability providers, and other demonstrations
 
 The following actors run as WebAssembly on wasmCloud hosts.
 
-| Example | Description | OCI Reference <br/> (refer to example for latest version) |
-|---|---|---|
-| [animal-image-downloader](https://github.com/wasmcloud/examples/tree/main/actor/animal-image-downloader) | An actor that receives messages and makes HTTP requests, downloading a picture of an animal to a blobstore |  `wasmcloud.azurecr.io/animal-image-downloader` |
-| [echo](https://github.com/wasmcloud/examples/tree/main/actor/echo) | An actor that listens on an HTTP port and returns a JSON payload describing the incoming request |  `wasmcloud.azurecr.io/echo` |
-| [echo-messaging](https://github.com/wasmcloud/examples/tree/main/actor/echo-messaging) | An actor that listens on a message broker topic and replies |  `wasmcloud.azurecr.io/echo-messaging` |
-| [hello](https://github.com/wasmcloud/examples/tree/main/actor/hello) | Canonical "hello world" actor that listens on an HTTP port and replies with a greeting |  `wasmcloud.azurecr.io/hello` |
-| [kvcounter](https://github.com/wasmcloud/examples/tree/main/actor/kvcounter) | An actor that uses the key-value store to increment a counter and return a value for every HTTP request it receives | `wasmcloud.azurecr.io/kvcounter` |
-| [logging](https://github.com/wasmcloud/examples/tree/main/actor/logging) | An actor that demonstrates the builtin logging capability provider | `wasmcloud.azurecr.io/logging` |
-| [message-pub](https://github.com/wasmcloud/examples/tree/main/actor/message-pub) | An actor that demonstrates receiving HTTP requests and publishing the request body as a message | `wasmcloud.azurecr.io/message-pub` |
-| [random](https://github.com/wasmcloud/examples/tree/main/actor/random) | An actor that demonstrates the builtin random number generation capability provider | `wasmcloud.azurecr.io/random` |
-| [todo-sql](https://github.com/wasmcloud/examples/tree/main/actor/todo-sql) | An todo-application using sql database, https server (with TLS), logging, and numbergen | (unpublished) |
-| [todo](https://github.com/wasmcloud/examples/tree/main/actor/todo) | An todo-application using keyvalue store, http server, and logging | (unpublished) |
-| [xkcd](https://github.com/wasmcloud/examples/tree/main/actor/xkcd) | A application that generates xkcd comics | `wasmcloud.azurecr/xkcd` |
+| Example                                                                                                  | Description                                                                                                         | OCI Reference <br/> (refer to example for latest version) |
+|----------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| [animal-image-downloader](https://github.com/wasmcloud/examples/tree/main/actor/animal-image-downloader) | An actor that receives messages and makes HTTP requests, downloading a picture of an animal to a blobstore          | `wasmcloud.azurecr.io/animal-image-downloader`            |
+| [echo](https://github.com/wasmcloud/examples/tree/main/actor/echo)                                       | An actor that listens on an HTTP port and returns a JSON payload describing the incoming request                    | `wasmcloud.azurecr.io/echo`                               |
+| [echo-messaging](https://github.com/wasmcloud/examples/tree/main/actor/echo-messaging)                   | An actor that listens on a message broker topic and replies                                                         | `wasmcloud.azurecr.io/echo-messaging`                     |
+| [hello](https://github.com/wasmcloud/examples/tree/main/actor/hello)                                     | Canonical "hello world" actor that listens on an HTTP port and replies with a greeting                              | `wasmcloud.azurecr.io/hello`                              |
+| [kvcounter](https://github.com/wasmcloud/examples/tree/main/actor/kvcounter)                             | An actor that uses the key-value store to increment a counter and return a value for every HTTP request it receives | `wasmcloud.azurecr.io/kvcounter`                          |
+| [logging](https://github.com/wasmcloud/examples/tree/main/actor/logging)                                 | An actor that demonstrates the builtin logging capability provider                                                  | `wasmcloud.azurecr.io/logging`                            |
+| [message-pub](https://github.com/wasmcloud/examples/tree/main/actor/message-pub)                         | An actor that demonstrates receiving HTTP requests and publishing the request body as a message                     | `wasmcloud.azurecr.io/message-pub`                        |
+| [random](https://github.com/wasmcloud/examples/tree/main/actor/random)                                   | An actor that demonstrates the builtin random number generation capability provider                                 | `wasmcloud.azurecr.io/random`                             |
+| [todo-sql](https://github.com/wasmcloud/examples/tree/main/actor/todo-sql)                               | An todo-application using sql database, https server (with TLS), logging, and numbergen                             | (unpublished)                                             |
+| [todo](https://github.com/wasmcloud/examples/tree/main/actor/todo)                                       | An todo-application using keyvalue store, http server, and logging                                                  | (unpublished)                                             |
+| [xkcd](https://github.com/wasmcloud/examples/tree/main/actor/xkcd)                                       | A application that generates xkcd comics                                                                            | `wasmcloud.azurecr/xkcd`                                  |
+| [ifconfig](https://github.com/wasmcloud/examples/tree/main/actor/ifconfig)                               | A tinygo actor that will return the external IP address of your http client                                         | (unpublished)                                             |
 
 
 ## Interfaces
