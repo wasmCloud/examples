@@ -32,7 +32,7 @@ wasmbus-rpc = { version = "0.11.0", features = ["otel"] }
 
 # test dependencies
 [dev-dependencies]
-wasmcloud-test-util = "0.6.0"
+wasmcloud-test-util = "0.6.2"
 
 rand = "0.8"
 

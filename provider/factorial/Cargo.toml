@@ -23,7 +23,7 @@ wasmcloud-interface-factorial = "0.7.0"
 
 # test dependencies
 [dev-dependencies]
-wasmcloud-test-util = "0.6.0"
+wasmcloud-test-util = "0.6.2"
 
 [[bin]]
 name = "factorial"

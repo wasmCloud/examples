@@ -21,7 +21,9 @@ async fn run_all() {
 
     // try to let the provider shut down gracefully
     let provider = test_provider().await;
-    let _ = provider.shutdown().await;
+    if let Err(e) = provider.shutdown().await {
+        eprintln!("shutdown error: {}", e);
+    }
 }
 
 /// test that health check returns healthy

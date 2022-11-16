@@ -2812,9 +2812,9 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-test-util"
-version = "0.6.0"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfb8b34c9f0b74fd2a4342dc0f5e6d6376099ad6c7bf4053eb03187c2798d23b"
+checksum = "362eaa3e7fe7d3657ed40a2e48d79269d7e1bc1f383690b61598e56da9301d3e"
 dependencies = [
  "anyhow",
  "async-nats",
@@ -2822,6 +2822,7 @@ dependencies = [
  "base64",
  "futures",
  "log",
+ "nkeys",
  "regex",
  "serde",
  "serde_json",
