@@ -2758,7 +2758,7 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-example-provider-factorial"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "async-trait",
  "base64",

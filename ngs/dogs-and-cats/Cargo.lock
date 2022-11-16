@@ -477,7 +477,7 @@ dependencies = [
 
 [[package]]
 name = "dogs-and-cats"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "futures",
  "serde_json",
