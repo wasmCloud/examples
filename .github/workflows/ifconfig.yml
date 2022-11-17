@@ -74,7 +74,9 @@ jobs:
       - name: Determine artifact metadata
         run: |
           echo "oci-version=$(wash claims inspect ./build/*_s.wasm -o json | jq -r '.version')" >> $GITHUB_ENV
-          echo "oci-repository=$(wash claims inspect ./build/*_s.wasm -o json | jq -r '.name')" >> $GITHUB_ENV
+          echo "oci-repository=ifconfig" >> $GITHUB_ENV
+          # Waiting on https://github.com/wasmCloud/wash/issues/336
+          # echo "oci-repository=$(wash claims inspect ./build/*_s.wasm -o json | jq -r '.name')" >> $GITHUB_ENV
         working-directory: ${{ env.working-directory }}
 
       - name: Push actor to AzureCR
