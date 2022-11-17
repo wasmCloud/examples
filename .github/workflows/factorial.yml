@@ -17,6 +17,7 @@ env:
   working-directory: ./provider/factorial
   WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
   WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_FACTORIAL }}
+  RUST_BACKTRACE: 1
 
 jobs:
   rust_check:
