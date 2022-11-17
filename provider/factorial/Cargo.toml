@@ -28,3 +28,6 @@ wasmcloud-test-util = "0.6.2"
 [[bin]]
 name = "factorial"
 path = "src/main.rs"
+
+[patch.crates-io]
+async-nats = { git = "https://github.com/nats-io/nats.rs", rev="5a5eab324ac55991b8fcdec8c8862edfb9a048cb" }
