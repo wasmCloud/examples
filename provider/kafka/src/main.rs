@@ -5,10 +5,13 @@ use std::{
     sync::{Arc, RwLock},
 };
 
-use kafka::{
-    consumer::{Consumer, FetchOffset, GroupOffsetStorage},
-    producer::{Producer, RequiredAcks},
+use futures::StreamExt;
+use rskafka::client::{
+    consumer::{StartOffset, StreamConsumerBuilder},
+    ClientBuilder,
 };
+
+use kafka::consumer::Consumer;
 use tokio::runtime::Handle;
 use tracing::{debug, instrument};
 use wasmbus_rpc::{core::LinkDefinition, provider::prelude::*};
@@ -24,23 +27,39 @@ const DEFAULT_HOST: &str = "127.0.0.1:9092";
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // handle lattice control messages and forward rpc to the provider dispatch
     // returns when provider receives a shutdown control message
-    debug!("ree");
-    tracing::info!("ree2");
     let hosts = std::env::var(KAFKA_HOSTS)
         .unwrap_or_else(|_| DEFAULT_HOST.to_string())
         .trim()
         .split(',')
         .map(|s| s.to_string())
         .collect::<Vec<String>>();
-    let kafka = KafkaProvider::new(hosts);
+    // get partition client
+    let client = ClientBuilder::new(hosts).build().await.unwrap();
+    let partition_client = Arc::new(client.partition_client("my-topic", 0).unwrap());
+
+    // construct stream consumer
+    let mut stream = StreamConsumerBuilder::new(partition_client, StartOffset::Earliest)
+        .with_max_wait_ms(100)
+        .build();
+
+    // consume data
+    while let Some(Ok((record, water_mark))) = stream.next().await {
+        println!(
+            "FROM REDPANDA {:?} {:?}",
+            String::from_utf8_lossy(&record.record.value.unwrap()),
+            water_mark
+        );
+    }
+
+    // let kafka = KafkaProvider::new(hosts);
     //TODO: adjust args
     // provider_run(KafkaProvider::new(), Some("Kafka Provider".to_string()))?;
-    println!("consumer: {:?}", kafka.consumer);
-    println!(
-        "client stuff: {:?}",
-        kafka.consumer.write().unwrap().client()
-    );
-    consume_messages(kafka.consumer).unwrap();
+    // println!("consumer: {:?}", kafka.consumer);
+    // println!(
+    //     "client stuff: {:?}",
+    //     kafka.consumer.write().unwrap();
+    // );
+    // consume_messages(kafka.consumer).unwrap();
 
     std::thread::park();
     eprintln!("Kafka provider exiting");
@@ -51,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[derive(Clone, Provider)]
 #[services(Messaging)]
 struct KafkaProvider {
-    producer: Arc<RwLock<Producer>>,
+    // producer: Arc<RwLock<Producer>>,
     consumer: Arc<RwLock<Consumer>>,
 }
 
@@ -59,15 +78,15 @@ impl KafkaProvider {
     fn new(hosts: Vec<String>) -> Self {
         Self {
             //TODO: configure this
-            producer: Arc::new(RwLock::new(
-                Producer::from_hosts(hosts.clone()).create().unwrap(),
-            )),
+            // producer: Arc::new(RwLock::new(
+            //     Producer::from_hosts(hosts.clone()).create().unwrap(),
+            // )),
             consumer: Arc::new(RwLock::new(
                 Consumer::from_hosts(hosts)
                     .with_topic("my-topic".to_owned())
-                    .with_fallback_offset(FetchOffset::Earliest)
+                    // .with_fallback_offset(FetchOffset::Earliest)
                     .with_group("my-group-unique".to_owned())
-                    .with_offset_storage(GroupOffsetStorage::Kafka)
+                    // .with_offset_storage(GroupOffsetStorage::Kafka)
                     .create()
                     .unwrap(),
             )),
