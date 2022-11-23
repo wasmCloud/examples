@@ -1,0 +1,26 @@
+name: Build and Test
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "Cargo.*"
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check formatting
+        run: cargo fmt -- --check
+        shell: bash
+      - name: Check lints with clippy
+        run: |
+          rustup component add clippy
+          cargo clippy
+      - name: Build provider
+        run: cargo build
+      # If your integration tests depend on NATS or Redis you can enable them here
+      - uses: wasmcloud/common-actions/run-nats@main
+      # - uses: wasmcloud/common-actions/run-redis@main
+      - name: Test provider
+        run: cargo test -- --nocapture

@@ -1,0 +1,135 @@
+name: Release
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "**"
+      - "src/**"
+      - "Cargo.*"
+    tags:
+      - "v*"
+env:
+  # For the release action, you'll have to set the following variables
+  WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY }}
+  WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
+jobs:
+  # Using a matrix, build for 6 supported targets for wasmCloud providers
+  build_provider_targets:
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-apple-darwin
+          - aarch64-unknown-linux-gnu
+          - aarch64-apple-darwin
+          - armv7-unknown-linux-gnueabihf
+          - x86_64-pc-windows-gnu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-cross@main
+      - name: Determine artifact name
+        run: |
+          echo "artifact-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].targets[0].name')" >> $GITHUB_ENV
+      - name: Build native executable
+        run: |
+          cross build --release --target ${{ matrix.target }}
+      - name: Upload executable to GH Actions
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.target }}
+          if-no-files-found: error
+          path: |
+            target/${{ matrix.target }}/release/${{ env.artifact-name }}
+            target/${{ matrix.target }}/release/${{ env.artifact-name }}.exe
+
+  assemble_provider_archive:
+    needs: [build_provider_targets]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+      # Downloads all provider artifacts
+      - uses: actions/download-artifact@v3
+      - name: Determine artifact name
+        run: |
+          echo "artifact-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].targets[0].name')" >> $GITHUB_ENV
+      - name: Create provider archive
+        run: |
+          mkdir -p target/release
+          mv x86_64-unknown-linux-gnu/${{ env.artifact-name }} target/release/
+          make par
+      - name: Fill provider archive with binaries
+        run: |
+          wash par insert --arch x86_64-macos   --binary x86_64-apple-darwin/${{ env.artifact-name }} build/${{ env.artifact-name }}.par.gz
+          wash par insert --arch aarch64-linux  --binary aarch64-unknown-linux-gnu/${{ env.artifact-name }} build/${{ env.artifact-name }}.par.gz
+          wash par insert --arch aarch64-macos  --binary aarch64-apple-darwin/${{ env.artifact-name }} build/${{ env.artifact-name }}.par.gz
+          wash par insert --arch armv7-linux    --binary armv7-unknown-linux-gnueabihf/${{ env.artifact-name }} build/${{ env.artifact-name }}.par.gz
+          wash par insert --arch x86_64-windows --binary x86_64-pc-windows-gnu/${{ env.artifact-name }}.exe build/${{ env.artifact-name }}.par.gz
+      - name: Upload provider archive to GH Actions
+        uses: actions/upload-artifact@v2
+        with:
+          name: provider-archive
+          path: build/${{ env.artifact-name }}.par.gz
+
+  github_release:
+    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    needs: [assemble_provider_archive]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+      - name: Download provider archive
+        uses: actions/download-artifact@v3
+        with:
+          name: provider-archive
+          path: build
+      - name: Create release text
+        run: |
+          export oci_version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')
+          export claims=$(wash par inspect build/*.par.gz)
+          echo "Your provider can be accessed at \`ghcr.io/${{ github.REPOSITORY }}:$oci_version\`" >> release.txt
+          echo "Claims information:" >> release.txt
+          echo "\`\`\`" >> release.txt
+          echo "$claims" >> release.txt
+          echo "\`\`\`" >> release.txt
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/*.par.gz
+          token: ${{ env.WASMCLOUD_PAT }}
+          body_path: release.txt
+          prerelease: false
+          draft: false
+
+  artifact_release:
+    needs: [assemble_provider_archive]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+      - name: Download provider archive
+        uses: actions/download-artifact@v3
+        with:
+          name: provider-archive
+          path: build
+
+      - name: Determine provider name
+        run: |
+          echo "provider-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
+      - name: Determine provider version
+        if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+        run: |
+          echo "provider-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
+      - name: Determine provider version (main)
+        if: ${{ !startswith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "provider-version=latest" >> $GITHUB_ENV
+      - name: Push provider archive to GHCR
+        env:
+          WASH_REG_USER: ${{ github.repository_owner }}
+          WASH_REG_PASSWORD: ${{ secrets.WASMCLOUD_PAT }}
+        run: |
+          wash reg push ghcr.io/${{ github.REPOSITORY }}:${{ env.provider-version }} build/${{ env.provider-name }}.par.gz -a org.opencontainers.image.source=https://github.com/${{ github.REPOSITORY }} --allow-latest
