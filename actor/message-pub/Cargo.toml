@@ -11,7 +11,7 @@ name = "message_pub"
 [dependencies]
 futures = "0.3"
 form_urlencoded = "1.0"
-wasmbus-rpc = "0.11.0"
+wasmbus-rpc = "0.11.2"
 wasmcloud-interface-httpserver = "0.8.0"
 wasmcloud-interface-messaging = "0.8.0"
 

@@ -11,10 +11,10 @@ name = "animal_image_downloader"
 [dependencies]
 futures = "0.3"
 serde_json = "1.0.85"
-wasmbus-rpc = "0.11.0"
-wasmcloud-interface-messaging = "0.8.0"
-wasmcloud-interface-httpclient = "0.8.0"
-wasmcloud-interface-blobstore = "0.5.0"
+wasmbus-rpc = "0.11.2"
+wasmcloud-interface-messaging = "0.8.1"
+wasmcloud-interface-httpclient = "0.8.1"
+wasmcloud-interface-blobstore = "0.5.1"
 
 [profile.release]
 # Optimize for small code size

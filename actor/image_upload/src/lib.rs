@@ -12,7 +12,10 @@ use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_blobstore::{
     Blobstore, BlobstoreSender, Chunk, ContainerObject, ListObjectsRequest, PutObjectRequest,
 };
-use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
+use wasmcloud_interface_httpserver::{
+    HeaderMap, HttpRequest, HttpResponse, HttpServer, HttpServerReceiver,
+};
+//use wasmcloud_interface_logging::{error, info};
 
 // LIMIT max size of data to avoid DOS
 const MAX_IMAGE_SIZE: usize = 200 * 1024 * 1024; // 200MB
@@ -24,10 +27,67 @@ const MAX_IMAGE_SIZE: usize = 200 * 1024 * 1024; // 200MB
 const IMAGE_BUCKET: &str = "alias_images";
 
 #[allow(dead_code)]
-#[allow(clippy::new_without_default)]
-pub mod wasmcloud_interface_blobstore {
+mod wasmcloud_interface_blobstore {
     include!(concat!(env!("OUT_DIR"), "/gen/blobstore.rs"));
 }
+
+#[allow(dead_code)]
+mod wasmcloud_interface_httpserver {
+    include!(concat!(env!("OUT_DIR"), "/gen/httpserver.rs"));
+}
+
+pub use wasmcloud_interface_httpserver::*;
+
+impl Default for HttpResponse {
+    /// create default HttpResponse with status 200, empty body and empty header
+    fn default() -> HttpResponse {
+        HttpResponse {
+            status_code: 200,
+            body: Vec::default(),
+            header: HeaderMap::default(),
+        }
+    }
+}
+impl HttpResponse {
+    fn not_found() -> Self {
+        HttpResponse {
+            status_code: 404,
+            ..Default::default()
+        }
+    }
+    /// Shortcut for creating a 400/Bad Request response
+    pub fn bad_request<T: ToString>(msg: T) -> HttpResponse {
+        HttpResponse {
+            status_code: 400,
+            body: msg.to_string().as_bytes().into(),
+            ..Default::default()
+        }
+    }
+
+    /// Creates a response with a given status code and serializes the given payload as JSON
+    pub fn json<T>(payload: T, status_code: u16) -> Result<HttpResponse, RpcError>
+    where
+        T: Serialize,
+    {
+        let body = serde_json::to_string(&payload)
+            .map_err(|e| RpcError::Ser(e.to_string()))?
+            .into_bytes();
+        let mut header = HeaderMap::new();
+        header.insert(
+            "content-type".to_string(),
+            vec!["application/json".to_string()],
+        );
+        Ok(HttpResponse {
+            body,
+            status_code,
+            header,
+        })
+    }
+}
+
+//mod wasmcloud_interface_logging {
+//    include!(concat!(env!("OUT_DIR"), "/gen/logging.rs"));
+//}
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]

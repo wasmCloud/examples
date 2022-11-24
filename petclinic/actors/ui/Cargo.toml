@@ -12,8 +12,8 @@ path = "lib.rs"
 [dependencies]
 async-trait = "0.1"
 futures = "0.3"
-wasmbus-rpc = "0.11.0"
-wasmcloud-interface-logging = "0.8.0"
+wasmbus-rpc = "0.11.2"
+wasmcloud-interface-logging = "0.8.1"
 petclinic-interface = { path = "../../petclinic-interface/rust"}
 rust-embed = "6.3.0"
 mime_guess = "2"
