@@ -24,8 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: install protoc
-      run: sudo apt-get install -y protobuf-compiler
     # If your integration tests require nats or redis, run them here
     - id: run-nats
       uses: wasmcloud/common-actions/run-nats@main
@@ -40,8 +38,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: install protoc
-        run: sudo apt-get install -y protobuf-compiler
       - uses: wasmcloud/common-actions/install-wash@main
       - uses: wasmcloud/common-actions/install-cross@main
 

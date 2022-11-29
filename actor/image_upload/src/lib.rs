@@ -85,10 +85,6 @@ impl HttpResponse {
     }
 }
 
-//mod wasmcloud_interface_logging {
-//    include!(concat!(env!("OUT_DIR"), "/gen/logging.rs"));
-//}
-
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
 struct ImageUploadActor {}
