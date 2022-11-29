@@ -37,6 +37,6 @@ class ApiService {
     }
 }
 
-const api = new ApiService(process.env.REACT_APP_API_URL ?? '');
+const api = new ApiService(process.env.REACT_APP_API_URL ?? '/api');
 
 export default api;
