@@ -1,15 +1,15 @@
-import { Fireworks, FireworksHandlers } from "@fireworks-js/react"
-import { useState, useEffect, useRef, FormEvent } from "react"
-import api from "../services/ApiService"
-import { ReactComponent as Logo } from "../assets/logo.svg"
-import { useScreenSize } from "../hooks/useScreenSize"
+import { Fireworks, FireworksHandlers } from '@fireworks-js/react'
+import { useState, useEffect, useRef, FormEvent } from 'react'
+import api from '../services/ApiService'
+import { ReactComponent as Logo } from '../assets/logo.svg'
+import { useScreenSize } from '../hooks/useScreenSize'
 
 function App() {
-  const [bucket, setBucket] = useState("")
+  const [bucket, setBucket] = useState('')
   const [count, setCount] = useState(0)
   const dimensions = useScreenSize()
   const fireworks = useRef<FireworksHandlers>(null)
-  
+
   const updateCount = async (key?: string) => {
     try {
       const response = await api.increment(key)
@@ -20,18 +20,30 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    fireworks.current?.updateSize(dimensions)
-  }, [dimensions])
-  
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    // TODO: work out how to reset count when bucket name changes
-    updateCount(bucket).then(newCount => fireworks.current?.launch(newCount - count))
+  const launch = (total: number) => {
+    fireworks.current?.launch(total > 50 ? 50 : total)
   }
 
   useEffect(() => {
-    updateCount().then(newCount => fireworks.current?.launch(newCount))
+    fireworks.current?.updateSize(dimensions)
+  }, [dimensions])
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    let workingTotal = count
+    const el = e.currentTarget.elements.namedItem('bucket') as HTMLInputElement
+    const newBucket = el?.value ?? ''
+    if (newBucket !== bucket) {
+      workingTotal = 0
+    }
+    updateCount(newBucket).then((newCount) => {
+      setBucket(newBucket)
+      launch(newCount - workingTotal)
+    })
+  }
+
+  useEffect(() => {
+    updateCount().then((newCount) => launch(newCount))
   }, [])
 
   return (
@@ -42,7 +54,6 @@ function App() {
             id="bucket"
             name="bucket"
             placeholder="Enter a bucket name"
-            onChange={(e) => setBucket(e.target.value)}
             className="mx-auto px-2 py-1.5 text-center w-56 max-w-full text-wasmcloudGray rounded-md border border-wasmcloudGreen-light"
           />
           <button

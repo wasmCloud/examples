@@ -9,6 +9,8 @@ The `REACT_APP_API_URL` should be the url to the KVCounter API. If it isn't set,
 In development, it assumes that the url will [proxy](https://create-react-app.dev/docs/proxying-api-requests-in-development/)
 all missed requests to http://localhost:8080.
 
+Note: The API must support CORS if it is not on the same domain.
+
 ## Available Scripts
 
 In the project directory, you can run:
