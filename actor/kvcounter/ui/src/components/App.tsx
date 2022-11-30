@@ -2,10 +2,12 @@ import { Fireworks, FireworksHandlers } from "@fireworks-js/react"
 import { useState, useEffect, useRef, FormEvent } from "react"
 import api from "../services/ApiService"
 import { ReactComponent as Logo } from "../assets/logo.svg"
+import { useScreenSize } from "../hooks/useScreenSize"
 
 function App() {
   const [bucket, setBucket] = useState("")
   const [count, setCount] = useState(0)
+  const dimensions = useScreenSize()
   const fireworks = useRef<FireworksHandlers>(null)
   
   const updateCount = async (key?: string) => {
@@ -19,9 +21,8 @@ function App() {
   }
 
   useEffect(() => {
-    // TODO: Update fireworks canvas size when screen is resized
-    
-  }, [])
+    fireworks.current?.updateSize(dimensions)
+  }, [dimensions])
   
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
