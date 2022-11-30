@@ -241,7 +241,9 @@ impl Messaging for KafkaProvider {
 
     #[instrument(level = "debug", skip(self, msg), fields(subject = %msg.subject))]
     async fn request(&self, _ctx: &Context, msg: &RequestMessage) -> RpcResult<ReplyMessage> {
-        debug!("Sending message request: {:?}", msg);
+        // From what I can tell, `request` doesn't really seem to make sense for Kafka.
+        // Kafka works by producing records on topics, and then consuming them. There isn't a
+        // primitive for producing a record and getting a response back from a consumer.
         Err(RpcError::NotImplemented)
     }
 }
