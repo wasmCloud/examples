@@ -12,9 +12,9 @@ use wasmcloud_interface_httpclient::{HttpClient, HttpClientSender, HttpRequest a
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
 use wasmcloud_interface_numbergen::random_in_range;
 
-// the highest numbered comic available. (around 2500 as of August 2021)
+// the highest numbered comic available. (around 2705 as of Nov 30, 2022)
 // xkcd comics are numbered continuously starting at 1
-const MAX_COMIC_ID: u32 = 2500;
+const MAX_COMIC_ID: u32 = 2705;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
