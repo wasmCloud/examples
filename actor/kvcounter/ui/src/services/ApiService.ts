@@ -6,7 +6,7 @@ class ApiService {
     }
 
     async increment(bucketName?: string) {
-        return await this.#getRequest(`/${bucketName ?? ''}`);
+        return await this.#getRequest(`/counter/${bucketName ?? ''}`);
     }
 
     async #checkApiError(response: Response) {

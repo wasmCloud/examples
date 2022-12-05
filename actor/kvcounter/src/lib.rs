@@ -3,6 +3,9 @@ use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
 use wasmcloud_interface_keyvalue::{IncrementRequest, KeyValue, KeyValueSender};
 
+mod ui;
+use ui::Asset;
+
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
 struct KvCounterActor {}
@@ -11,35 +14,53 @@ struct KvCounterActor {}
 #[async_trait]
 impl HttpServer for KvCounterActor {
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
-        // make friendlier key
-        let key = format!("counter:{}", req.path.replace('/', ":"));
+        let trimmed_path: Vec<&str> = req.path.trim_matches('/').split('/').collect();
 
-        // bonus: use specified amount from query, or 1
-        let amount: i32 = form_urlencoded::parse(req.query_string.as_bytes())
-            .find(|(n, _)| n == "amount")
-            .map(|(_, v)| v.parse::<i32>())
-            .unwrap_or(Ok(1))
-            .unwrap_or(1);
+        match (req.method.as_ref(), trimmed_path.as_slice()) {
+            ("GET", ["api", "counter"]) => increment_counter(ctx, "default", 1).await,
+            ("GET", ["api", "counter", counter]) => increment_counter(ctx, counter, 1).await,
+            // Any other GET request is interpreted as a static asset request for the UI
+            ("GET", asset_path) => {
+                let asset = asset_path.join("/");
 
-        // increment the value in kv and send response in json
-        let (body, status_code) = match increment_counter(ctx, key, amount).await {
-            Ok(v) => (json!({ "counter": v }).to_string(), 200),
-            // if we caught an error, return it to client
-            Err(e) => (json!({ "error": e.to_string() }).to_string(), 500),
-        };
-        let resp = HttpResponse {
-            body: body.as_bytes().to_vec(),
-            status_code,
-            ..Default::default()
-        };
-        Ok(resp)
+                let asset_request = if asset.trim() == "/" || asset.trim().is_empty() {
+                    "index.html"
+                } else {
+                    asset.trim().trim_start_matches('/')
+                };
+
+                if let Some(static_asset) = Asset::get(asset_request) {
+                    Ok(HttpResponse {
+                        body: Vec::from(static_asset.data),
+                        ..Default::default()
+                    })
+                } else {
+                    Ok(HttpResponse::not_found())
+                }
+            }
+            (_, _) => Ok(HttpResponse::not_found()),
+        }
     }
 }
 
-/// increment the counter by the amount, returning the new value
-async fn increment_counter(ctx: &Context, key: String, value: i32) -> RpcResult<i32> {
-    let new_val = KeyValueSender::new()
+/// Increment the `key` in the KeyValue store by `value`
+async fn increment_counter(ctx: &Context, counter: &str, value: i32) -> RpcResult<HttpResponse> {
+    // make friendlier key
+    let key = format!("counter:{}", counter.replace('/', ":"));
+
+    // increment the value in kv and format response as json
+    let (body, status_code) = match KeyValueSender::new()
         .increment(ctx, &IncrementRequest { key, value })
-        .await?;
-    Ok(new_val)
+        .await
+    {
+        Ok(v) => (json!({ "counter": v }).to_string(), 200),
+        // if we caught an error, return it to client
+        Err(e) => (json!({ "error": e.to_string() }).to_string(), 500),
+    };
+
+    Ok(HttpResponse {
+        body: body.as_bytes().to_vec(),
+        status_code,
+        ..Default::default()
+    })
 }

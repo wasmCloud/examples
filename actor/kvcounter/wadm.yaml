@@ -19,7 +19,7 @@ spec:
     - name: kvcounter
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/kvcounter:0.3.4
+        image: wasmcloud.azurecr.io/kvcounter:0.4.0
       traits:
         - type: linkdef
           properties:

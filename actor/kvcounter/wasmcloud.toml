@@ -1,0 +1,7 @@
+name = "kvcounter"
+language = "rust"
+type = "actor"
+version = "0.4.0"
+
+[actor]
+claims = ["wasmcloud:httpserver", "wasmcloud:keyvalue"]

@@ -958,17 +958,19 @@ checksum = "078e285eafdfb6c4b434e0d31e8cfcb5115b651496faca5749b88fafd4f23bfd"
 
 [[package]]
 name = "kvcounter"
-version = "0.3.5"
+version = "0.4.0"
 dependencies = [
  "async-trait",
  "form_urlencoded",
  "futures 0.3.24",
+ "rust-embed",
  "serde",
  "serde_bytes",
  "serde_json",
  "wasmbus-rpc",
  "wasmcloud-interface-httpserver",
  "wasmcloud-interface-keyvalue",
+ "wasmcloud-interface-logging",
 ]
 
 [[package]]
@@ -1589,6 +1591,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust-embed"
+version = "6.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "283ffe2f866869428c92e0d61c2f35dfb4355293cdfdc48f49e895c15f1333d1"
+dependencies = [
+ "rust-embed-impl",
+ "rust-embed-utils",
+ "walkdir",
+]
+
+[[package]]
+name = "rust-embed-impl"
+version = "6.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "31ab23d42d71fb9be1b643fe6765d292c5e14d46912d13f3ae2815ca048ea04d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "rust-embed-utils",
+ "syn",
+ "walkdir",
+]
+
+[[package]]
+name = "rust-embed-utils"
+version = "7.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c1669d81dfabd1b5f8e2856b8bbe146c6192b0ba22162edc738ac0a5de18f054"
+dependencies = [
+ "sha2 0.10.6",
+ "walkdir",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1681,6 +1717,15 @@ name = "ryu"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4501abdff3ae82a1c1b477a17252eb69cee9e66eb915c1abaa4f44d873df9f09"
+
+[[package]]
+name = "same-file"
+version = "1.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
+dependencies = [
+ "winapi-util",
+]
 
 [[package]]
 name = "schannel"
@@ -2335,6 +2380,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d5b2c62b4012a3e1eca5a7e077d13b3bf498c4073e33ccd58626607748ceeca"
 
 [[package]]
+name = "walkdir"
+version = "2.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "808cf2735cd4b6866113f648b791c6adc5714537bc222d9347bb203386ffda56"
+dependencies = [
+ "same-file",
+ "winapi",
+ "winapi-util",
+]
+
+[[package]]
 name = "want"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2511,6 +2567,22 @@ checksum = "a3f177f560e13156613b1f5d45a824e5b817fe74687385d2aae7301b047a96e5"
 dependencies = [
  "async-trait",
  "log",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "wasmbus-rpc",
+ "weld-codegen",
+]
+
+[[package]]
+name = "wasmcloud-interface-logging"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2132930f4491ac8f820bf481d7ea6e385e3184d7153d2740739e632fd347973"
+dependencies = [
+ "async-trait",
+ "cfg-if 1.0.0",
+ "futures 0.3.24",
  "serde",
  "serde_bytes",
  "serde_json",
