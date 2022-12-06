@@ -3,14 +3,14 @@ name: KVCOUNTER
 on:
   push:
     branches: [ main ]
-    paths:
-    - "actor/kvcounter/**"
+    # paths:
+    # - "actor/kvcounter/**"
     tags:
     - 'kvcounter-v*'
   pull_request:
     branches: [ main ]
-    paths:
-    - "actor/kvcounter/**"
+    # paths:
+    # - "actor/kvcounter/**"
 
 env:
   CARGO_TERM_COLOR: always
