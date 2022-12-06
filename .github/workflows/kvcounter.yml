@@ -35,7 +35,7 @@ jobs:
 
   build_artifact:
     needs: rust_check
-    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    # if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -45,7 +45,7 @@ jobs:
         run: rustup target add wasm32-unknown-unknown
 
       - name: Build wasmcloud actor
-        run: make
+        run: wash build
         working-directory: ${{ env.working-directory }}
       
       - name: Upload signed actor to GH Actions
@@ -55,7 +55,7 @@ jobs:
           path: ${{ env.working-directory }}/build/*.wasm
 
   github_release:
-    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    # if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: build_artifact
     runs-on: ubuntu-20.04
     steps:
@@ -65,17 +65,17 @@ jobs:
         name: wasmcloud-actor
         path: ${{ env.working-directory }}/build
 
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: ${{ env.working-directory }}/build/*.wasm
-        token: ${{ secrets.GITHUB_TOKEN }}
-        prerelease: true
-        draft: false
+    # - name: Release
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     files: ${{ env.working-directory }}/build/*.wasm
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     prerelease: true
+    #     draft: false
 
   artifact_release:
     needs: build_artifact
-    if: startswith(github.ref, 'refs/tags/') # Only run on tag push
+    # if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -91,12 +91,12 @@ jobs:
           echo "oci-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
         working-directory: ${{ env.working-directory }}
 
-      - name: Push actor to AzureCR
-        uses: wasmcloud/common-actions/oci-artifact-release@main
-        with:
-          artifact-path: ${{ env.working-directory }}/build/${{ env.oci-repository }}_s.wasm
-          oci-url: ${{ secrets.AZURECR_PUSH_URL }}
-          oci-repository: ${{ env.oci-repository }}
-          oci-version: ${{ env.oci-version }}
-          oci-username: ${{ secrets.AZURECR_PUSH_USER }}
-          oci-password: ${{ secrets.AZURECR_PUSH_PASSWORD }}
+      # - name: Push actor to AzureCR
+      #   uses: wasmcloud/common-actions/oci-artifact-release@main
+      #   with:
+      #     artifact-path: ${{ env.working-directory }}/build/${{ env.oci-repository }}_s.wasm
+      #     oci-url: ${{ secrets.AZURECR_PUSH_URL }}
+      #     oci-repository: ${{ env.oci-repository }}
+      #     oci-version: ${{ env.oci-version }}
+      #     oci-username: ${{ secrets.AZURECR_PUSH_USER }}
+      #     oci-password: ${{ secrets.AZURECR_PUSH_PASSWORD }}
