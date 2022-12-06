@@ -20,7 +20,7 @@ env:
 
 jobs:
   rust_check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     # If your integration tests require nats or redis, run them here
@@ -35,7 +35,7 @@ jobs:
   build_artifact:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: rust_check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
@@ -56,7 +56,7 @@ jobs:
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: build_artifact
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Download signed actor
       uses: actions/download-artifact@v2
@@ -75,7 +75,7 @@ jobs:
   artifact_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: build_artifact
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Download signed actor
