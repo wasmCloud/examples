@@ -18,7 +18,7 @@ env:
 
 jobs:
   rust_check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - id: rust-check-action
@@ -29,7 +29,7 @@ jobs:
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: rust_check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Create Release
       id: create_release
@@ -45,7 +45,7 @@ jobs:
   crates_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: github_release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v1
       - id: crates-release-action

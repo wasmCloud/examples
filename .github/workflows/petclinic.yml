@@ -18,7 +18,7 @@ env:
 
 jobs:
   interface_build_check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - id: rust-check-action
@@ -27,7 +27,7 @@ jobs:
           working-directory: petclinic/petclinic-interface/rust
 
   actors_build_check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -96,7 +96,7 @@ jobs:
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: actors_build_check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -119,7 +119,7 @@ jobs:
   artifact_release:
     needs: actors_build_check
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:

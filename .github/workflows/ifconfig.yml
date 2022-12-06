@@ -44,7 +44,7 @@ jobs:
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: build_artifact
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Download signed actor
       uses: actions/download-artifact@v2
@@ -63,7 +63,7 @@ jobs:
   artifact_release:
     needs: build_artifact
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Download signed actor
         uses: actions/download-artifact@v2

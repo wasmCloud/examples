@@ -4,7 +4,7 @@ use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, Http
 use wasmcloud_interface_keyvalue::{IncrementRequest, KeyValue, KeyValueSender};
 
 mod ui;
-use ui::Asset;
+use ui::get_asset;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
@@ -20,24 +20,7 @@ impl HttpServer for KvCounterActor {
             ("GET", ["api", "counter"]) => increment_counter(ctx, "default", 1).await,
             ("GET", ["api", "counter", counter]) => increment_counter(ctx, counter, 1).await,
             // Any other GET request is interpreted as a static asset request for the UI
-            ("GET", asset_path) => {
-                let asset = asset_path.join("/");
-
-                let asset_request = if asset.trim() == "/" || asset.trim().is_empty() {
-                    "index.html"
-                } else {
-                    asset.trim().trim_start_matches('/')
-                };
-
-                if let Some(static_asset) = Asset::get(asset_request) {
-                    Ok(HttpResponse {
-                        body: Vec::from(static_asset.data),
-                        ..Default::default()
-                    })
-                } else {
-                    Ok(HttpResponse::not_found())
-                }
-            }
+            ("GET", asset_path) => get_asset(asset_path.join("/")),
             (_, _) => Ok(HttpResponse::not_found()),
         }
     }
