@@ -2,54 +2,82 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"sync"
-	"time"
 
 	provider "github.com/wasmCloud/provider-sdk-go"
 )
 
-var p *provider.WasmcloudProvider
-var aID string
-var data map[string]int32
+type data map[string]interface{}
 
-var ErrNotImplemented error = errors.New("operation not implemented")
-var ErrInvalidOperation error = errors.New("operation not valid")
+var (
+	p        *provider.WasmcloudProvider
+	database map[string]data
+	lock     sync.RWMutex
+
+	ErrNotImplemented   error = errors.New("operation not implemented")
+	ErrInvalidOperation error = errors.New("operation not valid")
+)
 
 func main() {
 	var err error
-	var wg sync.WaitGroup
-	data = make(map[string]int32)
+	database = make(map[string]data)
+	lock = sync.RWMutex{}
 
-	p, err = provider.New("wasmcloud:keyvalue",
+	p, err = provider.New(
+		"wasmcloud:keyvalue",
 		provider.WithProviderActionFunc(handleKVAction),
+		provider.WithNewLinkFunc(newLinkReceived),
+		provider.WithHealthCheckMsg(healthCheckMsg),
 	)
 	if err != nil {
 		panic(err)
 	}
+
 	err = p.Start()
 	if err != nil {
 		panic(err)
 	}
+}
 
-	wg.Add(1)
-	go func() {
-		// TODO: move this to a cancel context
-		time.Sleep(5 * time.Hour)
-		wg.Done()
-	}()
-	wg.Wait()
+func healthCheckMsg() string {
+	return fmt.Sprintf("Num databases initialized: %d", len(database))
+}
+
+func newLinkReceived(a provider.ActorConfig) error {
+	newTable := make(map[string]interface{})
+	database[a.ActorID] = newTable
+	p.Logger.Info("Initialized DB for " + a.ActorID)
+	return nil
 }
 
 func handleKVAction(a provider.ProviderAction) (*provider.ProviderResponse, error) {
-	p.Logger.Info("Operation: " + a.Operation)
 	resp := new(provider.ProviderResponse)
 	var err error
 
 	switch a.Operation {
 	case "KeyValue.Increment":
 		msg := decodeIncrementRequest(a.Msg)
-		data[msg.Key]++
-		resp.Msg, err = encodeIncrementResponse(data[msg.Key])
+
+		// Get the actor specific database
+		db := database[a.FromActor]
+
+		if db[msg.Key] == nil {
+			lock.Lock()
+			db[msg.Key] = msg.Value
+			lock.Unlock()
+		} else {
+			value, ok := db[msg.Key].(int32)
+			if !ok {
+				return nil, errors.New("key value not of int type")
+			}
+
+			lock.Lock()
+			db[msg.Key] = value + msg.Value
+			lock.Unlock()
+		}
+
+		resp.Msg, err = encodeIncrementResponse(db[msg.Key].(int32))
 		if err != nil {
 			return nil, err
 		}
