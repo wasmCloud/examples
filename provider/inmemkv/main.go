@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	provider "github.com/wasmCloud/provider-sdk-go"
+	core "github.com/wasmcloud/interfaces/core/tinygo"
 )
 
 type data map[string]interface{}
@@ -27,7 +28,8 @@ func main() {
 	p, err = provider.New(
 		"wasmcloud:keyvalue",
 		provider.WithProviderActionFunc(handleKVAction),
-		provider.WithNewLinkFunc(newLinkReceived),
+		provider.WithNewLinkFunc(handleNewLink),
+		provider.WithDelLinkFunc(handleDelLink),
 		provider.WithHealthCheckMsg(healthCheckMsg),
 	)
 	if err != nil {
@@ -44,10 +46,14 @@ func healthCheckMsg() string {
 	return fmt.Sprintf("Num databases initialized: %d", len(database))
 }
 
-func newLinkReceived(a provider.ActorConfig) error {
+func handleDelLink(linkdef core.LinkDefinition) error {
+	delete(database, linkdef.ActorId)
+	return nil
+}
+
+func handleNewLink(linkdef core.LinkDefinition) error {
 	newTable := make(map[string]interface{})
-	database[a.ActorID] = newTable
-	p.Logger.Info("Initialized DB for " + a.ActorID)
+	database[linkdef.ActorId] = newTable
 	return nil
 }
 
