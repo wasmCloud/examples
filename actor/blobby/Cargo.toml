@@ -1,0 +1,26 @@
+[package]
+name = "blobby"
+version = "0.1.0"
+authors = [ "wasmCloud Team" ]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "blobby"
+
+[dependencies]
+futures = "0.3"
+http = "0.2"
+lazy_static = "1"
+serde_json = "1.0.85"
+tokio = { version = "1", features = ["parking_lot", "sync"] }
+wasmbus-rpc = "0.11"
+wasmcloud-interface-blobstore = "0.5"
+wasmcloud-interface-httpserver = "0.9"
+wasmcloud-interface-logging = "0.8"
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
+strip = true
