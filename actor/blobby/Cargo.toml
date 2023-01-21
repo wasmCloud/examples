@@ -9,6 +9,7 @@ crate-type = ["cdylib", "rlib"]
 name = "blobby"
 
 [dependencies]
+form_urlencoded = "1.0"
 futures = "0.3"
 http = "0.2"
 lazy_static = "1"
