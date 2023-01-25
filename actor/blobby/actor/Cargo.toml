@@ -20,9 +20,6 @@ wasmcloud-interface-blobstore = "0.5"
 wasmcloud-interface-httpserver = "0.9"
 wasmcloud-interface-logging = "0.8"
 
-[dev-dependencies]
-tokio = { version = "1", features = ["full"] }
-
 [profile.release]
 # Optimize for small code size
 lto = true
