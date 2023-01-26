@@ -26,7 +26,7 @@ Once you've installed **wash** and ran wasmCloud after following the [installati
 guide](https://wasmcloud.dev/overview/installation/), you can run this example actor and the
 wasmCloud providers with the following commands:
 ```
-$ wash ctl start actor wasmcloud.azurecr.io/blobby:0.1.0
+$ wash ctl start actor wasmcloud.azurecr.io/blobby:0.2.0
 # If you use a locally built actor, replace the actor ID below with your own
 $ wash ctl link put MBY3COMRDLQYTX2AUTNB5D2WYAH5TUKNIMELDSQ5BUFZVV7CBUUIKEDR VBBQNNCGUKIXEWLL5HL5XJE57BS3GU5DMDOKZS6ROEWPQFHEDP6NGVZM wasmcloud:blobstore "ROOT=/tmp"
 $ wash ctl link put MBY3COMRDLQYTX2AUTNB5D2WYAH5TUKNIMELDSQ5BUFZVV7CBUUIKEDR VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M wasmcloud:httpserver "ADDRESS=0.0.0.0:8080"
