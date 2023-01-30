@@ -22,7 +22,7 @@ The [Getting started tutorial](https://developer.hashicorp.com/vault/tutorials/g
 You'll need to install [wash](https://wasmcloud.dev/overview/installation/).
 
 You'll also need a running Vault server. Hashicorp's [Vault installation guide](https://developer.hashicorp.com/vault/docs/install) page describes installation methods for various platforms.
-Once installed, you'll need to [enable](https://developer.hashicorp.com/vault/docs/secrets/kv/kv-v2) the kv v2 secrets engine.
+
 
 To keep this tutorial simple, we'll start the vault server in developer mode. In the default developer mode, vault runs as a single server (no clustering), stores all data in-memory (no persistence), and uses an unencrypted connection to http://127.0.0.1:8200 (no TLS).
 ```
@@ -33,7 +33,7 @@ You should see some log messages on the console as the server starts,
 including a value for the "Root Token". When the development server is started, it saves a copy of the root token in the file `$HOME/.vault-token`.
 All the following vault commands need a token to access the vault. If the file `$HOME/.vault-token` does not exist, vault will use the value in the environment variable `VAULT_TOKEN`.
 
-Enable the kv v2 secrets engine
+Enable the kv v2 secrets engine ([kv v2 secrets engine](https://developer.hashicorp.com/vault/docs/secrets/kv/kv-v2))
 ```
 vault secrets enable -version=2 -local -address=http://127.0.0.1:8200 kv
 ```
