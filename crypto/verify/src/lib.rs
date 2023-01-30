@@ -4,7 +4,7 @@ use serde_json::Value;
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
 use wasmcloud_interface_keyvalue::{KeyValue, KeyValueSender};
-use wasmcloud_interface_logging::{error, info};
+use wasmcloud_interface_logging::error;
 
 // response code for invalid signature
 const HTTP_STATUS_BAD_SIG: u16 = 403;
@@ -27,10 +27,8 @@ impl HttpServer for VerifyActor {
             .find(|(n, _)| n == "sig")
             .map(|(_, v)| v.to_string())
             .and_then(|sig| URL_SAFE_NO_PAD.decode(sig).ok())
-            .and_then(|sig| {
-                info!("debug: signature from {}", String::from_utf8_lossy(&sig));
-                Signature::from_slice(&sig).ok()
-            }) {
+            .and_then(|sig| Signature::from_slice(&sig).ok())
+        {
             Some(sig) => sig,
             _ => {
                 return Ok(HttpResponse::bad_request(
@@ -40,8 +38,6 @@ impl HttpServer for VerifyActor {
         };
 
         let resp = if &req.path == "/verify" && !req.body.is_empty() {
-            // TODO: remove info!
-            info!("looking up key at path {}", &key_path);
             match KeyValueSender::new()
                 .get(ctx, &key_path)
                 .await

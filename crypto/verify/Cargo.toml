@@ -19,7 +19,7 @@ wasmbus-rpc = "0.11"
 wasmcloud-interface-httpserver = "0.9"
 wasmcloud-interface-keyvalue = "0.9"
 wasmcloud-interface-numbergen = "0.8"
-wasmcloud-interface-logging = { version = "0.8", features = [ "sync_macro" ] }
+wasmcloud-interface-logging = "0.8"
 
 [profile.release]
 # Optimize for small code size
