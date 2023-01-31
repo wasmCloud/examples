@@ -25,3 +25,4 @@ wasmcloud-interface-logging = { version = "0.8", features = [ "sync_macro" ] }
 # Optimize for small code size
 lto = true
 opt-level = "s"
+strip = true
