@@ -16,7 +16,7 @@ impl HttpServer for VerifyActor {
     // Diagnostic information is sent to the host error logs
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
         if &req.path != "/verify" || req.body.is_empty() {
-            error!("invalid url or mising request content");
+            error!("invalid url or mising content. path='{}'", &req.path);
             return Ok(HttpResponse::not_found());
         }
         // get key path from 'key' query parameter. if missing, defaults to 'public-key'
