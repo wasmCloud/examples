@@ -1,25 +1,36 @@
 # Cryptographic Signatures Tutorial
 
-This document will guide you through setup for two actors, one that creates an ed25519 cryptographic signature of a document,
-and one that verifies the signature. The signing keys are stored in a Hashicorp Vault, and accessed by the actors 
-using the keyvalue capability contract. This demo also uses the numbergen capability contract, for creating of
-a random nonce (used by the signature algorithm), and the httpserver capability, so the actors can be accessed with a REST api.
+This document will guide you through creation of a wasmcloud "microservice" that performs ed25519 cryptographic signatures and signature verification, with a REST api, and secure key storage using Hashicorp Vault.
+All the code for this microservice is available in the wasmcloud github repository. The service is componse of two actors, three capability contracts (Key-Value, Logging, and random number generation).
 
-Here's a diagram of the message paths for signing and verification. The sign and verify actors are distinct wasm modules.
-The capability providers are shared between them.
+Here's a diagram of the message paths for signing and verification. The sign and verify actors are written in rust and compiled to WebAssembly modules. 
 
 ![image-actor](./img/sign-actor.png)
 
 ![image-actor](./img/verify-actor.png)
 
 
-## When should you use this?
+## When should you use this pattern?
 
-TODO: more info about when this archicture is a good idea.
+- You want to calculate cryptographic signatures over data (documents, text, or binary data), or verify signatures
+- You want to store the signing key securely, using Hashicorp Vault, and (may) want to have fine-grained control over which actors can access it
+- You want the signing or verification to be done by an actor, as part of a wasmcloud application.
 
-Hashicorp Vault provides a convenient single-executable server for securely storing and managing secrets.
-This tutorial does not cover advanced Vault configuration, but we'll
-walk you through the basic setup and provide some pointers for customizing the setup based on different use cases.
+### Why do the signing in an actor and not a capability provider?
+
+You can of course create or verify signatures from within a capability provider, however for many use cases an actor may be preferable:
+
+- the actor already has the data that needs to be signed, and you want to avoid an extra rpc copy of the data from actor to provider
+- you want to take advantage of actor scaling and distribution to handle variable load, or high load 
+- you want a "lighter weight" development process, with the portability advantages of actors, and want to leverage existing open source capability providers without writing a new one.
+- the signature algorithm can be compiled to wasm, and you don't need GPU or SIMD support. (Some WASM runtimes do support SIMD, but support is still incomplete or unoptimized on some platforms, as of Jan 2023).
+The demo implementation uses ed25519, however the architecture can be easily adapted to change the signing algorithm, key format, or even implementation (for example, if you want to use HSMs or Cloud KMS services).
+
+ 
+### Why use Hashicorp Vault?
+
+Hashicorp Vault provides a convenient single-executable server for securely storing and managing secrets. It can run on most OS's directly, or in docker, and it can use a variety of storages and databases for persistence.
+This tutorial does not cover advanced Vault configuration, but we'll walk you through a basic setup and provide some pointers for customizing the setup based on different use cases.
 
 If you have never used Vault, or aren't familiar with its basic concepts, we recommend you review [What is Vault](https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-intro).
 The [Getting started tutorial](https://developer.hashicorp.com/vault/tutorials/getting-started) contains a gentle introduction to secrets storage with Vault and installation options.
@@ -33,6 +44,7 @@ You'll also need a running Vault server. Hashicorp's [Vault installation guide](
 
 
 To keep this tutorial simple, we'll start the vault server in developer mode. In the default developer mode, vault runs as a single server (no clustering), stores all data in-memory (no persistence), and uses an unencrypted connection to http://127.0.0.1:8200 (no TLS).
+
 ```
 vault server -dev
 ```
@@ -125,6 +137,12 @@ Set up links, pairing each of the two actors with both providers:
 - [ ] "Define Link", Actor:sign, Provider:KeyValue:Hashicorp Vault, Contract: `wasmcloud:keyvalue`, Values: `mount=kv,token=****`  (replace `****` with the value of your root token in $HOME/.vault-token)
 - [ ] "Define Link", Actor:verify, Provider:KeyValue:Hashicorp Vault, Contract: `wasmcloud:keyvalue`, Values: `mount=kv,token=****`  (replace `****` with the value of your root token in $HOME/.vault-token)
 
+### For further exploration ...
+
+:small_blue_diamond: When using the kv-vault provider, the optional `mount` parameter of the LinkDefinition defines the key namespace.
+Since the sign and verify actors use different link definitions, with different mount parameters and key paths,
+the access policies can be configured separately.
+
 :small_blue_diamond: Although the actors are also linked with the logging provider and numbergen provider, we don't need to explicitly create links. 
 If an actor is signed with claims for a builtin capability (`wasmcloud:builtin:login` or `wasmcloud:builtin:numbergen`), it is automatically linked when it's started. 
 The capability claims attached to the compiled WASM module are determined by the `claims` setting in `wasmcloud.toml`. You can view claims on a signed module (with name ending in `_s.wasm`) with `wash claims inspect FILE_s.wasm`.
@@ -148,9 +166,7 @@ SIG=$(cat $FILE.sig)
 curl -T $FILE "http://127.0.0.1:9902/verify?key=demo/public-key&sig=$SIG"
 ```
 
+## Congratulations!
 
-## Additional security configuration 
+You've set up a wasmcloud microservice for signing documents and verifying signatures, with secure key storage using Hashicorp Vault, and a REST api.
 
-When using the kv-vault provider, the optional `mount` parameter of the LinkDefinition defines the key namespace.
-Since the sign and verify actors use different link definitions, with different mount parameters and key paths,
-the access policies can be configured separately.
