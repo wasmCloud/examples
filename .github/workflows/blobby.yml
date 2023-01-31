@@ -4,19 +4,19 @@ on:
   push:
     branches: [main]
     paths:
-      - "actor/blobby/**"
+      - "actor/blobby/actor/**"
+      - "actor/blobby/testing/**"
     tags:
       - "blobby-v*"
   pull_request:
     branches: [main]
     paths:
-      - "actor/blobby/**"
+      - "actor/blobby/actor/**"
+      - "actor/blobby/testing/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./actor/blobby
-  WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_BLOBBY }}
+  working-directory: ./actor/blobby/actor
 
 jobs:
   rust_check:
@@ -33,10 +33,31 @@ jobs:
           # The `--doc` is required for wasm, as cargo cannot execute wasm tests by default
           test-options: "--verbose --doc"
 
-  build_artifact:
+  integration_test:
     needs: rust_check
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wasmcloud/common-actions/install-wash@main
+
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Build wasmcloud actor
+        run: wash build
+        working-directory: ${{ env.working-directory }}
+
+      - name: Run integration tests
+        working-directory: actor/blobby/testing/
+        run: cargo test -- --test-threads 1
+
+  build_artifact:
+    needs: integration_test
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-20.04
+    env:
+      WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
+      WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_BLOBBY }}
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main

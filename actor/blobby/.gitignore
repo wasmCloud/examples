@@ -3,7 +3,7 @@
 
 
 ## Build
-/build
+**/build
 /dist/
 /target
 **target

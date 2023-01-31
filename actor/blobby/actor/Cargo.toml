@@ -1,6 +1,6 @@
 [package]
 name = "blobby"
-version = "0.1.0"
+version = "0.2.0"
 authors = [ "wasmCloud Team" ]
 edition = "2021"
 
@@ -9,6 +9,7 @@ crate-type = ["cdylib", "rlib"]
 name = "blobby"
 
 [dependencies]
+form_urlencoded = "1.0"
 futures = "0.3"
 http = "0.2"
 lazy_static = "1"
