@@ -37,6 +37,11 @@ Review the following files to better understand how the project fits together.
 * [actors/customers/src/lib.rs](./actors/customers/src/lib.rs) - defines the api function signatures and maps to the database functions/structs (ACTION - needs better description)
 * [actors/clinicapi/src/lib.rs](./actors/clinicapi/src/lib.rs) - routes api calls into actor functions (ACTION - needs better description)
 
+## Vocabulary Considerations and Aliases
+Maintaining succinct vocabulary across documentation and examples is difficult. Below is a list of vocabulary terms and references to help insure consistent communication:
+* Capability: also known as 'capability provider' or 'provider'
+* Contract: also known as 'interface'
+
 ## Running the Petclinic
 
 If you'd like a quick out of the box example of the petclinic, you can use the included `run.sh`
