@@ -34,7 +34,7 @@ Review the following files to better understand how the project fits together.
 * [run.sh](./run.sh) - Constructs and deploys the needed artifacts to run this example. This file is especially interesting for those with devopps interests.
 * [customers.smithy](./petclinic-interface/customers.smithy) - Defines the Customers actor using [Smithy IDL specification](https://wasmcloud.com/docs/interfaces/wasmcloud-smithy) to define Models, Data types,Structures, Services, Operations, and Documentation.
 * [actors/customers/src/db.rs](./actors/customers/src/db.rs) - defines the database structures and functions (ACTION - needs better description)
-* [actors/customers/src/lib.rs](./actors/customers/src/lib.rs) - defines the api function signatures (ACTION - needs better description)
+* [actors/customers/src/lib.rs](./actors/customers/src/lib.rs) - defines the api function signatures and maps to the database functions/structs (ACTION - needs better description)
 * [actors/clinicapi/src/lib.rs](./actors/clinicapi/src/lib.rs) - routes api calls into actor functions (ACTION - needs better description)
 
 ## Running the Petclinic
