@@ -31,7 +31,7 @@ The following two capabilities support the wasmCloud Pet Clinic:
 ## Code Review - Where to Start
 Review the following files to better understand how the application fits together.
 * [wadm.yaml](./wadm.yaml) - See the list of actors and capabilities defined.
-* [run.sh](./run.sh) - Constructs and deploys the needed artifacts to run this example. This file is especially interesting for those with devopps interests.
+* [run.sh](./run.sh) - Constructs and deploys the needed artifacts to run this example. Devopps professionals will find this file interesting.
 * [customers.smithy](./petclinic-interface/customers.smithy) - Defines the Customers actor using [Smithy IDL specification](https://wasmcloud.com/docs/interfaces/wasmcloud-smithy) to define Models, Data types,Structures, Services, Operations, and Documentation.
 * [actors/customers/src/db.rs](./actors/customers/src/db.rs) - defines the database structures and functions for the Customer actor (ACTION - needs better description)
 * [actors/customers/src/lib.rs](./actors/customers/src/lib.rs) - defines the api function signatures and maps to the database functions/structs for the Customer actor (ACTION - needs better description)
