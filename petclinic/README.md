@@ -12,7 +12,7 @@ The wasmCloud Pet Clinic application has the following simple architecture:
 * Ensure that both the HTTP Server and relational database capability providers are
 started.
 
-The wasmCloud Pet Clinic consists of the following five [actors](./actors):
+The wasmCloud Pet Clinic consists of the following five [actors](https://wasmcloud.com/docs/reference/host-runtime/actors):
 * [Clinic API](./actors/clinicapi/README.md) - The main JSON (aka "REST") API gateway for
   interacting with the service
 * [Customers](./actors/customers/README.md) - Customers/Owners Actor - roughly equivalent to the
@@ -24,7 +24,7 @@ The wasmCloud Pet Clinic consists of the following five [actors](./actors):
 * [UI](./actors/ui/README.md) - An actor that contains all assets for the petclinic UI. This actor
   will serve the assets through the Clinic API
 
-The following two capabilities support the wasmCloud Pet Clinic:
+The following two [capabilities](https://wasmcloud.com/docs/reference/host-runtime/capabilities) support the wasmCloud Pet Clinic:
 * [httpserver](https://github.com/wasmCloud/capability-providers/tree/main/httpserver-rs) - Capability provider implements the wasmcloud:httpserver capability contract, and enables an actor to accept incoming HTTP(s) requests.
 * [postgres](https://github.com/wasmCloud/capability-providers/tree/main/sqldb-postgres) - Capability provider allows wasmCloud actors to use a Postgres-compatible database, and implements the "wasmcloud:sqldb" capability contract. 
 
