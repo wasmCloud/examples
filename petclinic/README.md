@@ -40,7 +40,7 @@ Review the following files to better understand how the application fits togethe
 
 ## Vocabulary Considerations and Aliases
 Maintaining succinct vocabulary across documentation and examples is difficult. Below is a list of vocabulary terms and references to help insure consistent communication:
-* Capability: also known as 'capability provider' or 'provider'
+* [Capability](https://wasmcloud.com/docs/reference/host-runtime/capabilities): also known as 'capability provider' or 'provider'
 * Contract: also known as 'interface'
 
 ## Running the Petclinic
