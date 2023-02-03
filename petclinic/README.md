@@ -8,7 +8,7 @@ The purpose of this README is to help you learn the wasmCloud application runtim
 The wasmCloud Pet Clinic application has the following simple architecture: 
 * Start all five of the actors
 * Push a link definition between the **Clinic API** actor and an **HTTP Server** capability provider via the **wasmcloud:httpserver** contract
-* Push link definitions between the **Customers**, **Vets**, and **Visits** actors and the **postgres** capability provider via the **wasmcloud:sqldb**. 
+* Push link definitions between the **Customers**, **Vets**, and **Visits** actors and the **postgres** capability provider via the **wasmcloud:sqldb** contract. 
 * Ensure that both the HTTP Server and relational database capability providers are
 started.
 
