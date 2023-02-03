@@ -29,7 +29,7 @@ The following two capabilities support the wasmCloud Pet Clinic:
 * [postgres](https://github.com/wasmCloud/capability-providers/tree/main/sqldb-postgres) - Capability provider allows wasmCloud actors to use a Postgres-compatible database, and implements the "wasmcloud:sqldb" capability contract. 
 
 ## Code Review - Where to Start
-Review the following files to better understand how the project fits together.
+Review the following files to better understand how the application fits together.
 * [wadm.yaml](./wadm.yaml) - See the list of actors and capabilities defined.
 * [run.sh](./run.sh) - Constructs and deploys the needed artifacts to run this example. This file is especially interesting for those with devopps interests.
 * [customers.smithy](./petclinic-interface/customers.smithy) - Defines the Customers actor using [Smithy IDL specification](https://wasmcloud.com/docs/interfaces/wasmcloud-smithy) to define Models, Data types,Structures, Services, Operations, and Documentation.
