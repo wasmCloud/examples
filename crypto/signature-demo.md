@@ -1,6 +1,6 @@
 # Cryptographic Signatures Tutorial
 
-This document will guide you through creation of a wasmcloud "microservice" that performs ed25519 cryptographic signatures and signature verification, with a REST api, and secure key storage using Hashicorp Vault.
+This document will guide you through creation of a wasmcloud microservice that performs ed25519 cryptographic signatures and signature verification, with a REST api, and secure key storage using Hashicorp Vault.
 All the code for this microservice is available in the wasmcloud github repository. The service is componse of two actors, three capability contracts (Key-Value, Logging, and random number generation).
 
 Here's a diagram of the message paths for signing and verification. The sign and verify actors are written in rust and compiled to WebAssembly modules. 
