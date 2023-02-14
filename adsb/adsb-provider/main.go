@@ -30,7 +30,7 @@ func main() {
 	var err error
 
 	p, err = provider.New(
-		"jordanrash:adsb",
+		"myorg:adsb",
 		provider.WithNewLinkFunc(handleNewLink),
 		provider.WithDelLinkFunc(handleDelLink),
 	)
