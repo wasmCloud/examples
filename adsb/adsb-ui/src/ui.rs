@@ -4,7 +4,7 @@ use wasmcloud_interface_httpserver::{HeaderMap, HttpResponse};
 
 /// This embeds the compiled static assets inside of the WebAssembly module
 #[derive(RustEmbed)]
-#[folder = "./ui/dist"]
+#[folder = "./dist"]
 pub(crate) struct Asset;
 
 pub(crate) fn get_asset(asset: String) -> RpcResult<HttpResponse> {
