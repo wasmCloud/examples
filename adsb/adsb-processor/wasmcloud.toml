@@ -1,0 +1,7 @@
+name = "asdb-processor"
+language = "tinygo"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = ["jordanrash:adsb", "wasmcloud:keyvalue"]
