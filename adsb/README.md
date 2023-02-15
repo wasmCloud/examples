@@ -72,7 +72,9 @@ We have included a [goreleaser]() configuration file to make this step easy.  If
 goreleaser build --clean --snapshot
 ```
 
-This will build a provider archive with the 5 most common architecture/os combinations.
+This will build the binaries for the 5 most common architecture/os combinations.  You will now need to add them to a provider archive one at a time.
+
+> Note: if you have goreleaser pro, you can use the post-hooks to build the provider archive for you all in one swoop 
 
 To manually create the provider archive, first run 
 
