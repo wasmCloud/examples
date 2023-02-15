@@ -9,10 +9,17 @@ export default defineConfig({
         chunkSizeWarningLimit: 2000,
         rollupOptions: {
             output: {
-                manualChunks: {
-                    'openlayers': ['vue3-openlayers'],
-                },
+                manualChunks: manualChunks,
             },
         },
     },
 })
+
+function manualChunks(id) {
+    console.log(id);
+    if (id.includes('vue3-openlayers')) {
+        return 'openlayers';
+    } else {
+        return 'vendor';
+    }
+}
