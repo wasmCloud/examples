@@ -47,4 +47,5 @@ Providers of capabilities for wasmCloud actors
 | Example | Description | 
 | --- | --- | 
 | [petclinic](https://github.com/wasmcloud/examples/tree/main/petclinic) |  A WebAssembly and wasmCloud-based reimagining of the classic [Spring Boot microservices Pet Clinic](https://github.com/spring-petclinic/spring-petclinic-microservices). The wasmCloud Pet Clinic consists of multiple actors, and uses a relational database capability provider and an http server capability provider. |
+| [adsb](https://github.com/wasmcloud/examples/tree/main/adsb) |  A FlightAware clone that allows users to take an [RTL-SDR](https://www.rtl-sdr.com/) and plot airplane data on a map. Users can also cluster many RTL-SDRs from all over the country and visualize them together utilizing the power of the wasmCloud lattice.  |
 
