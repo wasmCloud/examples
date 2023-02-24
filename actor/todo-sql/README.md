@@ -11,7 +11,7 @@ nor does it know which relational database implementation the host runtime has p
 
 ## Step 1 : Getting Started
 
-- Clone the repo using either HTTPS or ober SSH.
+- Clone the repo using either HTTPS or over SSH.
 - Navigate to `/examples/actor/todo-sql/`.
 - Make sure you have Docker installed. Follow the guide [here](https://docs.docker.com/get-docker/). Provide Docker with the necessary permissions to access the examples folder. You can configure shared paths from Docker -> Preferences... -> Resources -> File Sharing.
 
@@ -68,15 +68,15 @@ postgres[ql]://[username[:password]@][host[:port],]/database[?parameter_list]
                                             |- hostspec
 ```
 
-## Step 3 -  Running WasmCloud and NATS
-- Follow the guide for installing [WasmCloud](https://wasmcloud.dev/overview/installation/) and [NATS](https://docs.nats.io/running-a-nats-service/introduction/installation).
+## Step 3 -  Running wasmCloud and NATS
+- Follow the guide for installing [wasmCloud](https://wasmcloud.dev/overview/installation/) and [NATS](https://docs.nats.io/running-a-nats-service/introduction/installation).
 - Also make sure that you have [jq](https://stedolan.github.io/jq/) as well as Rust installed.
-- Run the WasmCloud host by running `wash up --allowed-insecure localhost:5000,127.0.0.1:5000` since we are using a self-signed certificate.
-- Navigate to `localhost:4000` to view the WasmCloud dashboard.
+- Run the wasmCloud host by running `wash up --allowed-insecure localhost:5000,127.0.0.1:5000` since we are using a self-signed certificate.
+- Navigate to `localhost:4000` to view the wasmCloud dashboard.
 
 ## Step 4 - Run the Makefile and Tests
-- Run `make clean-start` from the todo-sql folder. This will push the actor, start the providers, create the necessary linkdefs and link the components with each other. This is how your WasmCloud dashboard should look like:
-![WasmCloud Dashboard](images/wasmcloud-dashboard.png)
+- Run `make clean-start` from the todo-sql folder. This will push the actor, start the providers, create the necessary linkdefs and link the components with each other. This is how your wasmCloud dashboard should look like:
+![wasmCloud Dashboard](images/wasmcloud-dashboard.png)
 - Open your browser to "https://localhost:9000/", and accept the warning from the browser that the server is using a self-signed certificate.
 - Let's run the test suite from www.todobackend.com by navigating to "https://localhost:9000/test/" and clicking on the green button. You should see the tests cleared: 
 ![Tests cleared on localhost:9000](images/tests-passed.png)
@@ -87,4 +87,3 @@ postgres[ql]://[username[:password]@][host[:port],]/database[?parameter_list]
 - Docker should have permission to access the examples folder and its subdirectories as it needs access to the `create-tables.sql file`.
 - Check the paths in `http-linkdef.json` and uri in `sql-linkdef.json`. Check if your postgres database is working in the specific docker container and that the correct user has all the necessary permissions.
 - `wash up` uses port 4000 as of now. If the host is unable to start, inspect this port and kill the necessary processes before restarting. `wash down` will gracefully shut down the host as well.
-- If you see a `base64: invalid argument -w0` in your logs, change `base64 -w0` to `base64 -i` in your Makefile.

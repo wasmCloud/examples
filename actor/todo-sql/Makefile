@@ -27,9 +27,9 @@ start-providers:
 
 link-providers:
 	wash ctl link put $(shell make --silent actor_id) \
-		$(HTTPSERVER_ID) wasmcloud:httpserver config_b64=$(shell base64 -w0 http-linkdef.json)
+		$(HTTPSERVER_ID) wasmcloud:httpserver config_b64=$(shell base64 -w0 http-linkdef.json 2>/dev/null || base64 -i http-linkdef.json 2>/dev/null)
 	wash ctl link put $(shell make --silent actor_id) \
-		$(SQLDB_POSTGRES_ID) wasmcloud:sqldb config_b64=$(shell base64 -w0 sql-linkdef.json)
+		$(SQLDB_POSTGRES_ID) wasmcloud:sqldb config_b64=$(shell base64 -w0 sql-linkdef.json 2>/dev/null || base64 -i sql-linkdef.json 2>/dev/null)
 
 clean-start:
 	# if pushing to local server, make sure the host is started with
