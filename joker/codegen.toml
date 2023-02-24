@@ -1,0 +1,20 @@
+[[models]]
+path = "joker.smithy"
+
+[[models]]
+url = "https://wasmcloud.github.io/interfaces/idl/org.wasmcloud"
+files = [ "wasmcloud-core.smithy", "wasmcloud-model.smithy" ]
+
+
+[rust]
+output_dir = "."
+files = [
+    { path = "parser/src/joker.rs", namespace = "myorg.joker" },
+]
+
+[tinygo]
+output_dir = "."
+formatter = [ "goimports", "-w" ]
+files = [
+    { path = "apigw/joker.go", package="main", namespace = "myorg.joker" },
+]
