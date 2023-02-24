@@ -14,8 +14,8 @@ ACTOR_NAME = "Todo Sql"
 
 include ../../build/makefiles/actor.mk
 
-HTTPSERVER_REF = wasmcloud.azurecr.io/httpserver:0.14.5
-SQLDB_REF      = wasmcloud.azurecr.io/sqldb-postgres:0.1.0
+HTTPSERVER_REF = wasmcloud.azurecr.io/httpserver:0.17.0
+SQLDB_REF      = wasmcloud.azurecr.io/sqldb-postgres:0.4.0
 HTTPSERVER_ID  = VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M
 SQLDB_POSTGRES_ID = VDJQVOMF5FI3S5P4KJLCK2N25525U4IQIPH6NLHWZVTRZXTU6AOX4OPN
 
