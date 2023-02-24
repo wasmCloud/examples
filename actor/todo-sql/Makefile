@@ -14,8 +14,8 @@ ACTOR_NAME = "Todo Sql"
 
 include ../../build/makefiles/actor.mk
 
-HTTPSERVER_REF = wasmcloud.azurecr.io/httpserver:0.14.5
-SQLDB_REF      = wasmcloud.azurecr.io/sqldb-postgres:0.1.0
+HTTPSERVER_REF = wasmcloud.azurecr.io/httpserver:0.17.0
+SQLDB_REF      = wasmcloud.azurecr.io/sqldb-postgres:0.4.0
 HTTPSERVER_ID  = VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M
 SQLDB_POSTGRES_ID = VDJQVOMF5FI3S5P4KJLCK2N25525U4IQIPH6NLHWZVTRZXTU6AOX4OPN
 
@@ -25,11 +25,12 @@ start-providers:
 	wash ctl start provider $(SQLDB_REF) --link-name default \
 		--host-id $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id")
 
+# the following base64 shell command suffices most of the OSes and switches between the required -w0 or -i flag to accept an input file
 link-providers:
 	wash ctl link put $(shell make --silent actor_id) \
-		$(HTTPSERVER_ID) wasmcloud:httpserver config_b64=$(shell base64 -w0 http-linkdef.json)
+		$(HTTPSERVER_ID) wasmcloud:httpserver config_b64=$(shell base64 -w0 http-linkdef.json 2>/dev/null || base64 -i http-linkdef.json 2>/dev/null)
 	wash ctl link put $(shell make --silent actor_id) \
-		$(SQLDB_POSTGRES_ID) wasmcloud:sqldb config_b64=$(shell base64 -w0 sql-linkdef.json)
+		$(SQLDB_POSTGRES_ID) wasmcloud:sqldb config_b64=$(shell base64 -w0 sql-linkdef.json 2>/dev/null || base64 -i sql-linkdef.json 2>/dev/null)
 
 clean-start:
 	# if pushing to local server, make sure the host is started with
