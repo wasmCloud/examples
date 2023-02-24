@@ -25,6 +25,7 @@ start-providers:
 	wash ctl start provider $(SQLDB_REF) --link-name default \
 		--host-id $(shell $(WASH) ctl get hosts -o json | jq -r ".hosts[0].id")
 
+# the following base64 shell command suffices most of the OSes and switches between the required -w0 or -i flag to accept an input file
 link-providers:
 	wash ctl link put $(shell make --silent actor_id) \
 		$(HTTPSERVER_ID) wasmcloud:httpserver config_b64=$(shell base64 -w0 http-linkdef.json 2>/dev/null || base64 -i http-linkdef.json 2>/dev/null)

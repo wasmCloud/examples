@@ -87,3 +87,4 @@ postgres[ql]://[username[:password]@][host[:port],]/database[?parameter_list]
 - Docker should have permission to access the examples folder and its subdirectories as it needs access to the `create-tables.sql file`.
 - Check the paths in `http-linkdef.json` and uri in `sql-linkdef.json`. Check if your postgres database is working in the specific docker container and that the correct user has all the necessary permissions.
 - `wash up` uses port 4000 as of now. If the host is unable to start, inspect this port and kill the necessary processes before restarting. `wash down` will gracefully shut down the host as well.
+- Check the base64 command on your terminal and the flag it needs to accept an input file. It may be a `-w0` or `-i` flag. If this causes any issues for you during `make clean-start` you may edit the Makefile in link-providers subcommand to use the base64 command with the necessary flag. For example: `base64 -i http-linkdef.json 2>/dev/null`. 
