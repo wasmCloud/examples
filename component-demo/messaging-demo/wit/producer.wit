@@ -1,0 +1,7 @@
+/// An interface for a producer.
+default interface producer { 
+    use pkg.types.{broker, channel, event, error}
+
+	/// Publishes an event to a channel in a broker.
+	publish: func(b: broker, c: channel, e: event) -> result<_, error>
+}

@@ -1,0 +1,13 @@
+[package]
+name = "host"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wasmtime = { version = "6.0.1", features = ["component-model"] }
+anyhow = "1"
+wasi-common = { git = "https://github.com/bytecodealliance/preview2-prototyping"}
+wasi-cap-std-sync = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
+host = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
+async-trait = "0.1"
+tokio = { version = "1.22.0", features = [ "rt-multi-thread", "macros" ] }

@@ -1,0 +1,10 @@
+/// An interface for a generic consumer.
+default interface consumer {
+    use pkg.types.{broker, channel, subscription-token, error}
+
+	/// Subscribes to a channel in a broker.
+  	subscribe: func(b: broker, c: channel) -> result<subscription-token, error>
+
+	/// Unsubscribes from a channel via subscription token.
+  	unsubscribe: func(b: broker, st: subscription-token) -> result<_, error>
+}

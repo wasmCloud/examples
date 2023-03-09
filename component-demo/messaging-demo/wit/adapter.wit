@@ -1,0 +1,5 @@
+default world adapter {
+	export producer: pkg.producer
+	export consumer: pkg.consumer
+	import handler: pkg.handler
+}

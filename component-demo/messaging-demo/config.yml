@@ -1,0 +1,9 @@
+search-paths:
+  - target/wasm32-wasi/debug
+
+#  - ../service/target/wasm32-unknown-unknown/release
+
+instantiations:
+  $input:
+    arguments:
+      downstream: guest
