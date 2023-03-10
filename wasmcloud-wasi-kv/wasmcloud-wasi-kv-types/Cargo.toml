@@ -1,0 +1,16 @@
+[package]
+name = "wasmcloud-wasi-kv-types"
+description = "An implementation of WASI types used by KV (i.e. https://github.com/WebAssembly/wasi-keyvalue/blob/main/wit/types.wit) that runs in a guest."
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+name = "types"
+
+[dependencies]
+once_cell = "1.17.1"
+wasmbus-rpc = "0.11.2" # wasmcloud-interface-keyvalue uses 0.11.2
+wasmcloud-interface-keyvalue = "0.9.1"
+wit-bindgen = { git = "https://github.com/bytecodealliance/wit-bindgen" }

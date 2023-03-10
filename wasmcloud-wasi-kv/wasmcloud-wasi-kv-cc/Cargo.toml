@@ -1,0 +1,14 @@
+[package]
+name = "wasmcloud_wasi_kv_cc"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.component]
+target = { path = "../wit/world.wit" }
+
+[dependencies]
+wit-bindgen = { workspace = true }

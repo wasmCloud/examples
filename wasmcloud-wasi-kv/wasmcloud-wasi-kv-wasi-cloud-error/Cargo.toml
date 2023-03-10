@@ -1,0 +1,14 @@
+[package]
+name = "wasmcloud-wasi-kv-wasi-cloud-error"
+description = "An implementation of WASI cloud error used by KV (i.e. https://github.com/WebAssembly/wasi-keyvalue/blob/main/wit/error.wit) that runs in a guest."
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+# NOTE: while Rust does not allow dashed names, WASI expects it
+name = "wasi_cloud_error" 
+
+[dependencies]
+wit-bindgen = { workspace = true }

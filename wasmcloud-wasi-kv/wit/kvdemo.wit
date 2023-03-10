@@ -1,0 +1,4 @@
+default world kvdemo {
+  import keyvalue: pkg.keyvalue
+  export actor: pkg.wasmcloud.actor
+}

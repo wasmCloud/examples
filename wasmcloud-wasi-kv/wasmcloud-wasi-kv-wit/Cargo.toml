@@ -1,0 +1,16 @@
+[package]
+name = "wasmcloud_wasi_kv_wit"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+name = "keyvalue"
+
+[dependencies]
+once_cell = "1.17.1"
+wasmbus-rpc = "0.11.2" # wasmcloud-interface-keyvalue uses 0.11.2
+wasmcloud-interface-keyvalue = "0.9.1"
+wit-bindgen = { workspace = true }
+wit-component = { workspace = true }

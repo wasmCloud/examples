@@ -1,0 +1,46 @@
+// Due to the fact that muiltiple interfaces cannot be hung from one component
+// implementation (as of 2023/03/14), we must combine the keyvalue interface
+// and the wasmcloud actor interface into one.
+default interface wasmcloud-kv {
+	/// A key is a unique identifier for a value in a bucket. The key is used to
+	/// retrieve the value from the bucket.
+	type key = string
+
+	/// A list of keys
+	type keys = list<key>
+
+	/// Get the value associated with the key in the bucket. It returns a incoming-value
+	/// that can be consumed to get the value.
+	///
+	/// If the key does not exist in the bucket, it returns an error.
+	get: func(key: key) -> result<string, string>
+
+	/// Set the value associated with the key in the bucket. If the key already
+	/// exists in the bucket, it overwrites the value.
+	///
+	/// If the key does not exist in the bucket, it creates a new key-value pair.
+	/// If any other error occurs, it returns an error.
+	set: func(key: key, value: string) -> result<_, string>
+
+	/// Delete the key-value pair associated with the key in the bucket.
+	///
+	/// If the key does not exist in the bucket, it returns an error.
+	delete: func(key: key) -> result<_, string>
+
+	/// Check if the key exists in the bucket.
+	///
+	/// If the key does not exist in the bucket, it returns an error.
+	exists: func(key: key) -> result<bool, string>
+
+	/// Wasmcloud guest
+	guest-call: func(operation: string, payload: option<list<u8>>) -> result<option<list<u8>>, string>
+}
+
+///////////////
+// za warudo //
+///////////////
+
+default world keyvalue {
+  import host: pkg.wasmcloud.host
+  export keyvalue: self.wasmcloud-kv
+}
