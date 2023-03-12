@@ -121,8 +121,8 @@ impl Producer for MyAdapter {
         crate::host::host_call(
             //wasmbus_rpc::actor::prelude::host_call(
             "default",                 // link name
-            "wasmcloud:wit:messaging", // contract_id
-            "Producer.publish",        // method
+            "wasmcloud:wasi:messaging", // contract_id
+            "Messaging.Producer.publish",        // method
             &vec,
         )
         .map_err(|e| {
@@ -144,8 +144,8 @@ impl Consumer for MyAdapter {
         let ret = crate::host::host_call(
             //let ret = wasmbus_rpc::actor::prelude::host_call(
             "default",                 // link name
-            "wasmcloud:wit:messaging", // contract_id
-            "Consumer.subscribe",      // method
+            "wasmcloud:wasi:messaging", // contract_id
+            "Messaging.Consumer.subscribe",      // method
             &vec1,
         )
         .map_err(|e| {
@@ -164,8 +164,8 @@ impl Consumer for MyAdapter {
         println!("unsubscribe: serde encode: {}", vec1.len(),);
         let _ = crate::host::host_call(
             "default",                 // link name
-            "wasmcloud:wit:messaging", // contract_id
-            "Consumer.unsubscribe",    // method
+            "wasmcloud:wasi:messaging", // contract_id
+            "Messaging.Consumer.unsubscribe",    // method
             &vec1,
         )
         .map_err(|e| {
