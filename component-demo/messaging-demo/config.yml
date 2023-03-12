@@ -1,9 +1,10 @@
 search-paths:
-  - target/wasm32-wasi/debug
+  - target/components
 
-#  - ../service/target/wasm32-unknown-unknown/release
+dependencies:
+  downstream: target/components/guest.component.wasm
 
-instantiations:
-  $input:
-    arguments:
-      downstream: guest
+#instantiations:
+#  $input:
+#    arguments:
+#      downstream: guest.component.wasm

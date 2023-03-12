@@ -1,58 +1,67 @@
 # build component demo
 #
-# 'make'  compiles the rust code as wasm32-wasi
+# 'make'  compiles the rust code to wasm32-wasi
 # 'make componentize' compiles and turns into component wasm
-# 'make compose' joins components into 'actor.wasm'
+# 'make compose' joins components into 'actor.component.wasm'
 # 'make all' same as 'make compose'
 #
 
+TARGET     = wasm32-wasi
+TARGET_OUT = target/$(TARGET)/debug
+COMP_OUT   = target/components
+ACTOR      = $(COMP_OUT)/actor.component.wasm
+WASI       = ./wasi_snapshot_preview1.wasm
 
-#build:
-#	@echo "Building..."
-#	@cargo build --manifest-path ./guest/Cargo.toml   --target wasm32-wasi
-#	@cargo build --manifest-path ./adapter/Cargo.toml --target wasm32-wasi
+all: $(ACTOR)
+
+##
+## Build (compile rust to TARGET_OUT/*.wasm)
+##
+build: $(TARGET_OUT)/guest.wasm $(TARGET_OUT)/adapter.wasm
+
+$(TARGET_OUT)/guest.wasm: guest/Cargo.toml guest/src/*.rs 
+	cargo build --manifest-path guest/Cargo.toml --target $(TARGET)
+
+$(TARGET_OUT)/adapter.wasm: adapter/Cargo.toml adapter/src/*.rs 
+	cargo build --manifest-path adapter/Cargo.toml --target $(TARGET)
+
+##
+## Componentize: turn wasm into component 
+##
+componentize: $(COMP_OUT)/guest.component.wasm $(COMP_OUT)/adapter.component.wasm
+
+$(COMP_OUT)/guest.component.wasm: $(TARGET_OUT)/guest.wasm $(COMP_OUT) $(WASI)
+	wasm-tools component new $< -o $@ --adapt $(WASI)
+
+$(COMP_OUT)/adapter.component.wasm: $(TARGET_OUT)/adapter.wasm $(COMP_OUT) $(WASI)
+	wasm-tools component new $< -o $@ --adapt $(WASI)
+
+$(COMP_OUT):
+	@mkdir -p $@
+
+##
+## Compose
+##
+compose: $(COMP_OUT)/actor.component.wasm
+
+$(COMP_OUT)/actor.component.wasm: $(COMP_OUT)/adapter.component.wasm $(COMP_OUT)/guest.component.wasm config.yml $(WASI)
+	wasm-tools compose -vv -o $@ -c config.yml $<
 
 
-# build rules "make build"
 
-.PHONY: build
-build: target/wasm32-wasi/guest.wasm target/wasm32-wasi/adapter.wasm 
-
-target/wasm32-wasi/guest.wasm:  guest/Cargo.toml guest/src/*.rs
-	cargo build --manifest-path ./guest/Cargo.toml --target wasm32-wasi
-
-target/wasm32-wasi/adapter.wasm: adapter/Cargo.toml adapter/src/*.rs
-	cargo build --manifest-path ./adapter/Cargo.toml --target wasm32-wasi
-	
-
-guest.component.wasm: target/wasm32-wasi/debug/guest.wasm wasi_snapshot_preview1.wasm
-	@wasm-tools component new ./target/wasm32-wasi/debug/guest.wasm -o $@ --adapt ./wasi_snapshot_preview1.wasm
-
-adapter.component.wasm: target/wasm32-wasi/debug/adapter.wasm wasi_snapshot_preview1.wasm
-	@wasm-tools component new ./target/wasm32-wasi/debug/adapter.wasm -o $@ --adapt ./wasi_snapshot_preview1.wasm
-
-
-.PHONY: componentize
-componentize: guest.component.wasm adapter.component.wasm
-
-
-actor.wasm: config.yml adapter.component.wasm guest.component.wasm wasi_snapshot_preview1.wasm
-	wasm-tools compose -o $@ -c config.yml adapter.component.wasm
-
-
-.PHONY: compose
-compose: actor.wasm
-
-all: build componentize compose
-
-#build-all: both.wasm
-
-.PHONY: run
-run:
+##
+## Run
+##
+run: $(ACTOR)
 	@echo "Running..."
-	@cargo run --manifest-path ./host/Cargo.toml
+	@cargo run --manifest-path host/Cargo.toml
 
 
-.PHONY: clean
 clean:
-	@rm -rf target *.component.wasm
+	@rm -rf target 
+
+comp-clean:
+	@rm -rf $(COMP_OUT)
+
+
+.PHONY: clean run build componentize compose

@@ -1,5 +1,12 @@
 default world adapter {
 	export producer: pkg.producer
 	export consumer: pkg.consumer
-	import handler: pkg.handler
+	
+	import downstream: pkg.handler
+
+	// handler exported for host guest_call
+	export handler: pkg.handler
+
+    import host: pkg.wasmcloud.host
+    export actor: pkg.wasmcloud.actor
 }
