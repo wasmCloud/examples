@@ -1,8 +1,8 @@
 #![allow(unused_macros)]
-use crate::actor::Actor;
-use crate::consumer::Consumer;
-use crate::handler::Handler;
-use crate::producer::Producer;
+use actor::Actor;
+use consumer::Consumer;
+use handler::Handler;
+use producer::Producer;
 
 wit_bindgen::generate!({
     path: "../wit",
@@ -112,17 +112,27 @@ unsafe extern "C" fn __export_messaging_types_trace(arg0: i32) -> i32 {
 impl Producer for MyAdapter {
     /// Publish:  publish() from downstream crate coverted to wasmbus-rpc, forwarded to host
     fn publish(
-        _: u32,
-        _channel: crate::producer::ChannelResult,
+        _broker: u32,
+        channel: messaging_types::ChannelResult,
         event: crate::producer::EventResult,
     ) -> Result<(), u32> {
         println!(">>> called publish");
-        let vec = rmp_serde::to_vec(&event).unwrap();
+        let message = rmp_serde::to_vec(&event).map_err(|e| {
+            println!("serialization of event: {e}");
+            1u32
+        })?;
+        let rpc_message = wasmcloud_messaging::PublishDataResult {
+            subject: match channel {
+                messaging_types::ChannelResult::Queue(s) => s,
+                crate::producer::ChannelResult::Topic(s) => s,
+            },
+            message,
+        };
+        let vec = rmp_serde::to_vec(&rpc_message).unwrap();
         crate::host::host_call(
-            //wasmbus_rpc::actor::prelude::host_call(
-            "default",                 // link name
-            "wasmcloud:wasi:messaging", // contract_id
-            "Messaging.Producer.publish",        // method
+            "default",                    // link name
+            "wasmcloud:wasi:messaging",   // contract_id
+            "Messaging.Producer.publish", // method
             &vec,
         )
         .map_err(|e| {
@@ -143,9 +153,9 @@ impl Consumer for MyAdapter {
         println!("subscribe: serde encode: {}", vec1.len(),);
         let ret = crate::host::host_call(
             //let ret = wasmbus_rpc::actor::prelude::host_call(
-            "default",                 // link name
-            "wasmcloud:wasi:messaging", // contract_id
-            "Messaging.Consumer.subscribe",      // method
+            "default",                      // link name
+            "wasmcloud:wasi:messaging",     // contract_id
+            "Messaging.Consumer.subscribe", // method
             &vec1,
         )
         .map_err(|e| {
@@ -163,9 +173,9 @@ impl Consumer for MyAdapter {
         let vec1 = rmp_serde::to_vec(&channel).unwrap();
         println!("unsubscribe: serde encode: {}", vec1.len(),);
         let _ = crate::host::host_call(
-            "default",                 // link name
-            "wasmcloud:wasi:messaging", // contract_id
-            "Messaging.Consumer.unsubscribe",    // method
+            "default",                        // link name
+            "wasmcloud:wasi:messaging",       // contract_id
+            "Messaging.Consumer.unsubscribe", // method
             &vec1,
         )
         .map_err(|e| {

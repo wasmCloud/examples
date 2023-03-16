@@ -1,0 +1,41 @@
+[package]
+name = "wasmcloud-provider-wasi-messaging-nats"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+#async-nats = "0.28"
+async-trait = "0.1"
+atty = "0.2"
+base64 = "0.21"
+bytes = "1.0"
+chrono = "0.4"
+crossbeam="0.8"
+dashmap = "5.4.0"
+futures = "0.3"
+once_cell = "1.8"
+rmp-serde = "1.1.0"
+serde_bytes = "0.11"
+serde_json = "1.0"
+serde = {version = "1.0", features = ["derive"] }
+thiserror = "1.0"
+tokio = { version = "1", features = ["full"] }
+toml = "0.7"
+tracing = "0.1"
+tracing-futures = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+wit-bindgen = { git = "https://github.com/stevelr/wit-bindgen", branch = "feat/serde" }
+wascap = "0.10"
+uuid = { version = "1.3.0", features = [ "v4", "fast-rng" ] }
+anyhow = "1.0.69"
+
+wasmbus-rpc = { version = "0.12", features = [ "otel" ] }
+#wasmcloud-interface-messaging = "0.8.1"
+
+# test dependencies
+#[dev-dependencies]
+#wasmcloud-test-util = "0.6.4"
+
+[[bin]]
+name = "wasi-messaging-nats"
+path = "src/main.rs"

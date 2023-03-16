@@ -1,8 +1,6 @@
-default world adapter {
+default world messaging-capability-provider {
 	export producer: pkg.producer
 	export consumer: pkg.consumer
-	
-	import downstream: pkg.handler
 
   // messaging rpc types
   import wasmcloud-messaging: pkg.wasmcloud-messaging.wasmcloud-messaging
@@ -10,7 +8,4 @@ default world adapter {
 	// handler exported for host guest_call
 	export handler: pkg.handler
 
-  // wasmcloud
-  import host: pkg.wasmcloud.host
-  export actor: pkg.wasmcloud.actor
 }
