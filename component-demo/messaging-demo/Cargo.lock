@@ -33,7 +33,7 @@ dependencies = [
  "rmp-serde",
  "serde",
  "wasmbus-rpc",
- "wit-bindgen 0.4.0 (git+https://github.com/stevelr/wit-bindgen?branch=feat/serde)",
+ "wit-bindgen 0.4.0",
 ]
 
 [[package]]
@@ -3607,33 +3607,16 @@ dependencies = [
 [[package]]
 name = "wit-bindgen"
 version = "0.4.0"
+source = "git+https://github.com/stevelr/wit-bindgen?branch=feat/serde#20f90f41b75897d80fa999b8add7bc17abd5e8aa"
 dependencies = [
  "bitflags",
  "wit-bindgen-rust-macro 0.4.0",
 ]
 
 [[package]]
-name = "wit-bindgen"
-version = "0.4.0"
-source = "git+https://github.com/stevelr/wit-bindgen?branch=feat/serde#20f90f41b75897d80fa999b8add7bc17abd5e8aa"
-dependencies = [
- "bitflags",
- "wit-bindgen-rust-macro 0.4.0 (git+https://github.com/stevelr/wit-bindgen?branch=feat/serde)",
-]
-
-[[package]]
 name = "wit-bindgen-core"
 version = "0.3.0"
 source = "git+https://github.com/bytecodealliance/wit-bindgen#39030f9adabe581ceae7d574e4a902e37d1be6eb"
-dependencies = [
- "anyhow",
- "wit-component",
- "wit-parser",
-]
-
-[[package]]
-name = "wit-bindgen-core"
-version = "0.4.0"
 dependencies = [
  "anyhow",
  "wit-component",
@@ -3665,23 +3648,12 @@ dependencies = [
 [[package]]
 name = "wit-bindgen-rust"
 version = "0.4.0"
+source = "git+https://github.com/stevelr/wit-bindgen?branch=feat/serde#20f90f41b75897d80fa999b8add7bc17abd5e8aa"
 dependencies = [
  "heck 0.4.1",
  "wasm-metadata",
  "wit-bindgen-core 0.4.0",
  "wit-bindgen-rust-lib 0.4.0",
- "wit-component",
-]
-
-[[package]]
-name = "wit-bindgen-rust"
-version = "0.4.0"
-source = "git+https://github.com/stevelr/wit-bindgen?branch=feat/serde#20f90f41b75897d80fa999b8add7bc17abd5e8aa"
-dependencies = [
- "heck 0.4.1",
- "wasm-metadata",
- "wit-bindgen-core 0.4.0 (git+https://github.com/stevelr/wit-bindgen?branch=feat/serde)",
- "wit-bindgen-rust-lib 0.4.0 (git+https://github.com/stevelr/wit-bindgen?branch=feat/serde)",
  "wit-component",
 ]
 
@@ -3697,18 +3669,10 @@ dependencies = [
 [[package]]
 name = "wit-bindgen-rust-lib"
 version = "0.4.0"
-dependencies = [
- "heck 0.4.1",
- "wit-bindgen-core 0.4.0",
-]
-
-[[package]]
-name = "wit-bindgen-rust-lib"
-version = "0.4.0"
 source = "git+https://github.com/stevelr/wit-bindgen?branch=feat/serde#20f90f41b75897d80fa999b8add7bc17abd5e8aa"
 dependencies = [
  "heck 0.4.1",
- "wit-bindgen-core 0.4.0 (git+https://github.com/stevelr/wit-bindgen?branch=feat/serde)",
+ "wit-bindgen-core 0.4.0",
 ]
 
 [[package]]
@@ -3727,25 +3691,13 @@ dependencies = [
 [[package]]
 name = "wit-bindgen-rust-macro"
 version = "0.4.0"
+source = "git+https://github.com/stevelr/wit-bindgen?branch=feat/serde#20f90f41b75897d80fa999b8add7bc17abd5e8aa"
 dependencies = [
  "anyhow",
  "proc-macro2",
  "syn",
  "wit-bindgen-core 0.4.0",
  "wit-bindgen-rust 0.4.0",
- "wit-component",
-]
-
-[[package]]
-name = "wit-bindgen-rust-macro"
-version = "0.4.0"
-source = "git+https://github.com/stevelr/wit-bindgen?branch=feat/serde#20f90f41b75897d80fa999b8add7bc17abd5e8aa"
-dependencies = [
- "anyhow",
- "proc-macro2",
- "syn",
- "wit-bindgen-core 0.4.0 (git+https://github.com/stevelr/wit-bindgen?branch=feat/serde)",
- "wit-bindgen-rust 0.4.0 (git+https://github.com/stevelr/wit-bindgen?branch=feat/serde)",
  "wit-component",
 ]
 

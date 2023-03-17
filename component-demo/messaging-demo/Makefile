@@ -58,7 +58,7 @@ $(COMP_OUT):
 compose: $(COMP_OUT)/actor.component.wasm
 
 $(COMP_OUT)/actor.component.wasm: $(COMP_OUT)/adapter_host.component.wasm $(COMP_OUT)/adapter_guest.component.wasm $(COMP_OUT)/guest.component.wasm config.yml $(WASI)
-	$(WASM_TOOLS) compose -vv -o $@ -c config.yml $<
+	$(WASM_TOOLS) compose -vv --search-path $(COMP_OUT) -o $@ -c config.yml $<
 
 
 ##
