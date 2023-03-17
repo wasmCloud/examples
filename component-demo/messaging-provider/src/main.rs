@@ -1,8 +1,6 @@
 //! Nats implementation for wasmcloud:wasi:messaging.
 //!
 
-#![allow(unused_macros)] // for export in wit_bindgen
-
 use std::borrow::Cow;
 use std::{collections::HashMap, convert::Infallible, sync::Arc};
 
@@ -23,16 +21,39 @@ use wasmbus_rpc::{
     provider::prelude::*,
 };
 
-// from wit-bindgen
-use wasmcloud_messaging::{PublishDataParam, PublishDataResult};
+#[derive(Serialize, Deserialize)]
+struct PubMessage {
+    subject: String,
+    message: Vec<u8>,
+}
 
-wit_bindgen::generate!({
-    path: "../messaging-demo/wit",
-    world: "messaging-capability-provider",
-    serialize: "serde::Serialize",
-    deserialize: "serde::Deserialize",
-});
-use messaging_types::{EventParam, EventResult};
+#[derive(Deserialize, Serialize)]
+struct EventResult {
+    pub specversion: String,
+    pub ty: String,
+    pub source: String,
+    pub id: String,
+    pub data: Option<Vec<u8>>,
+    pub datacontenttype: Option<String>,
+    pub dataschema: Option<String>,
+    pub subject: Option<String>,
+    pub time: Option<String>,
+    pub extensions: Option<Vec<(String, String)>>,
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct EventParam<'a> {
+    pub specversion: &'a str,
+    pub ty: &'a str,
+    pub source: &'a str,
+    pub id: &'a str,
+    pub data: Option<&'a [u8]>,
+    pub datacontenttype: Option<&'a str>,
+    pub dataschema: Option<&'a str>,
+    pub subject: Option<&'a str>,
+    pub time: Option<&'a str>,
+    //pub extensions: Option<&'a [(&'a str, &'a str)]>,
+}
 
 const DEFAULT_NATS_URI: &str = "0.0.0.0:4222";
 const ENV_NATS_SUBSCRIPTION: &str = "SUBSCRIPTION";
@@ -107,7 +128,7 @@ impl ConnectionConfig {
             out.auth_seed = extra.auth_seed.clone()
         }
         if extra.ping_interval_sec.is_some() {
-            out.ping_interval_sec = extra.ping_interval_sec.clone()
+            out.ping_interval_sec = extra.ping_interval_sec
         }
         out
     }
@@ -315,7 +336,7 @@ impl NatsMessagingProvider {
                             dataschema: None,
                             subject: Some(&msg.subject),
                             time: Some(&time),
-                            extensions: None,
+                            //extensions: None,
                         };
                         match rmp_serde::to_vec(&event) {
                             Err(error) => {
@@ -338,11 +359,11 @@ impl NatsMessagingProvider {
                 // assuming it's already a CloudEvent, just use it!
                 // should we deserialize to test?
 
-                let data = PublishDataParam {
-                    subject: &msg.subject,
-                    message: &message,
-                };
                 debug!(actor_id=%link_def.actor_id, subject=%msg.subject, "subscription event received");
+                let data = PubMessage {
+                    subject: msg.subject,
+                    message: message.into(),
+                };
                 // unwrap ok here: serialize can't fail here
                 let data = rmp_serde::to_vec(&data).unwrap();
                 tokio::spawn(subscriber_event(ld.clone(), data).instrument(span));
@@ -378,8 +399,8 @@ impl wasmbus_rpc::common::MessageDispatch for NatsMessagingProvider {
         match message.method {
             "Messaging.Producer.publish" => {
                 let request =
-                    rmp_serde::from_slice::<PublishDataResult>(&message.arg).map_err(|error| {
-                        error!(%error, "deserializing PublishDataResult");
+                    rmp_serde::from_slice::<PubMessage>(&message.arg).map_err(|error| {
+                        error!(%error, "deserializing PubMessage");
                         RpcError::Deser(error.to_string())
                     })?;
                 // for now, don't have a reply-to in this api
@@ -399,7 +420,7 @@ impl wasmbus_rpc::common::MessageDispatch for NatsMessagingProvider {
                 // or possibly a regex. before subscribing, check that subscribe request,
                 // matches the regex. If not, return error for subscribe call.
                 let _join = self
-                    .subscribe(&nats_client, nats_bundle.ld.clone(), subject, None)
+                    .subscribe(nats_client, nats_bundle.ld.clone(), subject, None)
                     .await;
                 Ok(Vec::new())
             }
