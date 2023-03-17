@@ -1,9 +1,9 @@
 # capability-provider/nats/Makefile
 
-PROJECT = nats_messaging
-CAPABILITY_ID = wasmcloud:messaging
+PROJECT = wasi_messaging_nats
+CAPABILITY_ID = wasmcloud:wasi:messaging
 VENDOR   = "wasmcloud"
-NAME = "NATS Messaging"
+NAME = "wasi-cloud messaging over NATS"
 VERSION  = $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[] .version' | head -1)
 REVISION = 0
 oci_url  = localhost:5000/v2/$(PROJECT):$(VERSION)

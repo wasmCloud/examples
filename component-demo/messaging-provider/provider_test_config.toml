@@ -2,7 +2,7 @@
 
 # name of compiled binary (usually project name unless overridden in [[bin]]
 # Required
-bin_path = "target/debug/nats_messaging"
+bin_path = "target/debug/wasi_messaging_nats"
 
 # set RUST_LOG environment variable (default "info")
 rust_log = "debug"
@@ -20,4 +20,4 @@ rust_backtrace = "1"
 #link_name = "default"
 
 # name of contract under test
-contract_id = "wasmcloud:messaging"
+contract_id = "wasmcloud:wasi:messaging"

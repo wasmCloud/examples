@@ -1,12 +1,17 @@
 use tokio::sync::oneshot;
-use wasmbus_rpc::provider::prelude::*;
-use wasmcloud_interface_messaging::*;
+use wasmbus_rpc::{
+    async_nats,
+    error::{RpcError, RpcResult},
+    provider::ProviderTransport,
+    common::Transport,
+};
+//use wasmbus_rpc::provider::prelude::*;
 use wasmcloud_test_util::{
     check,
     cli::print_test_results,
     provider_test::test_provider,
     run_selected_spawn,
-    testing::{TestOptions, TestResult},
+    testing::{self, TestOptions, TestResult},
 };
 
 #[tokio::test]
@@ -85,11 +90,19 @@ async fn send_request(_opt: &TestOptions) -> RpcResult<()> {
     tokio::time::sleep(std::time::Duration::from_secs(2)).await;
 
     // create client and ctx
-    let client = MessagingSender::via(prov);
-    let ctx = Context::default();
+    //let client = MessagingSender::via(prov);
+    let ctx = wasmbus_rpc::common::Context::default();
+    let tp = ProviderTransport::new(&link_def, None);
+    tp.send(&ctx, wasmbus_rpc::common::Message{
+        "Messaging.Producer.publish", 
+        b"hello".to_vec().into(),
+    }, None).await;
+
     // start responder thread
     let (rx, responder) = make_responder(TEST_SUB_REQ.to_string(), 1).await;
     assert!(rx.await.is_ok());
+
+
 
     let resp = client
         .request(
@@ -115,6 +128,7 @@ async fn send_publish(_opt: &TestOptions) -> RpcResult<()> {
     const TEST_SUB_PUB: &str = "test.nats.pub";
     let prov = test_provider().await;
     tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+
 
     // start responder thread
     let (rx, responder) = make_responder(TEST_SUB_PUB.to_string(), 1).await;
