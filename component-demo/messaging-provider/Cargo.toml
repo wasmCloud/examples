@@ -34,7 +34,7 @@ wasmbus-rpc = { version = "0.12", features = [ "otel" ] }
 
 # test dependencies
 #[dev-dependencies]
-#wasmcloud-test-util = "0.6.4"
+#wasmcloud-test-util = { git = "https://github.com/wasmcloud/wasmcloud-test", branch="fix/bindgen" }
 
 [[bin]]
 name = "wasi-messaging-nats"

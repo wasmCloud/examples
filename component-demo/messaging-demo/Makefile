@@ -12,7 +12,8 @@ COMP_OUT   = ./components
 ACTOR      = $(COMP_OUT)/actor.component.wasm
 WASI       = ./wasi_snapshot_preview1.wasm
 WIT        = $(wildcard wit/*.wit)
-WASM_TOOLS = /Users/steve/git/bytecodealliance/wasm-tools/target/debug/wasm-tools
+#WASM_TOOLS = /Users/steve/git/bytecodealliance/wasm-tools/target/debug/wasm-tools
+WASM_TOOLS = wasm-tools
 
 
 all: $(ACTOR)
