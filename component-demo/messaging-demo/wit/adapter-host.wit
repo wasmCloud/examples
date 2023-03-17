@@ -1,0 +1,7 @@
+default world adapter-host {
+
+  export messaging: pkg.messaging-host
+
+  import host: pkg.wasmcloud.host
+  import lib: pkg.wasmcloud-messaging
+}

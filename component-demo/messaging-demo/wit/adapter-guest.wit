@@ -1,0 +1,4 @@
+default world adapter-guest {
+	import handler: pkg.handler
+  export actor: pkg.wasmcloud.actor
+}

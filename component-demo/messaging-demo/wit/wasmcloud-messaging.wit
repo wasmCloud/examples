@@ -1,0 +1,17 @@
+/// Types needed to convert wit messages to wasmcloud rpc
+default interface wasmcloud-messaging {
+
+  // this is analagous to `PubMessage` in wasmcloud-interface-messaging
+  // except that `PubMessage` has an optional reply-to field, which 
+  // is not supported in the current wasi-cloud wit api
+  record publish-data {
+    subject: string,
+    // msgpack serialized messaging-types::Event
+    message: list<u8>,
+  }
+
+  // All we needed was to get the record above into codegen,
+  // and then serialize separately. For the current wit-bindgen
+  // to generate the struct, it must be used in a function param or result
+  unused: func(r: publish-data) -> publish-data
+}

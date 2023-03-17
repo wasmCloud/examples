@@ -2,5 +2,6 @@
 members = [
     "host",
     "guest",
-    "adapter",
+    "adapter_host",
+    "adapter_guest",
 ]

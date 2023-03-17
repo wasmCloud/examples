@@ -1,10 +1,12 @@
 search-paths:
   - target/components
 
-dependencies:
-  downstream: target/components/guest.component.wasm
+#dependencies:
+#  downstream: target/components/guest.component.wasm
 
 #instantiations:
 #  $input:
 #    arguments:
-#      downstream: guest.component.wasm
+#      guest: guest.component.wasm
+#      adapter_guest: adapter_guest.component.wasm
+

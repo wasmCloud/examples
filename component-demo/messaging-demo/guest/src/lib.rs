@@ -1,7 +1,5 @@
-use crate::{
-    messaging_types::{open_broker, ChannelParam, EventParam},
-    producer::publish,
-};
+use messaging_types::{open_broker, ChannelParam, EventParam};
+use producer::publish;
 
 wit_bindgen::generate!({
     path: "../wit",

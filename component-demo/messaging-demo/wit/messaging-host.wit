@@ -1,0 +1,21 @@
+/// An interface for a producer.
+default interface messaging-host { 
+    use pkg.types.{broker, channel, event, error, subscription-token}
+
+	  /// Publishes an event to a channel in a broker.
+	  publish: func(b: broker, c: channel, e: event) -> result<_, error>
+
+    drop-broker: func(b: broker)
+
+    open-broker: func(name: string) -> result<broker, error>
+
+  	drop-error: func(e: error)
+
+  	trace: func(e: error) -> string
+
+	  /// Subscribes to a channel in a broker.
+  	subscribe: func(b: broker, c: channel) -> result<subscription-token, error>
+
+	  /// Unsubscribes from a channel via subscription token.
+  	unsubscribe: func(b: broker, st: subscription-token) -> result<_, error>
+}

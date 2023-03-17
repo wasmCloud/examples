@@ -1,0 +1,15 @@
+[package]
+name = "adapter_host"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = { git = "https://github.com/stevelr/wit-bindgen", branch="feat/serde" }
+anyhow = "1.0.69"
+async-trait = "0.1.66"
+serde = { version = "1.0", features = [ "derive" ] }
+wasmbus-rpc = "0.12"
+rmp-serde = { version = "1.1.1" }
