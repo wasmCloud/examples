@@ -7,8 +7,8 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-#wit-bindgen = { git = "https://github.com/stevelr/wit-bindgen", branch="feat/serde" }
-wit-bindgen = { path = "/Users/steve/projects/scratch/wasm-experiments/wit-bindgen/crates/guest-rust" }
+wit-bindgen = { git = "https://github.com/stevelr/wit-bindgen", branch="feat/serde" }
+#wit-bindgen = { path = "/Users/steve/projects/scratch/wasm-experiments/wit-bindgen/crates/guest-rust" }
 anyhow = "1.0.69"
 async-trait = "0.1.66"
 serde = { version = "1.0", features = [ "derive" ] }
