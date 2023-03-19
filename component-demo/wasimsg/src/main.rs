@@ -1,18 +1,9 @@
 use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
-use std::{borrow::Cow, sync::Arc, time::Duration};
-//use wascap::prelude::KeyPair;
 use nkeys::KeyPair;
-use wasmbus_rpc::{async_nats, core::WasmCloudEntity};
-
 use serde::{Deserialize, Serialize};
-
-//use tokio::sync::oneshot;
-//use wasmbus_rpc::{
-//    core::InvocationResponse,
-//    error::{RpcError, RpcResult},
-//    provider::ProviderTransport,
-//};
+use std::{borrow::Cow, sync::Arc, time::Duration};
+use wasmbus_rpc::{async_nats, core::WasmCloudEntity};
 
 const RPC_TIMEOUT: Duration = Duration::from_millis(2000);
 const FAKE_HOST_ID: &str = "N0000000000000000000000000000000000000000000000000000000";
@@ -24,7 +15,6 @@ struct PubMessage {
 }
 
 #[derive(Parser)]
-//#[command(CMD)]
 struct Args {
     /// Nats address
     #[arg(short, long, default_value = "127.0.0.1:4222")]
@@ -44,13 +34,11 @@ struct Args {
 }
 
 #[derive(Subcommand)]
-//#[command(PARENT CMD ATTRIBUTE)]
 enum Command {
     Sub(SubCmd),
 }
 
 #[derive(Parser)]
-//#[command(PARENT CMD ATTRIBUTE)]
 struct SubCmd {
     /// public key of actor - must already be linked to wasi-messaging provider
     #[arg(short, long)]
@@ -82,10 +70,9 @@ async fn main() {
 async fn run(args: Args) -> Result<()> {
     match args.command {
         Command::Sub(ref sub) => {
-            send_subscribe(&args, &sub).await?;
+            send_subscribe(&args, sub).await?;
         }
     }
-
     Ok(())
 }
 
