@@ -1,21 +1,19 @@
 //! Nats implementation for wasmcloud:wasi:messaging.
 //!
 
-use std::borrow::Cow;
-use std::{collections::HashMap, convert::Infallible, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, convert::Infallible, sync::Arc, time::Duration};
 
 use base64::{engine::general_purpose::STANDARD_NO_PAD, engine::Engine};
 use dashmap::DashMap;
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
-use tokio::sync::Semaphore;
-use tokio::task::JoinHandle;
+use tokio::{sync::Semaphore, task::JoinHandle};
 use tracing::{debug, error, instrument, warn};
 use tracing_futures::Instrument;
 use wascap::prelude::KeyPair;
-use wasmbus_rpc::common::Transport;
 use wasmbus_rpc::{
     async_nats,
+    common::Transport,
     core::{HostData, LinkDefinition},
     otel::OtelHeaderInjector,
     provider::prelude::*,
@@ -62,13 +60,11 @@ const ENV_NATS_CLIENT_JWT: &str = "CLIENT_JWT";
 const ENV_NATS_CLIENT_SEED: &str = "CLIENT_SEED";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // handle lattice control messages and forward rpc to the provider dispatch
-    // returns when provider receives a shutdown control message
     let host_data = load_host_data()?;
     let provider = generate_provider(host_data);
-    provider_main(provider, Some("NATS Messaging Provider".to_string()))?;
+    provider_main(provider, Some("WASI-Messaging NATS Provider".to_string()))?;
 
-    eprintln!("NATS messaging provider exiting");
+    eprintln!("WASI-Messaging NATS provider exiting");
     Ok(())
 }
 
@@ -278,16 +274,17 @@ impl NatsMessagingProvider {
         &self,
         client: &async_nats::Client,
         link_def: LinkDefinition,
-        sub: String,
+        subject: String,
         queue: Option<String>,
     ) -> RpcResult<JoinHandle<()>> {
+        debug!(actor_id=%link_def.actor_id, subject, queue, "subscribe");
         let mut subscriber = match queue {
-            Some(queue) => client.queue_subscribe(sub.clone(), queue).await,
-            None => client.subscribe(sub.clone()).await,
+            Some(queue) => client.queue_subscribe(subject.clone(), queue).await,
+            None => client.subscribe(subject.clone()).await,
         }
-        .map_err(|e| {
-            error!(subject = %sub, error = %e, "error subscribing subscribing");
-            RpcError::Nats(format!("subscription to {}: {}", sub, e))
+        .map_err(|error| {
+            error!(subject, error, "error subscribing subscribing");
+            RpcError::Nats(format!("subscription to {subject}: {error}"))
         })?;
 
         // Spawn a thread that listens for messages coming from NATS
@@ -338,7 +335,7 @@ impl NatsMessagingProvider {
                             time: Some(&time),
                             //extensions: None,
                         };
-                        match rmp_serde::to_vec(&event) {
+                        match serde_json::to_vec(&event) {
                             Err(error) => {
                                 // highly unlikely to get this since it derives Serialize
                                 error!(subject=%msg.subject,
@@ -353,12 +350,8 @@ impl NatsMessagingProvider {
                 };
                 //
                 // once we complete the transition to wasi-kk
-                /*
-                 */
-
                 // assuming it's already a CloudEvent, just use it!
                 // should we deserialize to test?
-
                 debug!(actor_id=%link_def.actor_id, subject=%msg.subject, "subscription event received");
                 let data = PubMessage {
                     subject: msg.subject,
@@ -382,6 +375,7 @@ impl wasmbus_rpc::common::MessageDispatch for NatsMessagingProvider {
         ctx: &wasmbus_rpc::common::Context,
         message: wasmbus_rpc::common::Message<'_>,
     ) -> Result<Vec<u8>, RpcError> {
+        debug!(method=&message.method, actor_id=%ctx.actor.as_ref().unwrap(), "dispatch");
         let actor_id = match ctx.actor.as_ref() {
             None => {
                 error!("invalid request 'Messaging.Producer.publish, ctx.actor missing");
@@ -393,6 +387,7 @@ impl wasmbus_rpc::common::MessageDispatch for NatsMessagingProvider {
             .actors
             .get(&actor_id)
             .ok_or_else(|| RpcError::InvalidParameter(format!("actor not linked:{}", &actor_id)))?;
+        debug!(actor_id, "actor is linked");
 
         let nats_client = &nats_bundle.client;
         let headers = OtelHeaderInjector::default_with_span().into();
@@ -404,11 +399,14 @@ impl wasmbus_rpc::common::MessageDispatch for NatsMessagingProvider {
                         RpcError::Deser(error.to_string())
                     })?;
                 // for now, don't have a reply-to in this api
-                nats_client
+                debug!(subject=%request.subject, "publishing message over nats");
+                let rc = nats_client
                     .publish_with_headers(request.subject, headers, request.message.into())
                     .await
                     .map_err(|e| RpcError::Nats(e.to_string()))
-                    .map(|_| Vec::new())
+                    .map(|_| Vec::new());
+                let _ = nats_client.flush().await;
+                rc
             }
             "Messaging.Consumer.subscribe" => {
                 let subject = rmp_serde::from_slice::<String>(&message.arg).map_err(|error| {
@@ -426,10 +424,11 @@ impl wasmbus_rpc::common::MessageDispatch for NatsMessagingProvider {
             }
             "Messaging.Consumer.unsubscribe" => {
                 // TODO: (unimplemented)
-                // would require creating channel, and changing wait loop
-                // in subscribe loop to use select() channel or next()
+                // would require creating channel,
+                // and changing subscription loop to use select() channel or next()
                 // also requires keepling list of current subscriptions
                 // and only unsubscribing to ones already subscribed
+                warn!("unsubscribe not implemented");
                 Ok(Vec::new())
             }
             _ => Err(wasmbus_rpc::error::RpcError::MethodNotHandled({
@@ -442,11 +441,13 @@ impl wasmbus_rpc::common::MessageDispatch for NatsMessagingProvider {
 // handle message received on a subscription. Send CloudEvent to subscribing Component
 #[instrument(level = "debug", skip_all, fields(actor_id = %link_def.actor_id))]
 async fn subscriber_event(link_def: LinkDefinition, message: Vec<u8>) {
+    debug!(actor_id=%link_def.actor_id, payload_size=message.len(), "subscriber event");
     let msg = wasmbus_rpc::common::Message {
         method: "Messaging.Handler.on_receive",
         arg: Cow::Owned(message),
     };
     let tp = wasmbus_rpc::provider::ProviderTransport::new(&link_def, None);
+    tp.set_timeout(Duration::from_millis(2000));
     if let Err(error) = tp
         .send(&wasmbus_rpc::common::Context::default(), msg, None)
         .await
@@ -464,7 +465,7 @@ impl ProviderHandler for NatsMessagingProvider {
     /// Provider should perform any operations needed for a new link,
     /// including setting up per-actor resources, and checking authorization.
     /// If the link is allowed, return true, otherwise return false to deny the link.
-    #[instrument(level = "debug", skip(self, ld), fields(actor_id = %ld.actor_id))]
+    #[instrument(level = "debug", skip(self, ld), fields(actor_id = %ld.actor_id, link_name=%ld.link_name, contract=%ld.contract_id))]
     async fn put_link(&self, ld: &LinkDefinition) -> RpcResult<bool> {
         // If the link definition values are empty, use the default connection configuration
         let config = if ld.values.is_empty() {
@@ -489,16 +490,15 @@ impl ProviderHandler for NatsMessagingProvider {
     /// Handle notification that a link is dropped: close the connection
     #[instrument(level = "info", skip(self))]
     async fn delete_link(&self, actor_id: &str) {
+        debug!(actor_id, "delete_link");
         if let Some(bundle) = self.actors.remove(actor_id) {
             // Note: subscriptions will be closed via Drop on the NatsClientBundle
             debug!(
-                "closing [{}] NATS subscriptions for actor [{}]...",
-                bundle.1.sub_handles.len(),
                 actor_id,
+                count = bundle.1.sub_handles.len(),
+                "closing NATS subscriptions for actor",
             );
         }
-
-        debug!("finished processing delete link for actor [{}]", actor_id);
     }
 
     /// Handle shutdown request by closing all connections
@@ -531,7 +531,7 @@ mod test {
 }
 "#;
 
-        let config: ConnectionConfig = serde_json::from_str(&input).unwrap();
+        let config: ConnectionConfig = serde_json::from_str(input).unwrap();
         assert_eq!(config.auth_jwt.unwrap(), "authy");
         assert_eq!(config.auth_seed.unwrap(), "seedy");
         assert_eq!(config.cluster_uris, ["nats://soyvuh"]);
@@ -558,12 +558,16 @@ mod test {
     #[test]
     fn test_connectionconfig_merge() {
         // second > original, individual vec fields are replace not extend
-        let mut cc1 = ConnectionConfig::default();
-        cc1.cluster_uris = vec!["old_server".to_string()];
-        cc1.subscriptions = vec!["topic1".to_string()];
-        let mut cc2 = ConnectionConfig::default();
-        cc2.cluster_uris = vec!["server1".to_string(), "server2".to_string()];
-        cc2.auth_jwt = Some("jawty".to_string());
+        let cc1 = ConnectionConfig {
+            cluster_uris: vec!["old_server".to_string()],
+            subscriptions: vec!["topic1".to_string()],
+            ..Default::default()
+        };
+        let cc2 = ConnectionConfig {
+            cluster_uris: vec!["server1".to_string(), "server2".to_string()],
+            auth_jwt: Some("jawty".to_string()),
+            ..Default::default()
+        };
         let cc3 = cc1.merge(&cc2);
         assert_eq!(cc3.cluster_uris, cc2.cluster_uris);
         assert_eq!(cc3.subscriptions, cc1.subscriptions);
