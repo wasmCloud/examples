@@ -1,0 +1,36 @@
+[workspace]
+#
+[package]
+name = "wasimsg"
+version = "0.1.0"
+description = "cli for configuring and testing wasi-messasge capability provider"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.69"
+async-trait = "0.1"
+atty = "0.2"
+base64 = "0.21"
+bytes = "1.0"
+clap = { version = "4.1", features = [ "derive" ] }
+env_logger = "0.10"
+futures = "0.3"
+nkeys = "0.2.0"
+once_cell = "1.8"
+rmp-serde = "1.1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_bytes = "0.11"
+serde_json = "1.0"
+thiserror = "1.0"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-futures = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1.3.0", features = [ "v4", "fast-rng" ] }
+#wascap = "0.10"
+wasmbus-rpc = "0.12"
+
+
+[[bin]]
+name = "wasimsg"
+path = "src/main.rs"
