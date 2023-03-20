@@ -42,6 +42,7 @@ endif
 ifeq ($(wildcard rust),rust)
 # some rules for building rust subdirs
 all::
+	wash gen
 	cd rust && cargo build
 test clean clippy::
 	cd rust && cargo $@

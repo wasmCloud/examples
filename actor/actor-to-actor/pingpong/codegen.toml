@@ -65,3 +65,15 @@ output_dir = "rust"
 [[rust.files]]
 path = "src/pingpong.rs"
 namespace = "org.wasmcloud.interface.pingpong.pingpong"
+
+##
+## Tinygo language output
+##
+[tinygo]
+output_dir = "tinygo"
+formatter = [ "goimports", "-w" ]
+
+[[tinygo.files]]
+path = "pingpong.go"
+package = "pingpong"
+namespace = "org.wasmcloud.interface.pingpong.pingpong"
