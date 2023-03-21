@@ -1,6 +1,6 @@
 [package]
 name = "python-provider"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 
 [dependencies]
@@ -28,7 +28,7 @@ tokio-util = { version = "0.7.0", features = ["io"] }
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
 triggered = "0.1.2"
-wasmbus-rpc = { version = "0.10.1", features = ["otel"] }
+wasmbus-rpc = { version = "0.11", features = ["otel"] }
 
 # test dependencies
 [dev-dependencies]

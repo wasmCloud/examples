@@ -1,6 +1,6 @@
 [package]
 name = "wasmcloud-example-provider-factorial"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 
 [dependencies]
@@ -18,8 +18,8 @@ serde = {version = "1.0.145", features = ["derive"] }
 thiserror = "1.0"
 tokio = { version = "1.21", features = ["full"] }
 toml = "0.5"
-wasmbus-rpc = { version = "0.10.1", features = ["otel"] }
-wasmcloud-interface-factorial = "0.6.0"
+wasmbus-rpc = { version = "0.11", features = ["otel"] }
+wasmcloud-interface-factorial = "0.7"
 
 # test dependencies
 [dev-dependencies]
