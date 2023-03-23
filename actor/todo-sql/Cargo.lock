@@ -1984,7 +1984,7 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 
 [[package]]
 name = "todo-sql"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "async-trait",
  "futures",
@@ -2412,9 +2412,9 @@ dependencies = [
 
 [[package]]
 name = "wasmcloud-interface-httpserver"
-version = "0.8.2"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46b44ff3a3b0aca792f969431ec2687e9d96007fd3a05eb9ba31a7bdcd3ef332"
+checksum = "cea02a20445b828ee195737fb3e23725d8a7356afa67cf2b8b58d74b7c44e43b"
 dependencies = [
  "async-trait",
  "serde",
