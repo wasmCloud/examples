@@ -4,17 +4,17 @@ on:
   push:
     branches: [ main ]
     paths:
-    - "actor/pinger/**"
+    - "actor/actor-to-actor/pinger/**"
     tags:
     - 'pinger-v*'
   pull_request:
     branches: [ main ]
     paths:
-    - "actor/pinger/**"
+    - "actor/actor-to-actor/pinger/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./actor/pinger
+  working-directory: ./actor/actor-to-actor/pinger
   WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
   WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_PINGER }}
 

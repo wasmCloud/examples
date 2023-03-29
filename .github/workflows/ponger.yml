@@ -4,17 +4,17 @@ on:
   push:
     branches: [ main ]
     paths:
-    - "actor/ponger/**"
+    - "actor/actor-to-actor/ponger/**"
     tags:
     - 'ponger-v*'
   pull_request:
     branches: [ main ]
     paths:
-    - "actor/ponger/**"
+    - "actor/actor-to-actor/ponger/**"
 
 env:
   CARGO_TERM_COLOR: always
-  working-directory: ./actor/ponger
+  working-directory: ./actor/actor-to-actor/ponger
   WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
   WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_PONGER }}
 
