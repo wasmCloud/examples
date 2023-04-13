@@ -1,6 +1,6 @@
 [package]
 name = "sign"
-version = "0.1.0"
+version = "0.1.1"
 description = "cryptographically sign http payload"
 keywords = [ "wasmcloud", "crypto", "ed25519" ]
 authors = [ "wasmCloud team" ]
@@ -16,11 +16,11 @@ form_urlencoded = "1.0"
 futures = "0.3"
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1.0"
-wasmbus-rpc = "0.11"
-wasmcloud-interface-httpserver = "0.9"
-wasmcloud-interface-keyvalue = "0.9"
-wasmcloud-interface-logging = "0.8"
-wasmcloud-interface-numbergen = "0.8"
+wasmbus-rpc = "0.13"
+wasmcloud-interface-httpserver = "0.10"
+wasmcloud-interface-keyvalue = "0.10"
+wasmcloud-interface-logging = "0.9"
+wasmcloud-interface-numbergen = "0.9"
 
 [profile.release]
 # Optimize for small code size

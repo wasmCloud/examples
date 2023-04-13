@@ -7,7 +7,7 @@ authors = [
   "Stuart Harris <stuart.harris@red-badger.com>",
 ]
 edition = "2021"
-version = "0.3.7"
+version = "0.3.8"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -19,10 +19,10 @@ futures = "0.3"
 serde = {version = "1.0", features = ["derive"]}
 serde_bytes = "0.11"
 serde_json = "1.0"
-wasmbus-rpc = "0.11"
-wasmcloud-interface-httpserver = "0.9"
-wasmcloud-interface-keyvalue = "0.9"
-wasmcloud-interface-logging = "0.8"
+wasmbus-rpc = "0.13"
+wasmcloud-interface-httpserver = "0.10"
+wasmcloud-interface-keyvalue = "0.10"
+wasmcloud-interface-logging = "0.9"
 
 [profile.release]
 # Optimize for small code size

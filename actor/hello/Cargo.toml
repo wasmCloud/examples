@@ -1,6 +1,6 @@
 [package]
 name = "hello"
-version = "0.1.6"
+version = "0.1.7"
 authors = [ "wasmcloud Team" ]
 edition = "2021"
 
@@ -13,8 +13,8 @@ futures = "0.3"
 form_urlencoded = "1.0"
 serde_bytes = "0.11"
 serde = {version = "1.0", features = ["derive"]}
-wasmbus-rpc = "0.11"
-wasmcloud-interface-httpserver = "0.9"
+wasmbus-rpc = "0.13"
+wasmcloud-interface-httpserver = "0.10"
 
 [profile.release]
 # Optimize for small code size
