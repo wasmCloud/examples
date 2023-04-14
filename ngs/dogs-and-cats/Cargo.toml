@@ -1,6 +1,6 @@
 [package]
 name = "dogs-and-cats"
-version = "0.2.3"
+version = "0.2.4"
 authors = [ "wasmCloud Team" ]
 edition = "2021"
 
