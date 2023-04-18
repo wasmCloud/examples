@@ -1,0 +1,27 @@
+[package]
+name = "wasmcloud-interface-timing"
+version = "0.1.0"
+description = "Interface for actors to perform time related operations"
+authors = ["jclmnop"]
+edition = "2021"
+repository = "https://github.com/wasmcloud/examples"
+license = "Apache-2.0"
+readme = "../README.md"
+keywords = ["wasm", "date-and-time", "wasmcloud", "webassembly", "capability"]
+
+# when publishing to crates.io, freeze src by omitting build.rs
+exclude = [ "build.rs" ]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+async-trait = "0.1.68"
+serde = "1.0.160"
+serde_bytes = "0.11.5"
+wasmbus-rpc = "0.13.0"
+
+# build-dependencies needed for build.rs
+[build-dependencies]
+weld-codegen = "0.7.0"
+
