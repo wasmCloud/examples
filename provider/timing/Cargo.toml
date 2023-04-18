@@ -1,0 +1,23 @@
+[package]
+name = "wasmcloud-provider-timing"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+repository = "https://github.com/wasmcloud/examples"
+license-file = "LICENSE"
+readme = "README.md"
+
+[dependencies]
+tokio = { version = "1", features = [ "full" ] }
+futures = "0.3.27"
+async-trait = "0.1"
+tracing = "0.1.37"
+wasmbus-rpc = "0.13.0"
+wasmcloud-interface-timing = "0.1.0"
+
+[dev-dependencies]
+wasmcloud-test-util = "0.8.0"
+
+[[bin]]
+name = "wasmcloud-provider-timing"
+path = "src/main.rs"
