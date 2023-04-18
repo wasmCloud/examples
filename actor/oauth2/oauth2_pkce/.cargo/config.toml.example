@@ -1,0 +1,8 @@
+[build]
+target = "wasm32-unknown-unknown"
+
+
+// Below is better added to $HOME/.cargo, will need to determine what to do for dev containers.
+[registries]
+jamminmusic-crates = { index = "https://dl.cloudsmith.io/SOMEAPITOKEN/jamminmusic/crates/cargo/index.git" }
+

@@ -1,0 +1,32 @@
+[package]
+name = "oauth2_pkce"
+version = "0.1.0"
+authors = ["stephenandary <stephen@jamminmusic.com>"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "oauth2_pkce"
+
+[dependencies]
+futures = "0.3.25"
+form_urlencoded = "1.1.0"
+wasmbus-rpc = "0.11.0"
+wasmcloud-interface-keyvalue = "0.9.1"
+wasmcloud-interface-logging = "0.8.1"
+wasmcloud-interface-numbergen = "0.8.1"
+wasmcloud-interface-httpclient = "0.8.1"
+# Look to update messaging interface instead of using below?
+jammin_interfaces_apigw = { version = "0.0.10", registry = "jamminmusic-crates" }
+base64 = "0.21.0"
+sha2 = "0.10.6"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.86"
+serde_urlencoded = "0.7.1"
+url = "2.3.1"
+anyhow = "1.0.68"
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"

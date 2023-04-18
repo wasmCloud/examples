@@ -1,0 +1,14 @@
+name = "oauth2_pkce"
+language = "rust"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = [
+    "wasmcloud:keyvalue",
+    "wasmcloud:httpclient",
+    "jammin:interfaces:apigw",
+    "wasmcloud:builtin:logging",
+    "wasmcloud:builtin:numbergen",
+]
+call_alias = "login_pkce"
