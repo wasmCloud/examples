@@ -10,7 +10,7 @@ kind: Application
 metadata:
   name: animal-image-downloader
   annotations:
-    version: v0.0.1
+    version: v0.0.3
     description: "wasmCloud Animal Image Downloader Example"
 spec:
   components:
@@ -42,14 +42,26 @@ spec:
       properties:
         image: wasmcloud.azurecr.io/httpclient:0.5.3
         contract: wasmcloud:httpclient
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
     - name: blobstore
       type: capability
       properties:
         image: wasmcloud.azurecr.io/blobstore_fs:0.1.0
         contract: wasmcloud:blobstore
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
     - name: messaging
       type: capability
       properties:
         image: wasmcloud.azurecr.io/nats_messaging:0.16.3
         contract: wasmcloud:messaging
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
 
