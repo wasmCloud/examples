@@ -7,7 +7,7 @@
 apiVersion: core.oam.dev/v1beta1
 kind: Application
 metadata:
-  name: animal
+  name: animal-image-downloader
   annotations:
     version: v0.0.1
     description: "wasmCloud Animal Image Downloader Example"
@@ -51,3 +51,4 @@ spec:
       properties:
         image: wasmcloud.azurecr.io/nats_messaging:0.16.3
         contract: wasmcloud:messaging
+
