@@ -29,3 +29,4 @@ weld-codegen = "0.7"
 # Optimize for small code size
 lto = true
 opt-level = "s"
+strip = true

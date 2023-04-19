@@ -1,6 +1,7 @@
-name = "KVCounter"
-language = "rust"
+name = "KVCounter (TinyGo)"
+language = "tinygo"
 type = "actor"
+version = "0.1.0"
 
 [actor]
 claims = ["wasmcloud:httpserver", "wasmcloud:keyvalue"]

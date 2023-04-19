@@ -22,3 +22,4 @@ wasmcloud-interface-sqldb = "0.9"
 # Optimize for small code size
 lto = true
 opt-level = "s"
+strip = true

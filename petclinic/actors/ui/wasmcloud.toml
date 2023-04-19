@@ -1,0 +1,7 @@
+name = "Pet Clinic UI"
+language = "rust"
+type = "actor"
+
+[actor]
+call_alias = "petclinic/ui"
+claims = ["wasmcloud:builtin:logging"]

@@ -1,0 +1,6 @@
+name = "XKCD Generator"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:httpserver", "wasmcloud:httpclient", "wasmcloud:builtin:numbergen"]

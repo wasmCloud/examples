@@ -20,3 +20,4 @@ wasmcloud-example-runner = { path = "../../interface/runner/rust" }
 # Optimize for small code size
 lto = true
 opt-level = "s"
+strip = true

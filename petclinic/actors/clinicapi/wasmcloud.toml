@@ -1,0 +1,6 @@
+name = "Pet Clinic API"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:httpserver", "wasmcloud:builtin:logging"]

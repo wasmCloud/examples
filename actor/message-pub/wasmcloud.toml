@@ -1,0 +1,6 @@
+name = "Message Pub"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:httpserver", "wasmcloud:messaging"]

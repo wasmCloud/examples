@@ -1,0 +1,6 @@
+name = "TODO Backend API"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:httpserver", "wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
