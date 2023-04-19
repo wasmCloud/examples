@@ -18,11 +18,12 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup tinygo
         run: |
-          wget https://github.com/tinygo-org/tinygo/releases/download/v0.23.0/tinygo_0.23.0_amd64.deb
-          sudo dpkg -i tinygo_0.23.0_amd64.deb
+          wget https://github.com/tinygo-org/tinygo/releases/download/v0.18.0/tinygo_0.18.0_amd64.deb
+          sudo dpkg -i tinygo_0.18.0_amd64.deb
+      - uses: wasmcloud/common-actions/install-wash@main
       - name: Build actor
         working-directory: ${{ env.working-directory }}
-        run: tinygo build -target wasm -scheduler none -no-debug .
+        run: wash build
       # Once you've written unit tests for your actor, you can uncomment
       # the two lines below to automatically run tests
       # - name: Test actor
