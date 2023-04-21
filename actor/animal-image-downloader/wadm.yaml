@@ -39,7 +39,7 @@ spec:
     - name: httpclient
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpclient:0.5.3
+        image: wasmcloud.azurecr.io/httpclient:0.6.0
         contract: wasmcloud:httpclient
     - name: blobstore
       type: capability

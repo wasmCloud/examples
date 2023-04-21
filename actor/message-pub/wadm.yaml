@@ -35,7 +35,7 @@ spec:
     - name: httpserver
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpserver:0.16.2
+        image: wasmcloud.azurecr.io/httpserver:0.17.0
         contract: wasmcloud:httpserver
     - name: messaging
       type: capability

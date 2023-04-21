@@ -37,10 +37,10 @@ spec:
     - name: httpserver
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpserver:0.16.2
+        image: wasmcloud.azurecr.io/httpserver:0.17.0
         contract: wasmcloud:httpserver
     - name: redis
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/kvredis:0.16.3
+        image: wasmcloud.azurecr.io/kvredis:0.19.0
         contract: wasmcloud:keyvalue
