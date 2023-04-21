@@ -1,9 +1,9 @@
-# This is a full example of how to run the petclinic example. Using this example requires you to
-# have WADM running: https://github.com/wasmCloud/wadm/tree/main/wadm and a host labeled with
-# `app=petclinic`. You can deploy this example with two simple commands:
+# This is a full manifest of the petclinic example. Using this example requires you to
+# have WADM running: https://github.com/wasmCloud/wadm.
 #
-# `wash app put wadm.yaml`
-# `wash app deploy petclinic 0.0.1`
+# Please note that the connection URI in this manifest is insecure for ease-of-use, and
+# should not be used in a production scenario.
+# You can deploy this example with a simple command: `wash app deploy wadm.yaml`
 
 apiVersion: core.oam.dev/v1beta1
 kind: Application
@@ -22,65 +22,48 @@ spec:
         - type: spreadscaler
           properties:
             replicas: 1
-            spread:
-              - name: uiclinicapp
-                requirements:
-                  app: petclinic
 
     - name: customers
       type: actor
       properties:
         image: wasmcloud.azurecr.io/customers:0.3.1
       traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
         - type: linkdef
           properties:
             target: postgres
             values:
-              uri: postgres://user:pass@your.db.host.com/petclinic
-        - type: spreadscaler
-          properties:
-            replicas: 1
-            spread:
-              - name: customersclinicapp
-                requirements:
-                  app: petclinic
+              uri: postgres://petclinic:supersecret123@127.0.0.1:5432/petclinic
 
     - name: vets
       type: actor
       properties:
         image: wasmcloud.azurecr.io/vets:0.3.1
       traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
         - type: linkdef
           properties:
             target: postgres
             values:
-              uri: postgres://user:pass@your.db.host.com/petclinic
-        - type: spreadscaler
-          properties:
-            replicas: 1
-            spread:
-              - name: vetsclinicapp
-                requirements:
-                  app: petclinic
+              uri: postgres://petclinic:supersecret123@127.0.0.1:5432/petclinic
 
     - name: visits
       type: actor
       properties:
         image: wasmcloud.azurecr.io/visits:0.3.1
       traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
         - type: linkdef
           properties:
             target: postgres
             values:
-              uri: postgres://user:pass@your.db.host.com/petclinic
-
-        - type: spreadscaler
-          properties:
-            replicas: 1
-            spread:
-              - name: visitsclinicapp
-                requirements:
-                  app: petclinic
+              uri: postgres://petclinic:supersecret123@127.0.0.1:5432/petclinic
 
     - name: clinicapi
       type: actor
@@ -90,10 +73,6 @@ spec:
         - type: spreadscaler
           properties:
             replicas: 1
-            spread:
-              - name: clinicapp
-                requirements:
-                  app: petclinic
         - type: linkdef
           properties:
             target: httpserver
@@ -103,27 +82,10 @@ spec:
     - name: httpserver
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpserver:0.16.2
+        image: wasmcloud.azurecr.io/httpserver:0.16.3
         contract: wasmcloud:httpserver
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-            spread:
-              - name: httpserverspread
-                requirements:
-                  app: petclinic
-
     - name: postgres
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/sqldb-postgres:0.3.1
+        image: wasmcloud.azurecr.io/sqldb-postgres:0.3.4
         contract: wasmcloud:sqldb
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-            spread:
-              - name: postgresspread
-                requirements:
-                  app: petclinic

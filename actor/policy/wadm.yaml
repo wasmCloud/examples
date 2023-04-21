@@ -1,0 +1,54 @@
+# This is the full manifest for running a the example policy actor on a host _without_ policy enabled,
+# in order to enforce the policy of the rest of the lattice.
+# To run the policy host, start it with `HOST_policy=enforcer wash up`
+# Then to run additional hosts, start them with the env var `WASMCLOUD_POLICY_SERVER=wasmcloud.policy.evaluator` set
+#
+# This requires you to have https://github.com/wasmCloud/wadm/tree/main/wadm running.
+
+# You can deploy this example with a simple command:
+#
+# `wash app deploy wadm.yaml`
+
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: policy
+  annotations:
+    version: v0.0.1
+    description: "wasmCloud Policy Example"
+spec:
+  components:
+    - name: policy
+      type: actor
+      properties:
+        image: wasmcloud.azurecr.io/example_policy:0.1.3
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              # Policy actor must run on a host without policy enabled
+              - name: policy-host
+                requirements:
+                  policy: enforcer
+
+        - type: linkdef
+          properties:
+            target: messaging
+            values:
+              SUBSCRIPTION: wasmcloud.policy.evaluator
+
+    - name: messaging
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/nats_messaging:0.16.3
+        contract: wasmcloud:messaging
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              # Messaging provider must run on a host without policy enabled
+              - name: policy-host
+                requirements:
+                  host: policy

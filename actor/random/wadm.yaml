@@ -1,0 +1,23 @@
+# This example runs the random actor which can be interacted with via `wash call`.
+# This requires you to have https://github.com/wasmCloud/wadm/tree/main/wadm running.
+# You can deploy this example with a simple command:
+#
+# `wash app deploy wadm.yaml`
+
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: random
+  annotations:
+    version: v0.0.1
+    description: "wasmCloud Random Example"
+spec:
+  components:
+    - name: random
+      type: actor
+      properties:
+        image: wasmcloud.azurecr.io/example_random:0.1.6
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1

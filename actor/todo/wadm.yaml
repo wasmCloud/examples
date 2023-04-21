@@ -1,4 +1,4 @@
-# This is a full example of how to run the kvcounter actor exposed with an HTTP server. Using this
+# This is a full example of how to run the todo actor exposed with an HTTP server. Using this
 # example requires you to have a Redis server running locally (though the linkdef can be modified to
 # use a Redis server you have running elsewhere) and WADM running:
 #
@@ -9,16 +9,16 @@
 apiVersion: core.oam.dev/v1beta1
 kind: Application
 metadata:
-  name: kvcounter
+  name: todo
   annotations:
     version: v0.0.1
-    description: "wasmCloud Key Value Counter Example"
+    description: "wasmCloud TODO API Example"
 spec:
   components:
-    - name: kvcounter
+    - name: todo
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/kvcounter:0.4.0
+        image: wasmcloud.azurecr.io/todo:0.3.8
       traits:
         - type: spreadscaler
           properties:
@@ -32,7 +32,7 @@ spec:
           properties:
             target: httpserver
             values:
-              ADDRESS: 0.0.0.0:8081
+              ADDRESS: 0.0.0.0:8080
 
     - name: httpserver
       type: capability
