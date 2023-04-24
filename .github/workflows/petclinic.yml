@@ -83,7 +83,7 @@ jobs:
 
       - name: Build wasmcloud actor
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
-        run: make
+        run: wash build
         working-directory: ${{ matrix.working-directory }}
 
       - name: Upload signed actor to GH Actions

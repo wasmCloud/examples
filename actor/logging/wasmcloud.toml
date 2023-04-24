@@ -1,0 +1,6 @@
+name = "Logging Example"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:builtin:logging"]

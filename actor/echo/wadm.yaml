@@ -24,7 +24,7 @@ spec:
           properties:
             target: httpserver
             values:
-              ADDRESS: 127.0.0.1:8080
+              address: 0.0.0.0:8080
 
     - name: httpserver
       type: capability

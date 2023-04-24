@@ -1,0 +1,7 @@
+name = "Pet Clinic Customers"
+language = "rust"
+type = "actor"
+
+[actor]
+call_alias = "petclinic/customers"
+claims = ["wasmcloud:sqldb", "wasmcloud:builtin:logging"]

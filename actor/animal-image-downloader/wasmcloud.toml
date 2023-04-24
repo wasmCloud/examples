@@ -1,0 +1,6 @@
+name = "Animal Image Downloader"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:httpclient", "wasmcloud:messaging", "wasmcloud:blobstore"]

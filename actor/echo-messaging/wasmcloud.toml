@@ -1,0 +1,6 @@
+name = "Echo Messaging"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:messaging", "wasmcloud:builtin:logging"]

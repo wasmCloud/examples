@@ -45,7 +45,7 @@ jobs:
         run: rustup target add wasm32-unknown-unknown
 
       - name: Build wasmcloud actor
-        run: make
+        run: wash build
         working-directory: ${{ env.working-directory }}
 
       - name: Upload signed actor to GH Actions

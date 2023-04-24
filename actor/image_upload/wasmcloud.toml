@@ -1,0 +1,6 @@
+name = "Image Uploader"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:httpserver", "wasmcloud:blobstore", "wasmcloud:builtin:logging"]
