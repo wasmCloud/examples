@@ -1,0 +1,53 @@
+# This is a full example of how to run the animal image downloader.
+# This requires you to have WADM running: https://github.com/wasmCloud/wadm/
+# You can deploy this example with a simple command:
+#
+# `wash app deploy wadm.yaml`
+
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: animal
+  annotations:
+    version: v0.0.1
+    description: "wasmCloud Animal Image Downloader Example"
+spec:
+  components:
+    - name: animal-image-downloader
+      type: actor
+      properties:
+        image: wasmcloud.azurecr.io/animal-image-downloader:0.1.1
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: httpclient
+        - type: linkdef
+          properties:
+            target: blobstore
+            values:
+              ROOT: "/tmp"
+        - type: linkdef
+          properties:
+            target: messaging
+            values:
+              SUBSCRIPTION: "wasmcloud.animal.*"
+
+    # Capability Providers
+    - name: httpclient
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/httpclient:0.6.0
+        contract: wasmcloud:httpclient
+    - name: blobstore
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/blobstore_fs:0.2.0
+        contract: wasmcloud:blobstore
+    - name: messaging
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/nats_messaging:0.16.3
+        contract: wasmcloud:messaging

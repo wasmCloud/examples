@@ -1,4 +1,4 @@
-# This is a full example of how to run the echo actor exposed with an HTTP server. Using this
+# This is a full example of how to run the hello actor exposed with an HTTP server. Using this
 # example requires you to have WADM running: https://github.com/wasmCloud/wadm/tree/main/wadm.
 #
 # To run this example, use: `wash app deploy wadm.yaml`
@@ -6,16 +6,16 @@
 apiVersion: core.oam.dev/v1beta1
 kind: Application
 metadata:
-  name: echo
+  name: hello
   annotations:
     version: v0.0.1
-    description: "wasmCloud Echo Example"
+    description: "wasmCloud Hello World Example"
 spec:
   components:
-    - name: echo
+    - name: hello
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/echo:0.3.5
+        image: wasmcloud.azurecr.io/hello:0.1.7
       traits:
         - type: spreadscaler
           properties:
