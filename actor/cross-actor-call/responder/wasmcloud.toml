@@ -1,0 +1,7 @@
+name = "responder"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = [""]
+call_alias = "responder"
