@@ -6,9 +6,13 @@
 Interface definition for the "wasmcloud:timing" capability contract. This 
 contract allows actors to retrieve the current system time on the wasmcloud host. 
 
-If the resultant timestamp has nanosecond precision, so if it will be exposed to 
+The `Timestamp` struct has nanosecond precision, so if it will be exposed to 
 users at any point, care should be taken to avoid timing attacks by truncating 
 the `nsec` field or to setting it to `0`.
+
+The default implementation of this capability contract truncates the `Timestamp` 
+to millisecond precision, but it may be necessary to reduce the precision even 
+further. 
 ## Example
 ```rust
 use wasmcloud_interface_timing::TimingSender;

@@ -35,7 +35,28 @@ impl ProviderHandler for TimingProvider {}
 #[async_trait]
 impl Timing for TimingProvider {
     async fn now(&self, _ctx: &Context) -> RpcResult<Timestamp> {
-        Ok(Timestamp::now())
+        Ok(truncate_nanos(Timestamp::now()))
     }
 }
 
+/// Decrease resolution of timestamp from nanosecond to millisecond to reduce
+/// the risk of timing attacks
+fn truncate_nanos(timestamp: Timestamp) -> Timestamp {
+    Timestamp {
+        sec: timestamp.sec,
+        nsec: timestamp.nsec - timestamp.nsec % 1_000_000
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::truncate_nanos;
+    use super::Timestamp;
+
+    #[test]
+    fn test_truncate_nanos() {
+        let timestamp = truncate_nanos(Timestamp::new(1682884424, 123456789).unwrap());
+        assert_eq!(timestamp.sec, 1682884424);
+        assert_eq!(timestamp.nsec, 123000000);
+    }
+}
