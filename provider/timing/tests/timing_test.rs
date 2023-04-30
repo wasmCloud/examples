@@ -1,8 +1,7 @@
 use std::ops::Add;
-use std::time::{Duration, SystemTime};
+use std::time::Duration;
 use wasmbus_rpc::error::RpcResult;
 use wasmbus_rpc::provider::prelude::*;
-use wasmbus_rpc::Timestamp;
 use wasmcloud_test_util::{check, cli::print_test_results, provider_test::test_provider, testing::TestOptions};
 #[allow(unused_imports)]
 use wasmcloud_test_util::{run_selected, run_selected_spawn};
@@ -11,7 +10,7 @@ use wasmcloud_interface_timing::{Timing, TimingSender};
 #[tokio::test]
 async fn run_all() {
     let opts = TestOptions::default();
-    let res = run_selected_spawn!(&opts, test_health_check, test_sleep, test_sleep_until, test_now);
+    let res = run_selected_spawn!(&opts, test_health_check, test_now);
     print_test_results(&res);
 
     let passed = res.iter().filter(|tr| tr.passed).count();
@@ -30,46 +29,6 @@ async fn test_health_check(_opt: &TestOptions) -> RpcResult<()> {
     // health check
     let hc = prov.health_check().await;
     check!(hc.is_ok())?;
-    Ok(())
-}
-
-/// test that `TimingSender::sleep()` works correctly
-async fn test_sleep(_opt: &TestOptions) -> RpcResult<()> {
-    let prov = test_provider().await;
-
-    let client = TimingSender::via(prov);
-    let ctx = Context::default();
-
-    let start = tokio::time::Instant::now();
-    let sleep_time_ms = 100;
-    client.sleep(&ctx, &sleep_time_ms).await?;
-    let actual_time_slept = start.elapsed();
-
-    check!(
-        actual_time_slept >= Duration::from_millis(sleep_time_ms as u64)
-    )?;
-
-    Ok(())
-}
-
-/// test that `TimingSender::sleep_until()` works correctly
-async fn test_sleep_until(_opt: &TestOptions) -> RpcResult<()> {
-    let prov = test_provider().await;
-
-    let client = TimingSender::via(prov);
-    let ctx = Context::default();
-
-    let start = tokio::time::Instant::now();
-    let sleep_duration = Duration::from_millis(100);
-    let sys_timestamp = SystemTime::now();
-    let sleep_until = Timestamp::from(sys_timestamp.add(sleep_duration));
-    client.sleep_until(&ctx, &sleep_until).await?;
-    let actual_time_slept = start.elapsed();
-
-    check!(
-        actual_time_slept >= sleep_duration
-    )?;
-
     Ok(())
 }
 

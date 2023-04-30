@@ -4,7 +4,7 @@ CAPABILITY_ID = "wasmcloud:timing"
 NAME = "timing"
 VENDOR = "jclmnop"
 PROJECT = wasmcloud-provider-timing
-VERSION = 0.1.0
+VERSION = 0.1.1
 REVISION = 0
 
 include ./provider.mk
