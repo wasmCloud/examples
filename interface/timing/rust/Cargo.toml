@@ -1,6 +1,6 @@
 [package]
 name = "wasmcloud-interface-timing"
-version = "0.1.0"
+version = "0.1.1"
 description = "Interface for actors to perform time related operations"
 authors = ["jclmnop"]
 edition = "2021"

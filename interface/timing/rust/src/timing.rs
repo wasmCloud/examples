@@ -22,7 +22,7 @@ use wasmbus_rpc::{
 #[allow(dead_code)]
 pub const SMITHY_VERSION: &str = "1.0";
 
-/// Allows actors to `sleep` for a specified duration, or until a desired time.
+/// Provides the capability to read the system time.
 /// wasmbus.contractId: wasmcloud:timing
 /// wasmbus.providerReceive
 #[async_trait]
@@ -31,22 +31,12 @@ pub trait Timing {
     fn contract_id() -> &'static str {
         "wasmcloud:timing"
     }
-    /// Sleep for a specified number of milliseconds
-    /// ```ignore
-    /// let sleepy = SleepySender::new();
-    /// // sleep for 5 seconds
-    /// sleepy.sleep(ctx, &5000).await?;
-    async fn sleep(&self, ctx: &Context, arg: &u32) -> RpcResult<()>;
-    /// Sleep until a specified time, provided as a `wasmbus_rpc::Timestamp` struct.
-    /// If the specified time is in the past, the operation will return immediately.
-    /// ```ignore
-    /// let sleepy = SleepySender::new();
-    /// let now = sleepy.now(ctx).await?;
-    /// let five_seconds = Timestamp::new(now.sec + 5, now.nsec);
-    /// // sleep until 5 seconds from now
-    /// sleepy.sleep_until(ctx, &five_seconds).await
-    async fn sleep_until(&self, ctx: &Context, arg: &Timestamp) -> RpcResult<()>;
     /// Returns the current time as a `wasmbus_rpc::Timestamp` struct.
+    ///
+    /// The returned timestamp has nanosecond precision, so care should be taken
+    /// to avoid timing attacks. If the timestamp will be made visible to users,
+    /// it's recommended to reduce the precision by truncating or removing the
+    /// `nsec` field.
     /// ```ignore
     /// let sleepy = SleepySender::new();
     /// let now = sleepy.now(ctx).await?;
@@ -54,28 +44,12 @@ pub trait Timing {
 }
 
 /// TimingReceiver receives messages defined in the Timing service trait
-/// Allows actors to `sleep` for a specified duration, or until a desired time.
+/// Provides the capability to read the system time.
 #[doc(hidden)]
 #[async_trait]
 pub trait TimingReceiver: MessageDispatch + Timing {
     async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
         match message.method {
-            "Sleep" => {
-                let value: u32 = wasmbus_rpc::common::deserialize(&message.arg)
-                    .map_err(|e| RpcError::Deser(format!("'U32': {}", e)))?;
-
-                let _resp = Timing::sleep(self, ctx, &value).await?;
-                let buf = Vec::new();
-                Ok(buf)
-            }
-            "SleepUntil" => {
-                let value: Timestamp = wasmbus_rpc::common::deserialize(&message.arg)
-                    .map_err(|e| RpcError::Deser(format!("'Timestamp': {}", e)))?;
-
-                let _resp = Timing::sleep_until(self, ctx, &value).await?;
-                let buf = Vec::new();
-                Ok(buf)
-            }
             "Now" => {
                 let resp = Timing::now(self, ctx).await?;
                 let buf = wasmbus_rpc::common::serialize(&resp)?;
@@ -91,7 +65,7 @@ pub trait TimingReceiver: MessageDispatch + Timing {
 }
 
 /// TimingSender sends messages to a Timing service
-/// Allows actors to `sleep` for a specified duration, or until a desired time.
+/// Provides the capability to read the system time.
 /// client for sending Timing messages
 #[derive(Clone, Debug)]
 pub struct TimingSender<T: Transport> {
@@ -131,54 +105,12 @@ impl TimingSender<wasmbus_rpc::actor::prelude::WasmHost> {
 #[async_trait]
 impl<T: Transport + std::marker::Sync + std::marker::Send> Timing for TimingSender<T> {
     #[allow(unused)]
-    /// Sleep for a specified number of milliseconds
-    /// ```ignore
-    /// let sleepy = SleepySender::new();
-    /// // sleep for 5 seconds
-    /// sleepy.sleep(ctx, &5000).await?;
-    async fn sleep(&self, ctx: &Context, arg: &u32) -> RpcResult<()> {
-        let buf = wasmbus_rpc::common::serialize(arg)?;
-
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Timing.Sleep",
-                    arg: Cow::Borrowed(&buf),
-                },
-                None,
-            )
-            .await?;
-        Ok(())
-    }
-    #[allow(unused)]
-    /// Sleep until a specified time, provided as a `wasmbus_rpc::Timestamp` struct.
-    /// If the specified time is in the past, the operation will return immediately.
-    /// ```ignore
-    /// let sleepy = SleepySender::new();
-    /// let now = sleepy.now(ctx).await?;
-    /// let five_seconds = Timestamp::new(now.sec + 5, now.nsec);
-    /// // sleep until 5 seconds from now
-    /// sleepy.sleep_until(ctx, &five_seconds).await
-    async fn sleep_until(&self, ctx: &Context, arg: &Timestamp) -> RpcResult<()> {
-        let buf = wasmbus_rpc::common::serialize(arg)?;
-
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "Timing.SleepUntil",
-                    arg: Cow::Borrowed(&buf),
-                },
-                None,
-            )
-            .await?;
-        Ok(())
-    }
-    #[allow(unused)]
     /// Returns the current time as a `wasmbus_rpc::Timestamp` struct.
+    ///
+    /// The returned timestamp has nanosecond precision, so care should be taken
+    /// to avoid timing attacks. If the timestamp will be made visible to users,
+    /// it's recommended to reduce the precision by truncating or removing the
+    /// `nsec` field.
     /// ```ignore
     /// let sleepy = SleepySender::new();
     /// let now = sleepy.now(ctx).await?;
