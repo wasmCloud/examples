@@ -1,4 +1,4 @@
-//! sleepy capability provider
+//! timing capability provider
 //!
 //!
 use async_trait::async_trait;
@@ -15,15 +15,15 @@ use wasmcloud_interface_timing::{Timing, TimingReceiver};
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     provider_main(
         TimingProvider::default(),
-        Some("sleepy Provider".to_string()),
+        Some("Timing Provider".to_string()),
     )?;
 
-    eprintln!("sleepy provider exiting");
+    eprintln!("timing provider exiting");
     Ok(())
 }
 
 /// Timing capability provider implementation
-/// contractId: "jclmnop:sleepy"
+/// contractId: "wasmcloud:timing"
 #[derive(Default, Clone, Provider)]
 #[services(Timing)]
 struct TimingProvider {}

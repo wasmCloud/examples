@@ -21,6 +21,6 @@ use wasmbus_rpc::Timestamp;
 
 async fn get_current_time(ctx: &Context) -> RpcResult<Timestamp> {
     let timing = TimingSender::new();
-    sleepy.now(ctx).await
+    timing.now(ctx).await
 }
 ```

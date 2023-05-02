@@ -38,8 +38,8 @@ pub trait Timing {
     /// it's recommended to reduce the precision by truncating or removing the
     /// `nsec` field.
     /// ```ignore
-    /// let sleepy = SleepySender::new();
-    /// let now = sleepy.now(ctx).await?;
+    /// let timing = TimingSender::new();
+    /// let now = timing.now(ctx).await?;
     async fn now(&self, ctx: &Context) -> RpcResult<Timestamp>;
 }
 
@@ -112,8 +112,8 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Timing for TimingSend
     /// it's recommended to reduce the precision by truncating or removing the
     /// `nsec` field.
     /// ```ignore
-    /// let sleepy = SleepySender::new();
-    /// let now = sleepy.now(ctx).await?;
+    /// let timing = TimingSender::new();
+    /// let now = timing.now(ctx).await?;
     async fn now(&self, ctx: &Context) -> RpcResult<Timestamp> {
         let buf = *b"";
         let resp = self

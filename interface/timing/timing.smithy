@@ -29,8 +29,8 @@ service Timing {
 /// it's recommended to reduce the precision by truncating or removing the
 /// `nsec` field.
 /// ```ignore
-/// let sleepy = SleepySender::new();
-/// let now = sleepy.now(ctx).await?;
+/// let timing = TimingSender::new();
+/// let now = timing.now(ctx).await?;
 operation Now {
     output: Timestamp,
 }
