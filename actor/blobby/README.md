@@ -30,7 +30,7 @@ $ wash ctl start actor wasmcloud.azurecr.io/blobby:0.2.0
 # If you use a locally built actor, replace the actor ID below with your own
 $ wash ctl link put MBY3COMRDLQYTX2AUTNB5D2WYAH5TUKNIMELDSQ5BUFZVV7CBUUIKEDR VBBQNNCGUKIXEWLL5HL5XJE57BS3GU5DMDOKZS6ROEWPQFHEDP6NGVZM wasmcloud:blobstore "ROOT=/tmp"
 $ wash ctl link put MBY3COMRDLQYTX2AUTNB5D2WYAH5TUKNIMELDSQ5BUFZVV7CBUUIKEDR VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M wasmcloud:httpserver "ADDRESS=0.0.0.0:8080"
-$ wash ctl start provider wasmcloud.azurecr.io/blobstore_fs:0.2.0 --skip-wait
+$ wash ctl start provider wasmcloud.azurecr.io/blobstore_fs:0.3.1 --skip-wait
 $ wash ctl start provider wasmcloud.azurecr.io/httpserver:0.16.0 --skip-wait
 ```
 

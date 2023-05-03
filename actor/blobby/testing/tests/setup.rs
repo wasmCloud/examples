@@ -155,7 +155,7 @@ pub async fn setup_test() -> (String, CleanupGuard) {
             "ctl",
             "start",
             "provider",
-            "wasmcloud.azurecr.io/blobstore_fs:0.2.0",
+            "wasmcloud.azurecr.io/blobstore_fs:0.3.1",
         ])
         .status()
         .await

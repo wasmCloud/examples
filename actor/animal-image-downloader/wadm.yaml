@@ -44,7 +44,7 @@ spec:
     - name: blobstore
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/blobstore_fs:0.2.0
+        image: wasmcloud.azurecr.io/blobstore_fs:0.3.1
         contract: wasmcloud:blobstore
     - name: messaging
       type: capability
