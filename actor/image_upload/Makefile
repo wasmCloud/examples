@@ -18,7 +18,7 @@ ACTOR_NAME = "Image uploader"
 include ../../build/makefiles/actor.mk
 
 WASH=wash
-HTTPSERVER_REF=wasmcloud.azurecr.io/httpserver:0.15.0
+HTTPSERVER_REF=wasmcloud.azurecr.io/httpserver:0.17.0
 HTTPSERVER_ID=VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M
 ACTOR_ID=$(shell make actor_id)
 

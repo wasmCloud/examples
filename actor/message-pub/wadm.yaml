@@ -40,5 +40,5 @@ spec:
     - name: messaging
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/nats_messaging:0.16.3
+        image: wasmcloud.azurecr.io/nats_messaging:0.17.0
         contract: wasmcloud:messaging

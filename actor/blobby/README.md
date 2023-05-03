@@ -25,13 +25,14 @@ Blobstore](https://github.com/wasmCloud/capability-providers/tree/main/blobstore
 Once you've installed **wash** and ran wasmCloud after following the [installation
 guide](https://wasmcloud.dev/overview/installation/), you can run this example actor and the
 wasmCloud providers with the following commands:
+
 ```
 $ wash ctl start actor wasmcloud.azurecr.io/blobby:0.2.0
 # If you use a locally built actor, replace the actor ID below with your own
 $ wash ctl link put MBY3COMRDLQYTX2AUTNB5D2WYAH5TUKNIMELDSQ5BUFZVV7CBUUIKEDR VBBQNNCGUKIXEWLL5HL5XJE57BS3GU5DMDOKZS6ROEWPQFHEDP6NGVZM wasmcloud:blobstore "ROOT=/tmp"
 $ wash ctl link put MBY3COMRDLQYTX2AUTNB5D2WYAH5TUKNIMELDSQ5BUFZVV7CBUUIKEDR VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M wasmcloud:httpserver "ADDRESS=0.0.0.0:8080"
 $ wash ctl start provider wasmcloud.azurecr.io/blobstore_fs:0.3.1 --skip-wait
-$ wash ctl start provider wasmcloud.azurecr.io/httpserver:0.16.0 --skip-wait
+$ wash ctl start provider wasmcloud.azurecr.io/httpserver:0.17.0 --skip-wait
 ```
 
 Once everything is up and running, you can run through all of the operations by following the

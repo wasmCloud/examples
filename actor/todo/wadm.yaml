@@ -42,5 +42,5 @@ spec:
     - name: redis
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/kvredis:0.19.0
+        image: wasmcloud.azurecr.io/kvredis:0.21.0
         contract: wasmcloud:keyvalue

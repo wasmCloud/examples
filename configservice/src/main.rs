@@ -78,10 +78,10 @@ fn fill_autostarts() {
     let petclinic_actors = AutoStartActorsProfile {
         requirements: petclinic_labels.clone(),
         actors: vec![
-            "wasmcloud.azurecr.io/clinicapi:0.2.1".to_string(),
-            "wasmcloud.azurecr.io/vets:0.2.1".to_string(),
-            "wasmcloud.azurecr.io/visits:0.2.1".to_string(),
-            "wasmcloud.azurecr.io/customers:0.2.1".to_string(),
+            "wasmcloud.azurecr.io/clinicapi:0.3.4".to_string(),
+            "wasmcloud.azurecr.io/vets:0.3.4".to_string(),
+            "wasmcloud.azurecr.io/visits:0.3.4".to_string(),
+            "wasmcloud.azurecr.io/customers:0.3.4".to_string(),
         ],
     };
 
@@ -91,11 +91,11 @@ fn fill_autostarts() {
         requirements: petclinic_labels,
         providers: vec![
             ProviderReference {
-                image_reference: "wasmcloud.azurecr.io/httpserver:0.14.10".to_string(),
+                image_reference: "wasmcloud.azurecr.io/httpserver:0.17.0".to_string(),
                 link_name: "default".to_string(),
             },
             ProviderReference {
-                image_reference: "wasmcloud.azurecr.io/sqldb-postgres:0.1.5".to_string(),
+                image_reference: "wasmcloud.azurecr.io/sqldb-postgres:0.5.0".to_string(),
                 link_name: "default".to_string(),
             },
         ],

@@ -142,7 +142,7 @@ pub async fn setup_test() -> (String, CleanupGuard) {
             "ctl",
             "start",
             "provider",
-            "wasmcloud.azurecr.io/httpserver:0.16.0",
+            "wasmcloud.azurecr.io/httpserver:0.17.0",
         ])
         .status()
         .await
