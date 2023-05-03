@@ -18,8 +18,8 @@ wash ctl start actor wasmcloud.azurecr.io/message-pub:0.1.3
 # If you use a locally build actor, replace the actor ID below with your own
 wash ctl link put MC3QONHYH3FY4KYFCOSVJWIDJG4WA2PVD6FHKR7FFT457GVUTZJYR2TJ VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M wasmcloud:httpserver address=0.0.0.0:8080
 wash ctl link put MC3QONHYH3FY4KYFCOSVJWIDJG4WA2PVD6FHKR7FFT457GVUTZJYR2TJ VADNMSIML2XGO2X4TPIONTIC55R2UUQGPPDZPAVSC2QD7E76CR77SPW7 wasmcloud:messaging
-wash ctl start provider wasmcloud.azurecr.io/httpserver:0.16.3 --skip-wait
-wash ctl start provider wasmcloud.azurecr.io/nats_messaging:0.14.5 --skip-wait
+wash ctl start provider wasmcloud.azurecr.io/httpserver:0.17.0 --skip-wait
+wash ctl start provider wasmcloud.azurecr.io/nats_messaging:0.17.0 --skip-wait
 ```
 
 And you can subscribe for messages with:

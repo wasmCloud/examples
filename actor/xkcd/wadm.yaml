@@ -37,5 +37,5 @@ spec:
     - name: httpclient
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpclient:0.6.0
+        image: wasmcloud.azurecr.io/httpclient:0.7.0
         contract: wasmcloud:httpclient

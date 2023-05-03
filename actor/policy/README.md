@@ -6,7 +6,7 @@ This actor only needs the `wasmcloud:messaging` capability in order to receive e
 
 To start the actor you'll need [wash](https://github.com/wasmcloud/wash) and an accessible wasmCloud host which you can get from our [installation guide](https://wasmcloud.dev/overview/installation/):
 ```shell
-wash ctl start wasmcloud.azurecr.io/example_policy:0.1.0
-wash ctl start wasmcloud.azurecr.io/nats_messaging:0.14.2
+wash ctl start wasmcloud.azurecr.io/example_policy:0.1.3
+wash ctl start wasmcloud.azurecr.io/nats_messaging:0.17.0
 wash ctl link put MAX4HKZIMZ2E47QNET7ZUP43AIDBGHK5LRAGU3ZGYDMHF74U2UYIELYG VADNMSIML2XGO2X4TPIONTIC55R2UUQGPPDZPAVSC2QD7E76CR77SPW7 wasmcloud:messaging SUBSCRIPTION=wasmcloud.policy.evaluator
 ```

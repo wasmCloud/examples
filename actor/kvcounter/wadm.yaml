@@ -18,7 +18,7 @@ spec:
     - name: kvcounter
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/kvcounter:0.4.0
+        image: wasmcloud.azurecr.io/kvcounter:0.4.2
       traits:
         - type: spreadscaler
           properties:
@@ -42,5 +42,5 @@ spec:
     - name: redis
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/kvredis:0.19.0
+        image: wasmcloud.azurecr.io/kvredis:0.21.0
         contract: wasmcloud:keyvalue

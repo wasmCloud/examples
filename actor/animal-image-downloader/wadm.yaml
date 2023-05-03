@@ -16,7 +16,7 @@ spec:
     - name: animal-image-downloader
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/animal-image-downloader:0.1.1
+        image: wasmcloud.azurecr.io/animal-image-downloader:0.1.2
       traits:
         - type: spreadscaler
           properties:
@@ -39,7 +39,7 @@ spec:
     - name: httpclient
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpclient:0.6.0
+        image: wasmcloud.azurecr.io/httpclient:0.7.0
         contract: wasmcloud:httpclient
     - name: blobstore
       type: capability
@@ -49,5 +49,5 @@ spec:
     - name: messaging
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/nats_messaging:0.16.3
+        image: wasmcloud.azurecr.io/nats_messaging:0.17.0
         contract: wasmcloud:messaging

@@ -17,7 +17,7 @@ spec:
     - name: ui
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/ui:0.3.2
+        image: wasmcloud.azurecr.io/ui:0.3.5
       traits:
         - type: spreadscaler
           properties:
@@ -26,7 +26,7 @@ spec:
     - name: customers
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/customers:0.3.1
+        image: wasmcloud.azurecr.io/customers:0.3.4
       traits:
         - type: spreadscaler
           properties:
@@ -40,7 +40,7 @@ spec:
     - name: vets
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/vets:0.3.1
+        image: wasmcloud.azurecr.io/vets:0.3.4
       traits:
         - type: spreadscaler
           properties:
@@ -54,7 +54,7 @@ spec:
     - name: visits
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/visits:0.3.1
+        image: wasmcloud.azurecr.io/visits:0.3.4
       traits:
         - type: spreadscaler
           properties:
@@ -68,7 +68,7 @@ spec:
     - name: clinicapi
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/clinicapi:0.3.1
+        image: wasmcloud.azurecr.io/clinicapi:0.3.4
       traits:
         - type: spreadscaler
           properties:
@@ -82,10 +82,10 @@ spec:
     - name: httpserver
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpserver:0.16.3
+        image: wasmcloud.azurecr.io/httpserver:0.17.0
         contract: wasmcloud:httpserver
     - name: postgres
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/sqldb-postgres:0.3.4
+        image: wasmcloud.azurecr.io/sqldb-postgres:0.5.0
         contract: wasmcloud:sqldb

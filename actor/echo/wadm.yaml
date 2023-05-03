@@ -15,7 +15,7 @@ spec:
     - name: echo
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/echo:0.3.5
+        image: wasmcloud.azurecr.io/echo:0.3.8
       traits:
         - type: spreadscaler
           properties:
