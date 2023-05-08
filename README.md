@@ -26,20 +26,21 @@ The following actors run as WebAssembly on wasmCloud hosts.
 
 The following example interfaces are defined by [Smithy](https://awslabs.github.io/smithy/) models.
 
-| Example | Description | Capability contract | Rust crate |
-| --- | --- | --- | --- |
-| [payments](https://github.com/wasmcloud/examples/tree/main/interface/payments) | A simple interface for a payments capability provider (used in the [Creating an Interface](https://wasmcloud.dev/app-dev/create-provider/new-interface/) tutorial) |  `wasmcloud:example:payments` | `wasmcloud-examples-payments` |
-| [runner](https://github.com/wasmcloud/examples/tree/main/interface/runner) | A simple interface with a single 'Run' method |  `wasmcloud:example:runner` | `wasmcloud-examples-runner` |
-
+| Example                                                                        | Description                                                                                                                                                        | Capability contract          | Rust crate                    |
+|--------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|-------------------------------|
+| [payments](https://github.com/wasmcloud/examples/tree/main/interface/payments) | A simple interface for a payments capability provider (used in the [Creating an Interface](https://wasmcloud.dev/app-dev/create-provider/new-interface/) tutorial) | `wasmcloud:example:payments` | `wasmcloud-examples-payments` |
+| [runner](https://github.com/wasmcloud/examples/tree/main/interface/runner)     | A simple interface with a single 'Run' method                                                                                                                      | `wasmcloud:example:runner`   | `wasmcloud-examples-runner`   |
+| [timing](https://github.com/wasmcloud/examples/tree/main/interface/timing)     | A simple interface for retrieving the current timestamp from the host                                                                                              | `wasmcloud:timing`           | `wasmcloud-interface-timing`  |
 
 ## Capability providers
 
 Providers of capabilities for wasmCloud actors
 
-| Example | Description | Capability contract | OCI Reference |
-| --- | --- | --- | --- |
-| [factorial](https://github.com/wasmcloud/examples/tree/main/provider/factorial) | A capability provider that computes factorial of a number |  `wasmcloud:example:payments` | `wasmcloud.azurecr.io/factorial` |
-| [fakepay](https://github.com/wasmcloud/examples/tree/main/provider/fakepay) | A simple payment provider, used in the [Creating a capability provider](https://wasmcloud.dev/app-dev/create-provider/) tutorial |  `wasmcloud:example:fakepay` | `wasmcloud.azurecr.io/fakepay` |
+| Example                                                                         | Description                                                                                                                         | Capability contract          | OCI Reference                                                                                                                                                                                   |
+|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [factorial](https://github.com/wasmcloud/examples/tree/main/provider/factorial) | A capability provider that computes factorial of a number                                                                           | `wasmcloud:example:payments` | `wasmcloud.azurecr.io/factorial`                                                                                                                                                                |
+| [fakepay](https://github.com/wasmcloud/examples/tree/main/provider/fakepay)     | A simple payment provider, used in the [Creating a capability provider](https://wasmcloud.dev/app-dev/create-provider/) tutorial    | `wasmcloud:example:fakepay`  | `wasmcloud.azurecr.io/fakepay`                                                                                                                                                                  |
+| [timing](https://github.com/wasmcloud/examples/tree/main/provider/timing)       | An implementation of the [`wasmcloud:timing`](https://github.com/wasmcloud/examples/tree/main/interface/timing) capability contract | `wasmcloud:timing`           | [![](https://ghcr-badge.egpl.dev/jclmnop/wasmcloud-provider-timing/latest_tag?trim=major&label=ghcr.io%2Fjclmnop%2Fwasmcloud-provider-timing)](ghcr.io/jclmnop/wasmcloud-provider-timing:0.1.1) |
 
 
 ## Applications
