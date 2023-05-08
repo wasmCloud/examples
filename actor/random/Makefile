@@ -16,20 +16,20 @@ include ../../build/makefiles/actor.mk
 ACTOR_ID=$(shell make actor_id 2>/dev/null | tail -1)
 
 pick-animal:
-	@wash call -o json $(ACTOR_ID) Run \
+	@wash call -o json $(ACTOR_ID) Runner.Run \
 		'["armadillo","bear","gecko","panda","platypus","sloth"]' \
-		| jq -r '.[0]'
+		| jq -r '.response[]'
 
 pick-a-card:
-	@CARD=$$(wash call -o json $(ACTOR_ID) Run \
+	@CARD=$$(wash call -o json $(ACTOR_ID) Runner.Run \
 		'["Ace","2","3","4","5","6","7","8","9","10","Jack","Qween","King"]' \
-		| jq -r '.[0]') \
-	&& SUIT=$$(wash call -o json $(ACTOR_ID) Run \
+		| jq -r '.response[]') \
+	&& SUIT=$$(wash call -o json $(ACTOR_ID) Runner.Run \
 		'["Hearts","Clubs","Diamonds","Spades"]' \
-		| jq -r '.[0]') \
+		| jq -r '.response[]') \
 	&& echo $$CARD of $$SUIT
 
 roll-die:
-	@wash call -o json $(ACTOR_ID) Run '[]' \
-		| jq -r '.[0]'
+	@wash call -o json $(ACTOR_ID) Runner.Run '[]' \
+		| jq -r '.response[]'
 

@@ -16,6 +16,6 @@ include ../../build/makefiles/actor.mk
 ACTOR_ID=$(shell make actor_id 2>/dev/null | tail -1)
 
 run:
-	@wash call -o json $(ACTOR_ID) Run '[]'
+	@wash call -o json $(ACTOR_ID) Runner.Run '[]'
 	@echo Check the wasmcloud host logs to see the output
 
