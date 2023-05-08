@@ -1,0 +1,7 @@
+name = "Cron Logger"
+language = "rust"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = ["wasmcloud:example:cron", "wasmcloud:builtin:logging"]
