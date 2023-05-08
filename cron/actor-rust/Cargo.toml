@@ -1,0 +1,21 @@
+[package]
+name = "cron-logger"
+version = "0.1.0"
+authors = [ "wasmCloud Team" ]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "cron_logger"
+
+[dependencies]
+futures = "0.3"
+wasmbus-rpc = "0.13"
+wasmcloud-interface-cron = { path = "../interface/rust", version = "0.1.0" }
+wasmcloud-interface-logging = "0.9.0"
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
+strip = true

@@ -1,0 +1,33 @@
+# This manifest runs the `cron` actor and provider, linking them with an invocation
+# schedule to call the actor once every minute.
+#
+# To run this example, use: `wash app deploy wadm.yaml`
+
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: cron
+  annotations:
+    version: v0.0.1
+    description: "wasmCloud Cron Example"
+spec:
+  components:
+    - name: cron
+      type: actor
+      properties:
+        image: wasmcloud.azurecr.io/cron_logger:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: cron
+            values:
+              expression: 0 * * * * * *
+
+    - name: cron
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/cron:0.1.0
+        contract: wasmcloud:example:cron

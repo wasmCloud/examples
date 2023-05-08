@@ -1,0 +1,23 @@
+[package]
+name = "wasmcloud-provider-cron"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+
+[dependencies]
+async-trait = "0.1"
+chrono = "0.4.24"
+cron = "0.12.0"
+tokio = { version = "1", features = [ "full" ] }
+tracing = "0.1.37"
+wasmbus-rpc = { version = "0.13", features = ["otel"] }
+wasmcloud-interface-cron = { path = "../interface/rust", version = "0.1" }
+wasmcloud-interface-httpserver = "0.10"
+
+# test dependencies
+[dev-dependencies]
+wasmcloud-test-util = "0.8"
+
+[[bin]]
+name = "cron"
+path = "src/main.rs"

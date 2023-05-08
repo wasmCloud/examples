@@ -1,0 +1,10 @@
+github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/stretchr/testify v1.7.1 h1:5TQK59W5E3v0r2duFAb7P95B6hEeOyEnHRa8MjYSMTY=
+github.com/wasmcloud/actor-tinygo v0.1.4 h1:JdMuidgln//hn3TpWqSMROwrOkN0aJyEoegTMCoAvMk=
+github.com/wasmcloud/actor-tinygo v0.1.4/go.mod h1:YkUiUMwwoutfMg7Zp9wXpL5V2KLjTz96VdqT3CEwRq8=
+github.com/wasmcloud/tinygo-cbor v0.1.0 h1:n9X+GK5XB3P8TJK4pSzGahcHUmMONW5pZ5f9lTCzsX8=
+github.com/wasmcloud/tinygo-cbor v0.1.0/go.mod h1:j7SE4KKfYiyAnLSdEcK2bEyyLA38yCDrGi1wLU+YETQ=
+github.com/wasmcloud/tinygo-msgpack v0.1.4 h1:jhZ0txnn+WiOuUCpulDjC7nHHpAaaxElF+KgXXYu3DA=
+github.com/wasmcloud/tinygo-msgpack v0.1.4/go.mod h1:VqjkQtxp6pkww69P2+OrvYhUHVpxczpATQKWbWA9WEU=
+gopkg.in/yaml.v3 v3.0.0 h1:hjy8E9ON/egN1tAYqKb61G10WtihqetD4sz2H+8nIeA=
