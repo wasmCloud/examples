@@ -1,5 +1,5 @@
 # Leaderboard Actor
-This actor was created as part of a blog post illustrating the ease with which people can create new actors and deploy them.
+This actor was created as part of a [blog post](https://cosmonic.com/blog/engineering/building-with-cosmonic-part-1-deploy-leaderboard-service) illustrating the ease with which people can create new actors and deploy them.
 
 This actor exposes the following RESTful API to manipulate leaderboards and their scores:
 
