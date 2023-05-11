@@ -1,0 +1,7 @@
+name = "Leaderboard"
+language = "rust"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = ["wasmcloud:httpserver", "wasmcloud:keyvalue"]
