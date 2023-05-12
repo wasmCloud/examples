@@ -29,8 +29,8 @@ impl HttpServer for LeaderboardActor {
     }
 }
 
-/// Creates a new leaderboard. Stores a leaderboard.{id} item in the KV store
-/// as well as a leaderboards item that maintains a JSON payload of the leaderboard
+/// Creates a new leaderboard if one does not already exist. Stores a leaderboard.{id} item in the
+/// KV store as well as a leaderboards item that maintains a JSON payload of the leaderboard
 /// summaries.
 async fn create_leaderboard(
     ctx: &Context,
@@ -44,18 +44,26 @@ async fn create_leaderboard(
     let raw = serde_json::to_string(&lb).map_err(|e| RpcError::Ser(e.to_string()))?;
     let key = format!("leaderboard.{}", leaderboard.id);
     let kv = KeyValueSender::new();
-    kv.set(
-        ctx,
-        &SetRequest {
-            key,
-            value: raw,
-            expires: 0,
-        },
-    )
-    .await?;
+
+    let Ok(res) = kv.get(ctx, &format!("leaderboard.{}", leaderboard.id)).await else {
+        return Ok(HttpResponse::not_found())
+    };
 
     let mut list = get_leaderboard_list(ctx).await;
-    list.push(leaderboard);
+
+    if !res.exists {
+        kv.set(
+            ctx,
+            &SetRequest {
+                key,
+                value: raw,
+                expires: 0,
+            },
+        )
+        .await?;
+
+        list.push(leaderboard);
+    }
 
     kv.set(
         ctx,
