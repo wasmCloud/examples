@@ -17,7 +17,7 @@ impl HttpServer for LeaderboardActor {
         let path = &req.path[1..req.path.len()];
         let segments: Vec<&str> = path.trim_end_matches('/').split('/').collect();
 
-        match (req.method.as_ref(), segments.as_slice()) {
+        let mut result = match (req.method.as_ref(), segments.as_slice()) {
             ("GET", ["leaderboards"]) => get_leaderboards(ctx).await,
             ("POST", ["leaderboards"]) => create_leaderboard(ctx, deser_json(&req.body)?).await,
             ("GET", ["leaderboards", leaderboard_id]) => get_leaderboard(ctx, leaderboard_id).await,
@@ -25,7 +25,19 @@ impl HttpServer for LeaderboardActor {
                 post_score(ctx, leaderboard_id, deser_json(&req.body)?).await
             }
             (_, _) => Ok(HttpResponse::not_found()),
-        }
+        }?;
+
+        result.header.extend([
+            (
+                "Access-Control-Allow-Origin".to_owned(),
+                vec!["*".to_owned()],
+            ),
+            (
+                "Content-Type".to_owned(),
+                vec!["application/json".to_owned()],
+            ),
+        ]);
+        Ok(result)
     }
 }
 
