@@ -25,25 +25,19 @@ impl HttpServer for LeaderboardActor {
                 post_score(ctx, leaderboard_id, deser_json(&req.body)?).await
             }
             (_, _) => Ok(HttpResponse::not_found()),
-        };
+        }?;
 
-        result
-            .as_mut()
-            .map(|res| {
-                res.header.extend([
-                    (
-                        "Access-Control-Allow-Origin".to_owned(),
-                        vec!["*".to_owned()],
-                    ),
-                    (
-                        "Content-Type".to_owned(),
-                        vec!["application/json".to_owned()],
-                    ),
-                ]);
-            })
-            .unwrap_or_default();
-
-        result
+        result.header.extend([
+            (
+                "Access-Control-Allow-Origin".to_owned(),
+                vec!["*".to_owned()],
+            ),
+            (
+                "Content-Type".to_owned(),
+                vec!["application/json".to_owned()],
+            ),
+        ]);
+        Ok(result)
     }
 }
 
