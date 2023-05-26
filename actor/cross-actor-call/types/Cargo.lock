@@ -288,6 +288,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6b4d9b1225d28d360ec6a231d65af1fd99a2a095154c8040689617290569c5c"
 
 [[package]]
+name = "bincode"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1706,9 +1715,9 @@ checksum = "bebd363326d05ec3e2f532ab7660680f3b02130d780c299bca73469d521bc0ed"
 
 [[package]]
 name = "serde"
-version = "1.0.160"
+version = "1.0.163"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb2f3770c8bce3bcda7e149193a069a0f4365bda1fa5cd88e03bca26afc1216c"
+checksum = "2113ab51b87a539ae008b5c6c02dc020ffa39afd2d83cffcb3f4eb2722cebec2"
 dependencies = [
  "serde_derive",
 ]
@@ -1724,9 +1733,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.160"
+version = "1.0.163"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "291a097c63d8497e00160b166a967a4a79c64f3facdd01cbd7502231688d77df"
+checksum = "8c805777e3930c8883389c602315a24224bcc738b63905ef87cd1420353ea93e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2231,7 +2240,10 @@ name = "types"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "bincode",
+ "serde",
  "wasmbus-rpc",
+ "wasmcloud-interface-logging",
 ]
 
 [[package]]
@@ -2461,6 +2473,22 @@ dependencies = [
  "uuid",
  "wascap",
  "wasmbus-macros",
+ "weld-codegen",
+]
+
+[[package]]
+name = "wasmcloud-interface-logging"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0db7ac53cdf45794b9c0a8ee1a62b44797c794823c106eda1b2f9bdc3b2c147"
+dependencies = [
+ "async-trait",
+ "cfg-if",
+ "futures",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "wasmbus-rpc",
  "weld-codegen",
 ]
 
