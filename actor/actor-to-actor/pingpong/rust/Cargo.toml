@@ -1,0 +1,27 @@
+[package]
+name = "wasmcloud-interface-pingpong"
+version = "0.1.0"
+description = "Interface library for the wasmCloud pingpong contract"
+authors = [ "wasmCloud Team" ]
+edition = "2021"
+license = "Apache-2.0"
+
+# when publishing to crates.io, freeze src by omitting build.rs
+exclude = [ "build.rs" ]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+async-trait = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_bytes = "0.11.5"
+wasmbus-rpc = "0.11"
+
+[dev-dependencies]
+base64 = "0.13"
+
+# build-dependencies needed for build.rs
+[build-dependencies]
+weld-codegen = "0.6"
+

@@ -1,0 +1,21 @@
+[package]
+name = "pinger"
+version = "0.1.0"
+authors = [ "wasmCloud Team" ]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "pinger"
+
+[dependencies]
+futures = "0.3"
+wasmbus-rpc = "0.11"
+wasmcloud-interface-httpserver = "0.8"
+wasmcloud-interface-pingpong = { path = "../pingpong/rust" }
+
+[profile.release]
+# Optimize for small code size
+strip = true
+lto = true
+opt-level = "s"
