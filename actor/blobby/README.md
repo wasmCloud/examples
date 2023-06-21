@@ -27,12 +27,12 @@ guide](https://wasmcloud.dev/overview/installation/), you can run this example a
 wasmCloud providers with the following commands:
 
 ```
-$ wash ctl start actor wasmcloud.azurecr.io/blobby:0.2.0
+$ wash ctl start actor wasmcloud.azurecr.io/blobby:0.2.1
 # If you use a locally built actor, replace the actor ID below with your own
 $ wash ctl link put MBY3COMRDLQYTX2AUTNB5D2WYAH5TUKNIMELDSQ5BUFZVV7CBUUIKEDR VBBQNNCGUKIXEWLL5HL5XJE57BS3GU5DMDOKZS6ROEWPQFHEDP6NGVZM wasmcloud:blobstore "ROOT=/tmp"
 $ wash ctl link put MBY3COMRDLQYTX2AUTNB5D2WYAH5TUKNIMELDSQ5BUFZVV7CBUUIKEDR VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M wasmcloud:httpserver "ADDRESS=0.0.0.0:8080"
-$ wash ctl start provider wasmcloud.azurecr.io/blobstore_fs:0.3.1 --skip-wait
-$ wash ctl start provider wasmcloud.azurecr.io/httpserver:0.17.0 --skip-wait
+$ wash ctl start provider wasmcloud.azurecr.io/blobstore_fs:0.3.2 --skip-wait
+$ wash ctl start provider wasmcloud.azurecr.io/httpserver:0.18.2 --skip-wait
 ```
 
 Once everything is up and running, you can run through all of the operations by following the
@@ -169,16 +169,14 @@ $ wash build
 
 ### Testing the actor
 
-Testing the actor is just a bit more complex, but still fairly easy
+Testing the actor is also easy:
 
 ```console
 $ cd testing
-$ cargo test -- --test-threads 1
+$ cargo test
 ```
 
-This will automatically build your actor and then run the tests. The `--test-threads 1` only runs
-one test at a time as a workaround until we can put in the work to automatically generate different
-ports for everything that is starting up
+This will automatically build your actor and then run the tests.
 
 Please note that these tests are currently being used as a testbed for actor integration testing. It
 is likely we will try to wrap this up in some sort of testing tool in the future!
