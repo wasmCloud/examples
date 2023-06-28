@@ -3,6 +3,16 @@ A FlightAware clone that leverages [dump1090](https://github.com/antirez/dump109
 
 > This is an orginal wasmCloud example that dates back to the beginning and updated to work in a >.60 world. Read a lot about the project [here](https://github.com/wasmcloud/wasm-air).
 
+## Requirements
+The following will need to be installed on your computer for this project to build:
+- yarn
+- tinygo
+- go 
+- goreleaser
+- cargo/rust 
+- dump1090
+- wash
+
 ## Architecture 
 
 ### dump1090 Provider 
@@ -47,7 +57,7 @@ The UI actor embeds a Vue3 webapp that is used to plot contacts and stations on 
 
 ## Build Instructions 
 
-> You will need [dump1090](https://github.com/wasmcloud/wasm-air) and [wash](https://github.com/wasmcloud/wash) installed.  
+> You will need [dump1090](https://github.com/MalcolmRobb/dump1090) and [wash](https://github.com/wasmcloud/wash) installed.  
 
 #### Build the interface
 
@@ -66,7 +76,7 @@ this will drop generated files in the provider and processer repositories.  With
 cd adsb-provider
 ```
 
-We have included a [goreleaser]() configuration file to make this step easy.  If you have cli installed, simple run 
+We have included a [goreleaser](https://goreleaser.com/) configuration file to make this step easy.  If you have cli installed, simple run 
 
 ```
 goreleaser build --clean --snapshot
