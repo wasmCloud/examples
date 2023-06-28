@@ -76,19 +76,7 @@ this will drop generated files in the provider and processer repositories.  With
 cd adsb-provider
 ```
 
-We have included a [goreleaser](https://goreleaser.com/) configuration file to make this step easy.  If you have cli installed, simple run 
-
-```
-goreleaser build --clean --snapshot
-```
-
-> Note: If you are building from a clone of the `wasmcloud/examples` repo, since it is a monorepo with many tagged examples, you will need to override the tag that goreleaser uses with `GORELEASER_CURRENT_TAG="v0.0.1" GORELEASER_PREVIOUS_TAG="v0.0.0"`.  
-
-This will build the binaries for the 5 most common architecture/os combinations.  You will now need to add them to a provider archive one at a time.
-
-> Note: if you have goreleaser pro, you can use the post-hooks to build the provider archive for you all in one swoop 
-
-To manually create the provider archive, first run 
+To create the provider archive, first run 
 
 ```
 go build -o build/adsb
@@ -109,8 +97,22 @@ wash par create --arch x86_64-macos \ # make sure to replace with your arch here
 
 This will create an artifact, `build/adsb.par.gz` that can be deployed into wasmCloud.
 
-If you have additional os/architecture pairs you would like to add (you will need to cross-compile the provider for every architucture you'd like it to run), 
+If you have additional os/architecture pairs you would like to add (you will need to cross-compile the provider for every architecture you'd like it to run), 
 then you can add them with `wash par insert` one at a time.
+
+#### Using goreleaser (optional)
+
+We have included a [goreleaser](https://goreleaser.com/) configuration file to make building the provider for multiple architectures easy.  If you have cli installed, simple run 
+
+```
+goreleaser build --clean --snapshot
+```
+
+> Note: If you are building from a clone of the `wasmcloud/examples` repo, since it is a monorepo with many tagged examples, you will need to override the tag that goreleaser uses with `GORELEASER_CURRENT_TAG="v0.0.1" GORELEASER_PREVIOUS_TAG="v0.0.0"`.  
+
+This will build the binaries for the 5 most common architecture/os combinations.  You will now need to add them to a provider archive one at a time.
+
+> Note: if you have goreleaser pro, you can use the post-hooks to build the provider archive for you all in one swoop 
 
 #### Build the processor actor
 
