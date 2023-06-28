@@ -11,6 +11,6 @@ files = [ "wasmcloud-core.smithy", "wasmcloud-model.smithy" ]
 output_dir = "."
 formatter = [ "goimports", "-w" ]
 files = [
-    { path = "adsb-processor/adsb_gen.go", package="main", namespace = "org.jordanrash.adsb" },
-    { path = "adsb-provider/adsb_gen.go", package="main", namespace = "org.jordanrash.adsb" },
+    { path = "adsb-processor/adsb_gen.go", package="main", namespace = "org.adsb" },
+    { path = "adsb-provider/adsb_gen.go", package="main", namespace = "org.adsb" },
 ]
