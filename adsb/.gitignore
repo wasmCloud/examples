@@ -1,7 +1,9 @@
-adsb_gen.go
-*/node_modules/
 */*/node_modules/
-adsb-ui/dist/
-adsb-ui/build/ 
-adsb-ui/target/
+*/node_modules/
+adsb-api/build/
+adsb-processor/build/
 adsb-provider/dist
+adsb-ui/build/ 
+adsb-ui/dist/
+adsb-ui/target/
+adsb_gen.go
