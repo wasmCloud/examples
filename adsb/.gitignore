@@ -4,3 +4,4 @@ adsb_gen.go
 adsb-ui/dist/
 adsb-ui/build/ 
 adsb-ui/target/
+adsb-provider/dist

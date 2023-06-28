@@ -82,6 +82,8 @@ We have included a [goreleaser](https://goreleaser.com/) configuration file to m
 goreleaser build --clean --snapshot
 ```
 
+> Note: If you are building from a clone of the `wasmcloud/examples` repo, since it is a monorepo with many tagged examples, you will need to override the tag that goreleaser uses with `GORELEASER_CURRENT_TAG="v0.0.1" GORELEASER_PREVIOUS_TAG="v0.0.0"`.  
+
 This will build the binaries for the 5 most common architecture/os combinations.  You will now need to add them to a provider archive one at a time.
 
 > Note: if you have goreleaser pro, you can use the post-hooks to build the provider archive for you all in one swoop 
