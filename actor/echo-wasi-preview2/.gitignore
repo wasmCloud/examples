@@ -1,0 +1,5 @@
+# Rust build outputs
+target
+
+# Wash build output directory
+build
