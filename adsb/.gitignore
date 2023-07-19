@@ -1,0 +1,9 @@
+*/*/node_modules/
+*/node_modules/
+adsb-api/build/
+adsb-processor/build/
+adsb-provider/dist
+adsb-ui/build/ 
+adsb-ui/dist/
+adsb-ui/target/
+adsb_gen.go
