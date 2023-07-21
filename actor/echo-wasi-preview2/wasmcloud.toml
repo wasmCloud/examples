@@ -1,0 +1,15 @@
+#
+# This actor showcases a component built to target WASI preview2
+# at `wash build` time.
+#
+# This code borrows heavily from the tests for the builtin component reactor on wasmcloud/wasmcloud:
+# https://github.com/wasmCloud/wasmCloud/tree/main/tests/actors/rust/builtins-component-reactor
+#
+
+name = "echo"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:httpserver"]
+wasm_target = "wasm32-wasi-preview2"

@@ -1,0 +1,5 @@
+package wasmcloud-examples:echo
+
+world echo {
+    export wasmcloud:bus/guest
+}
