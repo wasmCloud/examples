@@ -1,0 +1,7 @@
+name = "KVCounter"
+language = "rust"
+type = "actor"
+
+[actor]
+claims = ["wasmcloud:httpserver", "wasmcloud:keyvalue"]
+wasm_target = "wasm32-wasi-preview2"

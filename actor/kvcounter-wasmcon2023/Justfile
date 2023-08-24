@@ -1,0 +1,50 @@
+just := env_var_or_default("JUST", just_executable())
+cargo := env_var_or_default("CARGO", "cargo")
+wasm_tools := env_var_or_default("WASM_TOOLS", "wasm-tools")
+wash := env_var_or_default("WASH", "wash")
+
+expected_wasm_path := "target/wasm32-wasi/release/wasmcon2023_keyvalue.wasm"
+wasm_preview2_output_path := "target/wasm32-wasi/release/wasmcon2023_keyvalue.preview2.wasm"
+
+_default:
+    {{just}} --list
+
+# Lint
+lint:
+    {{cargo}} clippy --all-features --all-targets
+
+# Format
+fmt:
+    {{cargo}} fmt
+
+# Build the WASM components using wasmcloud tooling (wash)
+build:
+    @echo "[warning] ensure you're using a version of wash newer than v0.20.0"
+    @echo "[warning] update your PATH or set the WASH environment variable to change the version of wash used"
+    @{{wash}} build
+
+# Build the project, continuously
+build-watch:
+    {{cargo}} watch --ignore=target -- {{just}} build
+
+##############
+# Operations #
+##############
+
+# NOTE: don't forget to set up WASMCLOUD_CLUSTER_SEED and WASMCLOUD_CLUSTER_ISSUERS
+# as necessary when starting the 🦀 rust host!
+
+expected_signed_wasm_path := absolute_path("build/wasmcon2023_keyvalue_s.wasm")
+
+# Run the actor on a given host
+run-actor host_id:
+    @echo "[warn] make sure to set WASMCLOUD_CLUSTER_SEED and WASMCLOUD_CLUSTER_ISSUERS appropriately for new hosts"
+    @echo "(see output of wash up for expected values of cluster seed & issuers)"
+    @{{wash}} start actor file://{{expected_signed_wasm_path}} --host-id {{host_id}}
+
+# Set up links to a given in-lattice actor_id
+setup-links actor_id:
+    # Setting up links for HTTP provider (VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M)
+    @{{wash}} link put {{actor_id}} VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M wasmcloud:httpserver
+    # Setting up links for kvredis provider (VAG3QITQQ2ODAOWB5TTQSDJ53XK3SHBEIFNK4AYJ5RKAX2UNSCAPHA5M)
+    @{{wash}} link put {{actor_id}} VAZVC4RX54J2NVCMCW7BPCAHGGG5XZXDBXFUMDUXGESTMQEJLC3YVZWB wasmcloud:keyvalue

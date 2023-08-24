@@ -1,0 +1,7 @@
+keyvalue = "https://github.com/WebAssembly/wasi-keyvalue/archive/main.tar.gz"
+http = "https://github.com/wasmCloud/wasi-http/archive/main.tar.gz" # TODO: Switch to upstream once Wasm tooling compatible
+
+# see: https://github.com/wasmCloud/wasmCloud/blob/main/crates/runtime/wit/deps.toml
+poll = "https://github.com/WebAssembly/wasi-poll/archive/main.tar.gz" # TODO: Remove once keyvalue is compatible
+
+io = "./overrides/io" # Pin to newer version of streams contract
