@@ -1,7 +1,7 @@
 [package]
 name = "blobby"
-version = "0.2.1"
-authors = [ "wasmCloud Team" ]
+version = "0.3.0"
+authors = ["wasmCloud Team"]
 edition = "2021"
 
 [lib]
@@ -15,10 +15,10 @@ http = "0.2"
 lazy_static = "1"
 serde_json = "1.0.85"
 tokio = { version = "1", features = ["parking_lot", "sync"] }
-wasmbus-rpc = "0.13"
-wasmcloud-interface-blobstore = "0.6"
-wasmcloud-interface-httpserver = "0.10"
-wasmcloud-interface-logging = "0.9"
+wasmbus-rpc = "0.14"
+wasmcloud-interface-blobstore = "0.8"
+wasmcloud-interface-httpserver = "0.11"
+wasmcloud-interface-logging = "0.10"
 
 [profile.release]
 # Optimize for small code size
