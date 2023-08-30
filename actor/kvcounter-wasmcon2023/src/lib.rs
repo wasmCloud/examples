@@ -105,7 +105,7 @@ impl IncomingHandler for KvCounter {
                         response,
                         500,
                         &content_type_json(),
-                        ApiResponse::error("failed to retreive bucket").into_vec(),
+                        ApiResponse::error("failed to retrieve bucket").into_vec(),
                     );
                     return;
                 };
@@ -237,6 +237,7 @@ fn write_http_response(
 
 /// The response that is sent by the API after an operation
 #[derive(Debug, Serialize)]
+#[serde(untagged)]
 pub enum ApiResponse {
     Error { error: String },
     Success { counter: i32 },

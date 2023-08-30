@@ -2,13 +2,13 @@
 name = "wasmcon2023-keyvalue"
 version = "0.1.0"
 edition = "2021"
-authors = [ "wasmcloud Team" ]
+authors = ["wasmcloud Team"]
 description = """
 Wasmcon2023 WASI Keyvalue demo
 """
 
 [lib]
-crate-type = [ "cdylib" ]
+crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1.0.75"
@@ -17,7 +17,7 @@ mime_guess = "2.0.4"
 rust-embed = "6.8.1"
 serde = { version = "1.0.186", features = ["derive"] }
 serde_json = { version = "1.0.105" }
-wit-bindgen = { git = "https://github.com/bytecodealliance/wit-bindgen.git", rev = "a15cb9dbee4f619b286fc22879a94f7197d55b18" }
+wit-bindgen = { git = "https://github.com/bytecodealliance/wit-bindgen.git", rev = "749c01697bb3b11daeae4225789e14b765dcf839" }
 
 [build-dependencies]
 anyhow = "1.0.75"
