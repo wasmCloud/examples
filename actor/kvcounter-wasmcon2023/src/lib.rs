@@ -25,7 +25,7 @@ use wasi::{
 mod ui;
 use ui::get_static_asset;
 
-use crate::exports::wasi::http::incoming_handler::{IncomingHandler, IncomingRequest};
+use crate::exports::wasi::http::incoming_handler::{Guest, IncomingRequest};
 
 // NOTE: custom buckets are not yet supported
 const BUCKET: &str = "";
@@ -77,7 +77,7 @@ impl KvCounter {
 }
 
 /// Implementation of the WIT-driven incoming-handler interface for our implementation struct
-impl IncomingHandler for KvCounter {
+impl Guest for KvCounter {
     fn handle(request: IncomingRequest, response: ResponseOutparam) {
         // Decipher method
         let method = incoming_request_method(request);
