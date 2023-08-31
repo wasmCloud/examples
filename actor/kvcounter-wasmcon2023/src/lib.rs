@@ -6,6 +6,7 @@ wit_bindgen::generate!({
 });
 
 use anyhow::{anyhow, Context};
+use http::StatusCode;
 use serde::Serialize;
 use wasi::{
     http::http_types::{
@@ -61,15 +62,15 @@ impl KvCounter {
 
         // Build outgoing value to use
         let outgoing_value = new_outgoing_value();
-        let stream =
-            outgoing_value_write_body(outgoing_value).expect("failed to write outgoing value");
+        let stream = outgoing_value_write_body(outgoing_value)
+            .map_err(|_| anyhow!("failed to write outgoing value"))?;
 
         // Write out the new value
         write(stream, new_value.to_string().as_bytes())
-            .expect("failed to write to outgoing value stream");
+            .map_err(|e| anyhow!("failed to write to outgoing value stream: {e}"))?;
 
         // Set the key to the updated value
-        set(bucket, key, outgoing_value).expect("failed to set value");
+        set(bucket, key, outgoing_value).map_err(|e| anyhow!("failed to set value: {e}"))?;
 
         // Cheat and just assume the new value will be the increment
         Ok(new_value)
@@ -82,12 +83,35 @@ impl Guest for KvCounter {
         // Decipher method
         let method = incoming_request_method(request);
 
-        // Get path of request, then trim and split
-        let request_path = http::uri::PathAndQuery::from_maybe_shared(
-            incoming_request_path_with_query(request)
-                .expect("failed to retrieve path and query from request"),
-        )
-        .expect("failed to parse path & query");
+        // Get path and query params on the incoming request
+        let request_path = match incoming_request_path_with_query(request) {
+            Some(p) => p,
+            None => {
+                write_http_response(
+                    response,
+                    StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+                    &[],
+                    ApiResponse::error("failed to parse request path").into_vec(),
+                );
+                eprintln!("[error] failed to retrieve path and query from request");
+                return;
+            }
+        };
+
+        // Parse the path & query into a known type
+        let request_path = match http::uri::PathAndQuery::from_maybe_shared(request_path) {
+            Ok(pnq) => pnq,
+            Err(e) => {
+                write_http_response(
+                    response,
+                    StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+                    &[],
+                    ApiResponse::error(format!("failed to parse path & query: {e}")).into_vec(),
+                );
+                return;
+            }
+        };
+
         let trimmed_path: Vec<&str> = request_path.path().trim_matches('/').split('/').collect();
 
         // Generate an outgoing request
@@ -148,7 +172,7 @@ impl Guest for KvCounter {
                         response,
                         500,
                         &content_type_json(),
-                        ApiResponse::error("failed to retreive bucket").into_vec(),
+                        ApiResponse::error("failed to retrieve bucket").into_vec(),
                     );
                     return;
                 };
@@ -191,7 +215,7 @@ impl Guest for KvCounter {
                         bytes,
                     ),
                     Err(err) => {
-                        eprintln!("[error] failed to retreive static asset @ [{path}]: {err:?}");
+                        eprintln!("[error] failed to retrieve static asset @ [{path}]: {err:?}");
                         write_http_response(response, 404, &Vec::new(), "not found");
                     }
                 };
