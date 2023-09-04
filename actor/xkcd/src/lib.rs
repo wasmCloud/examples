@@ -5,16 +5,22 @@
 //! then requests metadata for that comic from the xkcd site,
 //! and generates and html page with the title and image url from the metadata.
 //!
-use serde::Deserialize;
+use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
 use serde_json::json;
+
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpclient::{HttpClient, HttpClientSender, HttpRequest as CHttpRequest};
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
 use wasmcloud_interface_numbergen::random_in_range;
 
-// the highest numbered comic available. (around 2705 as of Nov 30, 2022)
+mod ui;
+use ui::Asset;
+
+// the highest numbered comic available. (around 2705 as of Sep 4, 2023)
 // xkcd comics are numbered continuously starting at 1
-const MAX_COMIC_ID: u32 = 2705;
+const MAX_COMIC_ID: u32 = 2822;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
@@ -24,17 +30,45 @@ struct XkcdActor {}
 #[async_trait]
 impl HttpServer for XkcdActor {
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
-        // all the work happens inside handle_inner.
-        // The purpose of this wrapper is to catch any errors generated
-        // by the inner function and turn them into a valid HttpResponse.
-        Ok(self
-            .handle_inner(ctx, req)
-            .await
-            .unwrap_or_else(|e| HttpResponse {
-                body: json!({ "error": e.to_string() }).to_string().into_bytes(),
-                status_code: 500,
-                ..Default::default()
-            }))
+        match req.path.trim_start_matches('/') {
+            // Handle requests to retrieve comic data
+            "comic" =>
+            // all the work happens inside handle_inner.
+            // The purpose of this wrapper is to catch any errors generated
+            // by the inner function and turn them into a valid HttpResponse.
+            {
+                Ok(self
+                    .handle_inner(ctx, req)
+                    .await
+                    .unwrap_or_else(|e| HttpResponse {
+                        body: json!({ "error": e.to_string() }).to_string().into_bytes(),
+                        status_code: 500,
+                        ..Default::default()
+                    }))
+            }
+            ui_asset_path => {
+                let path = if ui_asset_path.is_empty() {
+                    "index.html"
+                } else {
+                    ui_asset_path
+                };
+                // Request for UI asset
+                Ok(Asset::get(path)
+                    .map(|asset| {
+                        let mut header = HashMap::new();
+                        if let Some(content_type) = mime_guess::from_path(path).first() {
+                            header
+                                .insert("Content-Type".to_string(), vec![content_type.to_string()]);
+                        }
+                        HttpResponse {
+                            status_code: 200,
+                            header,
+                            body: Vec::from(asset.data),
+                        }
+                    })
+                    .unwrap_or_else(|| HttpResponse::not_found()))
+            }
+        }
     }
 }
 
@@ -59,22 +93,8 @@ impl XkcdActor {
         // and build html page
         let info = serde_json::from_slice::<XkcdMetadata>(&resp.body)
             .map_err(|e| tag_err("decoding metadata", e))?;
-        let html = format!(
-            r#"<!DOCTYPE html>
-        <html>
-        <head>
-            <title>Your XKCD random comic</title>
-        </head>
-        <body>
-            <h1>{}</h1>
-            <img src="{}"/>
-        </body>
-        </html>
-        "#,
-            &info.title, &info.img
-        );
         let resp = HttpResponse {
-            body: html.into_bytes(),
+            body: serde_json::to_vec(&info).unwrap_or_default(),
             ..Default::default()
         };
         Ok(resp)
@@ -83,7 +103,7 @@ impl XkcdActor {
 
 /// Metadata returned as json
 /// (this is a subset of the full metadata, but we only need two fields)
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct XkcdMetadata {
     title: String,
     img: String,

@@ -15,7 +15,7 @@ spec:
     - name: xkcd
       type: actor
       properties:
-        image: wasmcloud.azurecr.io/xkcd:0.1.7
+        image: wasmcloud.azurecr.io/xkcd:0.2.0
       traits:
         - type: spreadscaler
           properties:
@@ -32,10 +32,10 @@ spec:
     - name: httpserver
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpserver:0.17.0
+        image: wasmcloud.azurecr.io/httpserver:0.19.1
         contract: wasmcloud:httpserver
     - name: httpclient
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpclient:0.7.0
+        image: wasmcloud.azurecr.io/httpclient:0.8.0
         contract: wasmcloud:httpclient
