@@ -17,7 +17,9 @@ spec:
             replicas: 1
         - type: linkdef
           properties:
-            address: 0.0.0.0:8080
+            target: httpserver
+            values:
+              address: 0.0.0.0:8080
     - name: ponger
       type: actor
       properties:

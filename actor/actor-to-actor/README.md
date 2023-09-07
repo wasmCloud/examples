@@ -14,9 +14,6 @@ You'll need [wash](https://wasmcloud.com/docs/installation) installed to run thi
 wash up -d
 wash app deploy ./wadm.yaml
 
-# Invoke the pinger actor's HTTP handler directly
-wash call MBN2KUUZP4Y2F7IRXEPLV232YCZFKGSWYIQ3DNPDIERBE4BHPMUC5BUX HttpServer.HandleRequest '{"method": "GET", "path": "/", "body": "", "queryString":"","header":{}}'
-
 # cURL the pinger's HTTP handler
 curl localhost:8080
 ```
