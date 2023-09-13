@@ -5,7 +5,7 @@ wit_bindgen::generate!({
     }
 });
 
-use anyhow::{anyhow, Context};
+use anyhow::anyhow;
 use http::StatusCode;
 use serde::Serialize;
 use wasi::{
@@ -15,12 +15,7 @@ use wasi::{
         ResponseOutparam,
     },
     io::streams::write,
-    keyvalue::{
-        readwrite::{get, set},
-        types::{
-            incoming_value_consume_sync, new_outgoing_value, open_bucket, outgoing_value_write_body,
-        },
-    },
+    keyvalue::{atomic::increment, types::open_bucket},
 };
 
 mod ui;
@@ -33,49 +28,6 @@ const BUCKET: &str = "";
 
 /// Implementation struct for the 'kvcounter' world (see: wit/kvcounter.wit)
 struct KvCounter;
-
-impl KvCounter {
-    /// Increment (possibly negatively) the counter for a given key
-    fn increment_counter(bucket: u32, key: &String, amount: i32) -> anyhow::Result<i32> {
-        let current_value: i32 = match get(bucket, key) {
-            // If the value exists, parse it into an i32
-            Ok(incoming_value) => {
-                // Read bytes from incoming value
-                let bytes = incoming_value_consume_sync(incoming_value)
-                    .map_err(|count| anyhow!("failed to parse incoming bytes, read [{count}]"))?;
-                // Convert the bytes to a i32
-                String::from_utf8(bytes)
-                    .context("failed to parse string from returned bytes")?
-                    .trim()
-                    .parse()
-                    .context("failed to parse i32 from bytes")?
-            }
-            // If the value is missing or we fail to get it, assume it is zero
-            Err(_) => {
-                eprintln!("[warn] encountered missing key [{key}], defaulting to 0");
-                0
-            }
-        };
-
-        // Calculate the new value
-        let new_value: i32 = current_value + amount;
-
-        // Build outgoing value to use
-        let outgoing_value = new_outgoing_value();
-        let stream = outgoing_value_write_body(outgoing_value)
-            .map_err(|_| anyhow!("failed to write outgoing value"))?;
-
-        // Write out the new value
-        write(stream, new_value.to_string().as_bytes())
-            .map_err(|e| anyhow!("failed to write to outgoing value stream: {e}"))?;
-
-        // Set the key to the updated value
-        set(bucket, key, outgoing_value).map_err(|e| anyhow!("failed to set value: {e}"))?;
-
-        // Cheat and just assume the new value will be the increment
-        Ok(new_value)
-    }
-}
 
 /// Implementation of the WIT-driven incoming-handler interface for our implementation struct
 impl Guest for KvCounter {
@@ -135,20 +87,20 @@ impl Guest for KvCounter {
                 };
 
                 // Increment the counter
-                let updated_value =
-                    match KvCounter::increment_counter(bucket, &String::from("default"), 1) {
-                        Ok(v) => v,
-                        Err(_) => {
-                            write_http_response(
-                                response,
-                                500,
-                                &content_type_json(),
-                                ApiResponse::error("failed to increment default counter")
-                                    .into_vec(),
-                            );
-                            return;
-                        }
-                    };
+                let updated_value = match increment(bucket, &String::from("default"), 1)
+                    .map_err(|_| anyhow!("failed to increment value in bucket"))
+                {
+                    Ok(v) => v,
+                    Err(_) => {
+                        write_http_response(
+                            response,
+                            500,
+                            &content_type_json(),
+                            ApiResponse::error("failed to increment default counter").into_vec(),
+                        );
+                        return;
+                    }
+                };
 
                 // Build & write the response the response
                 eprintln!("[success] successfully incremented default counter");
@@ -178,19 +130,20 @@ impl Guest for KvCounter {
                 };
 
                 // Increment the counter
-                let updated_value =
-                    match KvCounter::increment_counter(bucket, &counter.to_string(), 1) {
-                        Ok(v) => v,
-                        Err(e) => {
-                            write_http_response(
-                                response,
-                                500,
-                                &content_type_json(),
-                                ApiResponse::error(format!("{e}")).into_vec(),
-                            );
-                            return;
-                        }
-                    };
+                let updated_value = match increment(bucket, &counter.to_string(), 1)
+                    .map_err(|_| anyhow!("failed to increment value in bucket"))
+                {
+                    Ok(v) => v,
+                    Err(e) => {
+                        write_http_response(
+                            response,
+                            500,
+                            &content_type_json(),
+                            ApiResponse::error(format!("{e}")).into_vec(),
+                        );
+                        return;
+                    }
+                };
 
                 // Write out HTTP response
                 eprintln!("[success] successfully incremented [{counter}] counter");
@@ -264,7 +217,7 @@ fn write_http_response(
 #[serde(untagged)]
 pub enum ApiResponse {
     Error { error: String },
-    Success { counter: i32 },
+    Success { counter: u64 },
 }
 
 impl ApiResponse {
@@ -276,7 +229,7 @@ impl ApiResponse {
     }
 
     /// Generate an error response
-    fn success(counter: i32) -> Self {
+    fn success(counter: u64) -> Self {
         ApiResponse::Success { counter }
     }
 

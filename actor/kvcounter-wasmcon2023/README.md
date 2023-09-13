@@ -184,7 +184,7 @@ wash start actor file:///path/to/your/build/wasmcon2023_keyvalue_s.wasm --host <
 Your output should look something like the following:
 
 ```
-Actor [MD3T2JMVXPP2DNY3YGVIXOFHPSCOUQOE4IFOLC4EKDB3QFOTWQPHACAH] (ref: [file:///home/mrman/code/work/cosmonic/forks/examples/actor/kvcounter-wasmcon2023/build/wasmcon2023_keyvalue_s.wasm]) started on host [NAYIPQDLQE62R3XEICJZXJEOCUASMA5BC24O76H3ONVIJS7ONTNBWQYI]
+Actor [MD3T2JMVXPP2DNY3YGVIXOFHPSCOUQOE4IFOLC4EKDB3QFOTWQPHACAH] (ref: [file:///path/to/examples/actor/kvcounter-wasmcon2023/build/wasmcon2023_keyvalue_s.wasm]) started on host [NAYIPQDLQE62R3XEICJZXJEOCUASMA5BC24O76H3ONVIJS7ONTNBWQYI]
 ```
 
 Take a note of the Actor ID for your actor. For example it should look something like this:
