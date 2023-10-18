@@ -7,7 +7,7 @@
 version: "3"
 services:
   nats:
-    image: nats:2.3
+    image: nats:2.9.22-alpine
     ports:
       - "4222:4222"
       - "6222:6222"
@@ -45,7 +45,6 @@ services:
     depends_on:
       - "nats"
       - "redis"
-    image: wasmcloud.azurecr.io/wadm:0.1.0
+    image: ghcr.io/wasmcloud/wadm:latest
     environment:
-      - WADM_NATS_HOST=nats
-      - WADM_REDIS_HOST=redis
+      - WADM_NATS_SERVER=nats
