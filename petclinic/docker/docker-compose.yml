@@ -84,17 +84,18 @@ services:
       - 55681:55681 # otlp http  
 
   wasmcloud:
-    image: wasmcloud/wasmcloud_host:0.56.0
+    image: wasmcloud/wasmcloud_host:latest
     depends_on: 
       - nats
     environment:
       LC_ALL: en_US.UTF-8
-      RUST_LOG: debug,hyper=info
-      WASMCLOUD_OCI_ALLOWED_INSECURE: registry:5000
+      RUST_LOG: debug,hyper=info,async_nats=info,oci_distribution=info,cranelift_codegen=warn
+      WASMCLOUD_LOG_LEVEL: debug
       WASMCLOUD_RPC_HOST: nats
       WASMCLOUD_CTL_HOST: nats
       WASMCLOUD_PROV_RPC_HOST: nats
       WASMCLOUD_CLUSTER_SEED: ${WASMCLOUD_CLUSTER_SEED}
+      WASMCLOUD_OCI_ALLOWED_INSECURE: registry:5000
       OTEL_TRACES_EXPORTER: otlp
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:55681
       HOST_app: petclinic

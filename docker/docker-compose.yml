@@ -8,7 +8,7 @@
 version: "4"
 services:
   nats:
-    image: nats:2.8.4-alpine
+    image: nats:2.9.22-alpine
     ports:
       - "4222:4222"
       - "6222:6222"
@@ -49,23 +49,23 @@ services:
       - "redis"
       - "grafana"
       - "tempo"
-    image: wasmcloud/wasmcloud_host:latest
+    image: wasmcloud/wasmcloud:latest
     environment:
-      RUST_LOG: debug,hyper=info
+      RUST_LOG: debug,hyper=info,async_nats=info,oci_distribution=info,cranelift_codegen=warn
+      WASMCLOUD_LOG_LEVEL: debug
       WASMCLOUD_RPC_HOST: nats
       WASMCLOUD_CTL_HOST: nats
       WASMCLOUD_PROV_RPC_HOST: nats
+      WASMCLOUD_OCI_ALLOWED_INSECURE: registry:5000
       OTEL_TRACES_EXPORTER: otlp
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:55681
     ports:
-      - "4000:4000"
       - "8080-8089:8080-8089" # Allows exposing examples on ports 8080-8089
 
   wadm:
     depends_on:
       - "nats"
       - "redis"
-    image: wasmcloud.azurecr.io/wadm:0.1.0
+    image: ghcr.io/wasmcloud/wadm:latest
     environment:
-      - WADM_NATS_HOST=nats
-      - WADM_REDIS_HOST=redis
+      - WADM_NATS_SERVER=nats
