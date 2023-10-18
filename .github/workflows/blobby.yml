@@ -22,7 +22,7 @@ jobs:
   rust_check:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       # If your integration tests require nats or redis, run them here
       - name: Add wasm32-unknown-unknown
         run: rustup target add wasm32-unknown-unknown
@@ -37,7 +37,7 @@ jobs:
     needs: rust_check
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: wasmcloud/common-actions/install-wash@main
 
       - name: Add wasm32-unknown-unknown
@@ -59,7 +59,7 @@ jobs:
       WASH_ISSUER_KEY: ${{ secrets.WASMCLOUD_ACCOUNT_OFFICIAL }}
       WASH_SUBJECT_KEY: ${{ secrets.WASMCLOUD_BLOBBY }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: wasmcloud/common-actions/install-wash@main
 
       - name: Add wasm32-unknown-unknown
@@ -70,7 +70,7 @@ jobs:
         working-directory: ${{ env.working-directory }}
 
       - name: Upload signed actor to GH Actions
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: wasmcloud-actor
           path: ${{ env.working-directory }}/build/*_s.wasm
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Download signed actor
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: wasmcloud-actor
           path: ${{ env.working-directory }}/build
@@ -99,9 +99,9 @@ jobs:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Download signed actor
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: wasmcloud-actor
           path: ${{ env.working-directory }}/build

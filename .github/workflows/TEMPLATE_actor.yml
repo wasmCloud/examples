@@ -24,7 +24,7 @@ jobs:
   rust_check:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     # If your integration tests require nats or redis, run them here
     - name: Add wasm32-unknown-unknown
       run: rustup target add wasm32-unknown-unknown
@@ -40,7 +40,7 @@ jobs:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: wasmcloud/common-actions/install-wash@main
 
       - name: Add wasm32-unknown-unknown
@@ -80,7 +80,7 @@ jobs:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Download signed actor
         uses: actions/download-artifact@v2
         with:
