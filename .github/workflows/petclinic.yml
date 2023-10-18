@@ -20,7 +20,7 @@ jobs:
   interface_build_check:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - id: rust-check-action
         uses: wasmcloud/common-actions/rust-check@main
         with:
@@ -49,7 +49,7 @@ jobs:
           - working-directory: petclinic/actors/ui
             artifact-name: ui
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: wasmcloud/common-actions/install-wash@main
 
       - name: Add wasm32-unknown-unknown
@@ -88,7 +88,7 @@ jobs:
 
       - name: Upload signed actor to GH Actions
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.working-directory }}/build/*.wasm
@@ -103,7 +103,7 @@ jobs:
         artifact-name: [clinicapi, customers, vets, visits, ui]
     steps:
       - name: Download signed actor
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: build
@@ -141,9 +141,9 @@ jobs:
           - working-directory: petclinic/actors/ui
             artifact-name: ui
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Download signed actor
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.working-directory}}/build
