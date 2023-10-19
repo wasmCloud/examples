@@ -18,10 +18,24 @@ fmt:
     {{cargo}} fmt
 
 # Build the WASM components using wasmcloud tooling (wash)
+#
+# NOTE: right now only wash version 0.20.2 works with this demo,
+# due to upstream (wasmtime, etc) changes that modified the
+# adapter and other ecosystem projects.
 build:
-    @echo "[warning] ensure you're using a version of wash newer than v0.20.0"
-    @echo "[warning] update your PATH or set the WASH environment variable to change the version of wash used"
-    @{{wash}} build
+    #!/bin/env -S bash -euo pipefail
+    if [ "wash 0.20.2" != "$({{wash}} --version)" ]; then \
+      echo "";
+      echo "🛑  [error] Only wash version 0.20.2 is currently supported for this demo.";
+      echo "";
+      echo "You can install wash version 0.20.2 with the rust toolchain:";
+      echo "";
+      echo "cargo install --version=0.20.2";
+      echo "";
+      exit -1;
+    fi
+    echo "[info] update your PATH or set the WASH environment variable to change the version of wash used"
+    {{wash}} build
 
 # Build the project, continuously
 build-watch:
