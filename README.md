@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> The examples in this repository are WebAssembly _modules_ which consume interfaces defined in Smithy and communicate with providers over the [stable ABI](https://wasmcloud.com/docs/hosts/abis/wasmbus/). Actors built as WebAssembly _components_ consume interfaces defined using [WIT](https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md). Examples of actor components can be found in the [wasmCloud repo](https://github.com/wasmCloud/wasmCloud/tree/main/examples). Note that support for WIT is considered **experimental** at this time.
+
 # wasmCloud Examples
 
 Example actors, capability providers, and other demonstrations
