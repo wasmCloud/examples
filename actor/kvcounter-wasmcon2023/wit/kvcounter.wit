@@ -1,8 +1,0 @@
-package wasmcloud:kvcounter
-
-world kvcounter {
-    import wasi:keyvalue/readwrite
-    import wasi:keyvalue/atomic
-
-    export wasi:http/incoming-handler
-}
